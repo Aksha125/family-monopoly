@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classic Family Monopoly - Live Multiplayer</title>
+  <title>Classic Family Monopoly - Tournament Edition</title>
   
-  <!-- Firebase SDKs (Compat version for zero-build HTML) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <style>
     :root {
-      --board-bg: #d7e8d5;
-      --board-border: #1a2a1a;
-      --tile-bg: #f9fbf8;
-      --tile-border: #2e3d2f;
-      --panel-bg: #1c2826;
+      --board-bg: #dbeed6;
+      --board-border: #132213;
+      --tile-bg: #fbfdfa;
+      --tile-border: #233526;
+      --panel-bg: #121c19;
+      --card-panel: #1a2723;
       --text-light: #f3f6f4;
-      --text-dark: #1e2922;
+      --text-dark: #1b2820;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
@@ -30,36 +31,137 @@
 
     body {
       font-family: var(--font-family);
-      background: #0f1715;
+      background: radial-gradient(circle at center, #182622 0%, #0a100e 100%);
       color: var(--text-light);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 12px;
+      padding: 8px;
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* Lobby Overlay */
+    .screen-shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .floating-emoji {
+      position: fixed;
+      bottom: 20px;
+      font-size: 2.4rem;
+      pointer-events: none;
+      z-index: 1200;
+      animation: floatUp 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; }
+      15% { opacity: 1; transform: translateY(-40px) scale(1.2); }
+      80% { opacity: 1; }
+      100% { transform: translateY(-450px) scale(0.9); opacity: 0; }
+    }
+
+    /* Event Notification Toast */
+    #event-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1c2b27;
+      border: 2px solid #ffd15c;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.85);
+      border-radius: 40px;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1100;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #event-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    #event-toast.toast-celebrate {
+      border-color: #ffd15c;
+      background: linear-gradient(135deg, #1c2b27, #243d35);
+      color: #ffd15c;
+    }
+
+    #event-toast.toast-dread {
+      border-color: #ef4444;
+      background: linear-gradient(135deg, #241416, #3b171a);
+      color: #fca5a5;
+    }
+
+    .toast-icon { font-size: 1.8rem; }
+    .toast-title { font-weight: 900; font-size: 1.05rem; }
+    .toast-subtitle { font-size: 0.8rem; color: #e5e7eb; }
+
+    /* Synced Pause Overlay */
+    .pause-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 14, 12, 0.92);
+      backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1500;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .pause-overlay.active { display: flex; }
+
+    .pause-title {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #ffd15c;
+      letter-spacing: 2px;
+    }
+
+    /* Multiplayer Lobby */
     .lobby-overlay {
       position: fixed;
       inset: 0;
-      background: #0f1715;
+      background: rgba(10, 16, 14, 0.95);
+      backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 200;
+      z-index: 500;
       padding: 16px;
     }
 
     .lobby-card {
-      background: #1c2826;
-      border: 1px solid #334440;
-      border-radius: 12px;
-      padding: 28px;
+      background: #1c2b27;
+      border: 1px solid #364e47;
+      border-radius: 16px;
+      padding: 32px 28px;
       max-width: 440px;
       width: 100%;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -67,51 +169,51 @@
     }
 
     .lobby-card h1 {
-      font-size: 1.8rem;
+      font-size: 2rem;
+      font-weight: 900;
       color: #ffd15c;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
     .lobby-input {
       width: 100%;
-      padding: 12px;
-      background: #151e1c;
-      border: 1px solid #334440;
-      border-radius: 6px;
+      padding: 12px 14px;
+      background: #131c19;
+      border: 1.5px solid #334a43;
+      border-radius: 8px;
       color: #fff;
       font-size: 1rem;
       text-align: center;
       outline: none;
     }
+    .lobby-input:focus { border-color: #ffd15c; }
+    .lobby-btn-row { display: flex; gap: 10px; }
 
-    .lobby-btn-row {
-      display: flex;
-      gap: 10px;
-    }
-
+    /* Layout */
     .game-wrapper {
       display: flex;
       flex-direction: row;
-      gap: 16px;
-      max-width: 1540px;
+      gap: 14px;
+      max-width: 1640px;
       width: 100%;
-      height: 94vh;
+      height: 96vh;
       align-items: stretch;
     }
 
     /* Left Control Panel */
     .side-panel {
-      flex: 1.1;
+      flex: 1;
       min-width: 330px;
-      max-width: 400px;
+      max-width: 380px;
       background: var(--panel-bg);
-      border-radius: 12px;
-      border: 1px solid #2f3e3a;
-      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #283a35;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      gap: 10px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
       overflow: hidden;
     }
 
@@ -119,49 +221,65 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #334440;
-      padding-bottom: 8px;
+      border-bottom: 1px solid #2a3d37;
+      padding-bottom: 6px;
     }
 
     .panel-header h1 {
-      font-size: 1.2rem;
-      font-weight: 800;
+      font-size: 1.25rem;
+      font-weight: 900;
       color: #ffd15c;
-      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .room-badge {
-      font-size: 0.75rem;
-      background: #2a3a36;
+    .header-btns {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .btn-header {
+      background: #243631;
+      border: 1px solid #37534c;
+      color: #6ee7b7;
+      font-size: 0.72rem;
+      font-weight: 700;
       padding: 4px 8px;
       border-radius: 6px;
-      color: #6ee7b7;
-      font-weight: bold;
       cursor: pointer;
+      transition: all 0.15s;
     }
+    .btn-header:hover { background: #2f4740; }
 
     .players-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       overflow-y: auto;
-      max-height: 250px;
+      max-height: 170px;
       padding-right: 4px;
     }
 
     .player-card {
-      background: #253330;
+      background: #192622;
       border-radius: 8px;
       padding: 8px 10px;
       border: 2px solid transparent;
       display: flex;
       flex-direction: column;
       gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
     .player-card.active {
       border-color: #ffd15c;
-      background: #2d3f3b;
+      background: #243731;
+      box-shadow: 0 0 12px rgba(255, 209, 92, 0.2);
+    }
+
+    .player-card.selected-view {
+      border-left: 4px solid #6ee7b7;
     }
 
     .player-identity {
@@ -173,47 +291,34 @@
     }
 
     .player-avatar {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      border: 1.5px solid #fff;
+      border: 2px solid #fff;
     }
 
     .player-balance {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       color: #6ee7b7;
+      font-family: monospace;
     }
 
-    .prop-pill-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-      margin-top: 3px;
-    }
-
-    .prop-pill {
-      font-size: 0.6rem;
-      font-weight: bold;
-      padding: 2px 5px;
-      border-radius: 3px;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-    }
-    .prop-pill.mortgaged { opacity: 0.45; text-decoration: line-through; }
-
-    /* Console */
+    /* Console & 3D Dice */
     .console-panel {
-      background: #172220;
-      border-radius: 8px;
+      background: #0d1513;
+      border-radius: 12px;
       padding: 10px;
-      border: 1px solid #2e3e3b;
+      border: 1px solid #20312c;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      align-items: center;
+      position: relative;
     }
 
     .turn-status-banner {
+      width: 100%;
       font-size: 0.8rem;
       font-weight: 700;
       color: #ffd15c;
@@ -223,31 +328,102 @@
       border-radius: 6px;
     }
 
-    .dice-row {
+    /* 30-Second Turn Timer Progress Bar */
+    .timer-container {
+      width: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #ffd15c;
     }
 
-    .die-face {
-      width: 40px;
-      height: 40px;
-      background: #ffffff;
-      color: #111;
-      font-size: 1.3rem;
-      font-weight: 900;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #ccc;
+    .timer-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: #1f2e29;
+      border-radius: 3px;
+      overflow: hidden;
     }
+
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: #ffd15c;
+      transition: width 1s linear, background 0.3s;
+    }
+    .timer-bar-fill.warning { background: #ef4444; }
+
+    .dice-stage {
+      display: flex;
+      gap: 16px;
+      padding: 4px 0;
+      perspective: 600px;
+    }
+
+    .die-cube {
+      width: 48px;
+      height: 48px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(-18deg) rotateY(24deg);
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+    }
+
+    .die-cube.rolling {
+      animation: spinDice 0.65s linear infinite;
+    }
+
+    @keyframes spinDice {
+      0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+      50%  { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+      100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+    }
+
+    .die-face-cube {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ebebeb 80%, #d4d4d4 100%);
+      border: 1.5px solid #bcbcbc;
+      border-radius: 8px;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.35);
+      display: grid;
+      padding: 5px;
+    }
+
+    .pip {
+      width: 8px;
+      height: 8px;
+      background: #18191a;
+      border-radius: 50%;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.4);
+      align-self: center;
+      justify-self: center;
+    }
+
+    .die-1 { grid-template: 1fr / 1fr; }
+    .die-2 { grid-template: 1fr 1fr / 1fr 1fr; }
+    .die-2 .pip:nth-child(2) { grid-column: 2; grid-row: 2; }
+    .die-3 { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+    .die-3 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+    .die-3 .pip:nth-child(2) { grid-column: 2; grid-row: 2; }
+    .die-3 .pip:nth-child(3) { grid-column: 3; grid-row: 3; }
+    .die-4 { grid-template: 1fr 1fr / 1fr 1fr; }
+    .die-5 { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+    .die-5 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+    .die-5 .pip:nth-child(2) { grid-column: 3; grid-row: 1; }
+    .die-5 .pip:nth-child(3) { grid-column: 2; grid-row: 2; }
+    .die-5 .pip:nth-child(4) { grid-column: 1; grid-row: 3; }
+    .die-5 .pip:nth-child(5) { grid-column: 3; grid-row: 3; }
+    .die-6 { grid-template: 1fr 1fr 1fr / 1fr 1fr; }
 
     .controls-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
+      width: 100%;
     }
 
     button.btn-action {
@@ -260,40 +436,127 @@
       cursor: pointer;
       font-size: 0.8rem;
       transition: all 0.15s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+    button.btn-action:hover:not(:disabled) { background: #349b73; transform: translateY(-1px); }
+    button.btn-action:disabled { background: #202c28; color: #526661; cursor: not-allowed; box-shadow: none; transform: none; }
+    button.btn-secondary { background: #364843; }
+    button.btn-warning { background: #d97706; }
+    button.btn-danger { background: #ad2d30; }
+
+    /* Tabbed Activity Feed & Live Chat */
+    .feed-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0d1513;
+      border-radius: 8px;
+      border: 1px solid #1c2b26;
+      overflow: hidden;
+      min-height: 170px;
     }
 
-    button.btn-action:hover:not(:disabled) { background: #349b73; }
-    button.btn-action:disabled { background: #334440; color: #6b7f7a; cursor: not-allowed; }
-    button.btn-secondary { background: #3a4c48; }
-    button.btn-danger { background: #b53335; }
+    .feed-tabs {
+      display: flex;
+      background: #141f1c;
+      border-bottom: 1px solid #20312c;
+    }
 
-    /* Activity Feed */
-    .activity-log {
+    .feed-tab {
       flex: 1;
-      background: #151e1c;
-      border-radius: 8px;
-      padding: 8px;
+      padding: 7px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      color: #8fa9a3;
+      transition: all 0.15s;
+    }
+    .feed-tab.active {
+      background: #0d1513;
+      color: #ffd15c;
+      border-bottom: 2px solid #ffd15c;
+    }
+
+    .tab-content {
+      flex: 1;
+      padding: 8px 10px;
+      overflow-y: auto;
       font-family: monospace;
       font-size: 0.72rem;
-      color: #b9ccc7;
-      overflow-y: auto;
-      border: 1px solid #23312e;
+      color: #a7c2bc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .log-entry { line-height: 1.3; margin-bottom: 4px; }
+    .chat-bubble { line-height: 1.3; margin-bottom: 3px; word-break: break-word; }
+    .chat-author { font-weight: 800; margin-right: 4px; }
 
-    /* Board Container */
+    .chat-dock {
+      border-top: 1px solid #20312c;
+      background: #141f1c;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .emoji-tray {
+      display: flex;
+      justify-content: space-around;
+      gap: 2px;
+    }
+
+    .emoji-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: transform 0.15s;
+      border-radius: 4px;
+      padding: 2px 4px;
+    }
+    .emoji-btn:hover { transform: scale(1.3); background: rgba(255,255,255,0.08); }
+
+    .chat-input-row { display: flex; gap: 6px; }
+
+    .chat-text-input {
+      flex: 1;
+      background: #090e0c;
+      border: 1px solid #293f38;
+      border-radius: 4px;
+      padding: 5px 8px;
+      color: #fff;
+      font-size: 0.75rem;
+      outline: none;
+    }
+    .chat-text-input:focus { border-color: #ffd15c; }
+
+    .chat-send-btn {
+      background: #2a7c5c;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Center Board */
     .board-container {
       flex: 2;
       aspect-ratio: 1 / 1;
-      max-height: 94vh;
+      max-height: 96vh;
       background: var(--board-bg);
-      border: 3px solid var(--board-border);
+      border: 4px solid var(--board-border);
       border-radius: 8px;
       display: grid;
       grid-template-columns: 13.5% repeat(9, 8.11%) 13.5%;
       grid-template-rows: 13.5% repeat(9, 8.11%) 13.5%;
       position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
     }
 
     .tile {
@@ -306,9 +569,11 @@
       cursor: pointer;
       color: var(--text-dark);
       font-size: 0.65rem;
+      transition: filter 0.15s;
     }
+    .tile:hover { filter: brightness(0.95); z-index: 5; }
 
-    /* Grid positions for 40 tiles */
+    /* Positions for 40 tiles */
     .tile-pos-0  { grid-column: 11; grid-row: 11; }
     .tile-pos-1  { grid-column: 10; grid-row: 11; }
     .tile-pos-2  { grid-column: 9;  grid-row: 11; }
@@ -350,10 +615,10 @@
     .tile-pos-38 { grid-column: 11; grid-row: 9; }
     .tile-pos-39 { grid-column: 11; grid-row: 10; }
 
-    .tile-bar { height: 20%; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.3); }
-    .tile-bottom .tile-bar { order: 1; border-bottom: 0; border-top: 1px solid rgba(0,0,0,0.3); }
-    .tile-left .tile-bar { width: 22%; height: 100%; position: absolute; right: 0; top: 0; border-bottom: 0; border-left: 1px solid rgba(0,0,0,0.3); }
-    .tile-right .tile-bar { width: 22%; height: 100%; position: absolute; left: 0; top: 0; border-bottom: 0; border-right: 1px solid rgba(0,0,0,0.3); }
+    .tile-bar { height: 21%; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.4); }
+    .tile-bottom .tile-bar { order: 1; border-bottom: 0; border-top: 1px solid rgba(0,0,0,0.4); }
+    .tile-left .tile-bar { width: 22%; height: 100%; position: absolute; right: 0; top: 0; border-left: 1px solid rgba(0,0,0,0.4); }
+    .tile-right .tile-bar { width: 22%; height: 100%; position: absolute; left: 0; top: 0; border-right: 1px solid rgba(0,0,0,0.4); }
 
     .tile-content {
       flex: 1;
@@ -361,15 +626,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 2px;
+      padding: 3px 2px;
       text-align: center;
-      font-size: 0.58rem;
+      font-size: 0.56rem;
       font-weight: 700;
     }
 
+    .tile-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+    .tile-icon svg { width: 100%; height: 100%; }
+
     .houses-display {
       display: flex;
-      gap: 1px;
+      gap: 1.5px;
       justify-content: center;
       position: absolute;
       width: 100%;
@@ -377,13 +645,13 @@
       left: 0;
       z-index: 2;
     }
-    .house-dot { width: 6px; height: 6px; background: #10944b; border-radius: 1px; }
-    .hotel-dot { width: 14px; height: 6px; background: #c81d25; border-radius: 1px; }
+    .house-dot { width: 6px; height: 6px; background: #138f49; border-radius: 1px; border: 0.5px solid #084924; }
+    .hotel-dot { width: 14px; height: 6px; background: #d02028; border-radius: 1px; border: 0.5px solid #630e12; }
 
     .mortgage-stripe {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(45deg, rgba(200,30,30,0.35), rgba(200,30,30,0.35) 5px, transparent 5px, transparent 10px);
+      background: repeating-linear-gradient(45deg, rgba(200,30,30,0.4), rgba(200,30,30,0.4) 6px, transparent 6px, transparent 12px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -407,33 +675,41 @@
     }
 
     .board-token {
-      width: 11px;
-      height: 11px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       border: 1.5px solid #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .board-center {
       grid-column: 2 / span 9;
       grid-row: 2 / span 9;
-      background: #d7e8d5;
+      background: radial-gradient(circle at center, #e3f2df 0%, #d4e8cf 100%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       padding: 20px;
+      position: relative;
     }
 
-    .brand-title {
-      font-size: 2.8rem;
-      font-weight: 900;
-      letter-spacing: 3px;
-      color: #d9383a;
+    .brand-title-box {
+      background: #cf1c24;
+      border: 3.5px solid #ffffff;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
       transform: rotate(-10deg);
-      border: 4px solid #d9383a;
-      padding: 4px 18px;
-      background: #fbfbfb;
-      margin-top: 15%;
+      padding: 6px 26px;
+      margin-top: 14%;
+    }
+    .brand-title {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #ffffff;
+      text-shadow: 2px 2px 0px #1a2a1a;
+      line-height: 1;
     }
 
     .deck-slots {
@@ -443,30 +719,177 @@
       margin-bottom: 8%;
     }
 
-    .card-deck {
-      width: 100px;
-      height: 65px;
+    .card-deck-stack {
+      width: 110px;
+      height: 72px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .card-deck-stack:hover { transform: translateY(-2px); }
+
+    .stack-layer {
+      position: absolute;
+      inset: 0;
       border-radius: 6px;
-      border: 2px dashed #405748;
+      border: 1px solid rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    }
+    .stack-layer-1 { top: 4px; left: 4px; background: #c2d6ce; z-index: 1; }
+    .stack-layer-2 { top: 2px; left: 2px; background: #d7e8e2; z-index: 2; }
+    .stack-layer-top {
+      top: 0; left: 0; z-index: 3;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 800;
-      color: #34473b;
-      background: rgba(255,255,255,0.25);
+      border: 2px solid #233c2e;
+    }
+    .chance-stack .stack-layer-top { background: #ffe4e6; color: #9f1239; }
+    .community-stack .stack-layer-top { background: #e0f2fe; color: #0369a1; }
+
+    /* Right Player Portfolio */
+    .portfolio-panel {
+      flex: 1.15;
+      min-width: 350px;
+      max-width: 420px;
+      background: var(--panel-bg);
+      border-radius: 14px;
+      border: 1px solid #283a35;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      overflow: hidden;
     }
 
-    /* Modals */
+    .portfolio-header {
+      border-bottom: 1px solid #2a3d37;
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .portfolio-header h2 { font-size: 1.05rem; color: #ffd15c; font-weight: 800; }
+
+    .cash-tray {
+      background: #0d1513;
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid #20312c;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cash-tray-title { font-size: 0.7rem; font-weight: 700; color: #9cb5af; text-transform: uppercase; }
+    .bill-rack { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
+    .bill-card {
+      min-width: 44px;
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #111;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .bill-500 { background: #fde047; }
+    .bill-100 { background: #bae6fd; }
+    .bill-50  { background: #fed7aa; }
+    .bill-20  { background: #bbf7d0; }
+    .bill-10  { background: #fef08a; }
+    .bill-5   { background: #fbcfe8; }
+    .bill-1   { background: #ffffff; }
+
+    .special-cards-container { display: flex; gap: 8px; }
+    .jail-free-card {
+      background: #fffbeb;
+      border: 1.5px solid #d97706;
+      color: #92400e;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .deeds-scroll-container {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .deed-card {
+      background: #ffffff;
+      color: #111111;
+      border: 1.5px solid #111;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      font-size: 0.65rem;
+      line-height: 1.25;
+      position: relative;
+      transition: transform 0.15s;
+    }
+    .deed-card:hover { transform: translateY(-2px); }
+    .deed-card.mortgaged-deed { filter: grayscale(0.8); opacity: 0.7; }
+    .deed-header {
+      padding: 5px 4px;
+      text-align: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid #111;
+    }
+    .deed-sub { font-size: 0.55rem; font-weight: 600; display: block; opacity: 0.9; }
+
+    .deed-body {
+      padding: 6px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      justify-content: space-between;
+    }
+    .deed-row { display: flex; justify-content: space-between; border-bottom: 0.5px solid #eee; padding-bottom: 1px; }
+    .deed-row.bold { font-weight: 800; }
+    .deed-divider { border: 0; border-top: 1px solid #111; margin: 3px 0; }
+    .deed-actions-row { display: flex; gap: 4px; margin-top: 4px; }
+    .deed-btn {
+      flex: 1;
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 3px 0;
+      border-radius: 4px;
+      border: 1px solid #888;
+      background: #f1f4f2;
+      cursor: pointer;
+    }
+
+    /* Generic Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.8);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      z-index: 1200;
       padding: 16px;
     }
     .modal-overlay.active { display: flex; }
@@ -475,63 +898,74 @@
       background: #fff;
       color: #111;
       width: 100%;
-      max-width: 400px;
-      border-radius: 10px;
+      max-width: 520px;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 16px 45px rgba(0,0,0,0.6);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .modal-header {
-      padding: 12px;
+      padding: 14px;
       text-align: center;
       font-weight: 800;
-      background: #eee;
+      font-size: 1.1rem;
+      background: #f1f1f1;
+      border-bottom: 2px solid #ddd;
     }
-    .modal-body { padding: 14px; font-size: 0.85rem; }
-    .modal-footer { padding: 10px 14px; background: #fafafa; display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-body { padding: 16px; font-size: 0.88rem; line-height: 1.45; overflow-y: auto; flex: 1; }
+    .modal-footer { padding: 12px 16px; background: #f8f8f8; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #ddd; }
+
+    /* Rule Book Layout */
+    .rule-section { margin-bottom: 16px; }
+    .rule-title { font-weight: 800; font-size: 0.95rem; color: #1c2b27; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .rule-text { font-size: 0.82rem; color: #374151; line-height: 1.4; }
 
     /* Colors */
-    .color-brown { background: #8b4513; }
-    .color-lightblue { background: #87ceeb; }
-    .color-pink { background: #d81b60; }
-    .color-orange { background: #f57c00; }
-    .color-red { background: #d32f2f; }
-    .color-yellow { background: #fbc02d; }
-    .color-green { background: #388e3c; }
-    .color-darkblue { background: #1976d2; }
+    .color-brown { background: #7a3d1d; }
+    .color-lightblue { background: #89cff0; color: #111 !important; }
+    .color-pink { background: #d94b80; }
+    .color-orange { background: #f28500; }
+    .color-red { background: #d72638; }
+    .color-yellow { background: #fecb00; color: #111 !important; }
+    .color-green { background: #2e8b57; }
+    .color-darkblue { background: #185adb; }
     .color-railroad { background: #37474f; }
-    .color-utility { background: #78909c; }
-
-    .mgmt-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 8px;
-      background: #f1f4f2;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      margin-bottom: 6px;
-    }
-    .mgmt-sm-btn {
-      padding: 3px 6px;
-      font-size: 0.7rem;
-      border: 1px solid #aaa;
-      background: #fff;
-      cursor: pointer;
-      font-weight: 700;
-    }
+    .color-utility { background: #607d8b; }
   </style>
 </head>
 <body>
+
+  <!-- Confetti Canvas -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- Big Event Toast Banner -->
+  <div id="event-toast">
+    <span class="toast-icon" id="toast-icon">🎉</span>
+    <div>
+      <div class="toast-title" id="toast-title">Title</div>
+      <div class="toast-subtitle" id="toast-subtitle">Subtitle</div>
+    </div>
+  </div>
+
+  <!-- Synced Pause Screen Overlay -->
+  <div class="pause-overlay" id="pause-screen">
+    <div class="pause-title">⏸️ GAME PAUSED</div>
+    <div style="font-size: 1.1rem; color: #9cb5af;" id="pause-by-label">Player taking a quick break...</div>
+    <button class="btn-action" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleGamePause(false)">▶️ Resume Game</button>
+  </div>
 
   <!-- Multiplayer Lobby Screen -->
   <div class="lobby-overlay" id="lobby-screen">
     <div class="lobby-card">
       <h1>Monopoly Online</h1>
-      <p style="font-size: 0.85rem; color: #a4bfb9;">Play in real-time with family and friends.</p>
+      <p style="font-size: 0.85rem; color: #a4bfb9;">Authentic rules, interactive rule book & turn timers.</p>
 
       <input type="text" id="player-name-input" class="lobby-input" placeholder="Enter Your Nickname" maxlength="14">
       
-      <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
         <button class="btn-action" onclick="createRoom()">Host New Game</button>
         <div style="font-size: 0.75rem; color: #7b8f8a;">— OR JOIN EXISTING —</div>
         <div class="lobby-btn-row">
@@ -542,53 +976,128 @@
     </div>
   </div>
 
-  <div class="game-wrapper">
-    <!-- Side Dashboard -->
+  <div class="game-wrapper" id="main-viewport">
+    <!-- 1. Left Control Panel -->
     <div class="side-panel">
       <div class="panel-header">
         <h1>Monopoly</h1>
-        <span class="room-badge" id="room-display" onclick="copyShareLink()" title="Click to copy invite link">Room: ----</span>
+        <div class="header-btns">
+          <button class="btn-header" onclick="openRuleBookModal()" title="View Official Rules">📖 Rules</button>
+          <button class="btn-header" id="btn-pause-toggle" onclick="toggleGamePause(true)" title="Pause Game">⏸️</button>
+          <span class="btn-header" id="room-display" onclick="copyShareLink()" title="Click to copy invite link">Room: ----</span>
+        </div>
       </div>
 
       <!-- Players List -->
       <div class="players-list" id="players-ledger"></div>
 
-      <!-- Action Panel -->
+      <!-- Console, Timer & 3D Dice -->
       <div class="console-panel">
         <div class="turn-status-banner" id="status-message">Connecting to room...</div>
 
-        <div class="dice-row">
-          <div class="die-face" id="die-1">?</div>
-          <div class="die-face" id="die-2">?</div>
+        <!-- 30-Second Turn Countdown Timer -->
+        <div class="timer-container">
+          <span>⏳</span>
+          <div class="timer-bar-bg">
+            <div class="timer-bar-fill" id="turn-timer-fill"></div>
+          </div>
+          <span id="turn-timer-text">30s</span>
+        </div>
+
+        <div class="dice-stage">
+          <div class="die-cube" id="die-cube-1">
+            <div class="die-face-cube die-1" id="die-face-1"><div class="pip"></div></div>
+          </div>
+          <div class="die-cube" id="die-cube-2">
+            <div class="die-face-cube die-1" id="die-face-2"><div class="pip"></div></div>
+          </div>
         </div>
 
         <div class="controls-grid">
           <button class="btn-action" id="btn-roll" onclick="rollDice()" disabled>Roll Dice</button>
           <button class="btn-action btn-secondary" id="btn-end-turn" onclick="endTurn()" disabled>End Turn</button>
-          <button class="btn-action btn-secondary" id="btn-manage" onclick="openPropertyManager()">Estates</button>
           <button class="btn-action btn-danger" id="btn-bankrupt" onclick="declareBankruptcy()">Bankrupt</button>
         </div>
       </div>
 
-      <!-- Live Activity Feed -->
-      <div class="activity-log" id="game-feed"></div>
-    </div>
+      <!-- Tabbed Activity Feed & Live Chat Room -->
+      <div class="feed-container">
+        <div class="feed-tabs">
+          <div class="feed-tab active" id="tab-log" onclick="switchFeedTab('log')">📋 Game Feed</div>
+          <div class="feed-tab" id="tab-chat" onclick="switchFeedTab('chat')">💬 Live Chat</div>
+        </div>
 
-    <!-- 11x11 Board -->
-    <div class="board-container" id="board">
-      <div class="board-center">
-        <div class="brand-title">MONOPOLY</div>
-        <div class="deck-slots">
-          <div class="card-deck">
-            <span>Chance</span>
-            <span style="font-size: 1.2rem;">❓</span>
+        <div class="tab-content" id="game-feed"></div>
+        <div class="tab-content" id="chat-feed" style="display: none;"></div>
+
+        <div class="chat-dock">
+          <div class="emoji-tray">
+            <button class="emoji-btn" onclick="sendReaction('🔥')">🔥</button>
+            <button class="emoji-btn" onclick="sendReaction('😂')">😂</button>
+            <button class="emoji-btn" onclick="sendReaction('😭')">😭</button>
+            <button class="emoji-btn" onclick="sendReaction('💀')">💀</button>
+            <button class="emoji-btn" onclick="sendReaction('🤑')">🤑</button>
+            <button class="emoji-btn" onclick="sendReaction('👏')">👏</button>
+            <button class="emoji-btn" onclick="sendReaction('🎲')">🎲</button>
+            <button class="emoji-btn" onclick="sendReaction('👑')">👑</button>
           </div>
-          <div class="card-deck">
-            <span>Community</span>
-            <span style="font-size: 1.2rem;">📦</span>
+          <div class="chat-input-row">
+            <input type="text" id="chat-input" class="chat-text-input" placeholder="Type a message..." maxlength="80" onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 2. Center 11x11 Board -->
+    <div class="board-container" id="board">
+      <div class="board-center">
+        <div class="brand-title-box">
+          <div class="brand-title">MONOPOLY</div>
+        </div>
+
+        <!-- 3D Card Stacks (Chance & Community Chest) -->
+        <div class="deck-slots">
+          <div class="card-deck-stack chance-stack" onclick="inspectDeck('chance')">
+            <div class="stack-layer stack-layer-1"></div>
+            <div class="stack-layer stack-layer-2"></div>
+            <div class="stack-layer stack-layer-top">
+              <span>CHANCE</span>
+              <span style="font-size: 1.3rem;">❓</span>
+            </div>
+          </div>
+
+          <div class="card-deck-stack community-stack" onclick="inspectDeck('community')">
+            <div class="stack-layer stack-layer-1"></div>
+            <div class="stack-layer stack-layer-2"></div>
+            <div class="stack-layer stack-layer-top">
+              <span>COMMUNITY</span>
+              <span style="font-size: 1.3rem;">📦</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Right Player Portfolio -->
+    <div class="portfolio-panel">
+      <div class="portfolio-header">
+        <h2 id="portfolio-title">Your Portfolio</h2>
+        <span id="portfolio-owner-badge" style="font-size:0.75rem; color:#8fa9a3;">Viewing: You</span>
+      </div>
+
+      <!-- Banknotes Denomination Tray -->
+      <div class="cash-tray">
+        <div class="cash-tray-title">Cash Denominations Stack</div>
+        <div class="bill-rack" id="bill-rack-display"></div>
+      </div>
+
+      <!-- Special Items (Get Out of Jail Card) -->
+      <div class="special-cards-container" id="special-cards-tray"></div>
+
+      <!-- Physical Deeds Fan Binder -->
+      <div style="font-size: 0.72rem; font-weight: 700; color: #9cb5af; text-transform: uppercase;">Title Deed Cards (<span id="deed-count">0</span>)</div>
+      <div class="deeds-scroll-container" id="deeds-tray"></div>
     </div>
   </div>
 
@@ -603,7 +1112,164 @@
 
   <script>
     /* ==========================================================================
-       1. FIREBASE INITIALIZATION & ROOM ARCHITECTURE
+       1. AUDIO SYNTHESIZER
+       ========================================================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    const SFX = {
+      fanfare: () => {
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => playTone(freq, 'triangle', 0.22, 0.15), idx * 75);
+        });
+      },
+      cashIn: () => {
+        playTone(587.33, 'triangle', 0.12, 0.12);
+        setTimeout(() => playTone(880.00, 'triangle', 0.2, 0.14), 90);
+      },
+      birthdaySong: () => {
+        const tune = [261.6, 261.6, 293.7, 261.6, 349.2, 329.6];
+        tune.forEach((freq, idx) => {
+          setTimeout(() => playTone(freq, 'sine', 0.2, 0.12), idx * 120);
+        });
+      },
+      rollDice: () => {
+        playTone(200, 'square', 0.05, 0.08);
+        setTimeout(() => playTone(240, 'square', 0.05, 0.08), 60);
+      },
+      popReaction: () => {
+        playTone(520, 'sine', 0.08, 0.15);
+        setTimeout(() => playTone(840, 'sine', 0.12, 0.12), 40);
+      },
+      jailThud: () => {
+        playTone(180, 'sawtooth', 0.25, 0.2);
+        setTimeout(() => playTone(120, 'sawtooth', 0.35, 0.22), 150);
+        setTimeout(() => playTone(75, 'sawtooth', 0.6, 0.25), 320);
+      },
+      voidSpeedingSiren: () => {
+        playTone(450, 'sawtooth', 0.18, 0.2);
+        setTimeout(() => playTone(300, 'sawtooth', 0.18, 0.2), 160);
+        setTimeout(() => playTone(450, 'sawtooth', 0.18, 0.2), 320);
+        setTimeout(() => playTone(220, 'sawtooth', 0.4, 0.25), 480);
+      },
+      taxFine: () => {
+        playTone(300, 'sawtooth', 0.12, 0.15);
+        setTimeout(() => playTone(220, 'sawtooth', 0.22, 0.18), 100);
+      },
+      mortgageWarning: () => {
+        playTone(210, 'sine', 0.15, 0.12);
+        setTimeout(() => playTone(175, 'sine', 0.25, 0.15), 140);
+      }
+    };
+
+    /* ==========================================================================
+       2. VISUAL FX ENGINE
+       ========================================================================== */
+    const fxCanvas = document.getElementById('fx-canvas');
+    const ctx = fxCanvas.getContext('2d');
+    let confettiParticles = [];
+
+    function resizeCanvas() {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function triggerConfetti(durationMs = 2800) {
+      const colors = ['#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+      for (let i = 0; i < 90; i++) {
+        confettiParticles.push({
+          x: fxCanvas.width * Math.random(),
+          y: -10,
+          w: 8 + Math.random() * 8,
+          h: 4 + Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 4,
+          vy: 3 + Math.random() * 5,
+          rot: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 8
+        });
+      }
+
+      const startTime = Date.now();
+      function loop() {
+        ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+        confettiParticles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.rotSpeed;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+
+          if (p.y > fxCanvas.height + 20) confettiParticles.splice(idx, 1);
+        });
+
+        if (confettiParticles.length > 0 || Date.now() - startTime < durationMs) {
+          requestAnimationFrame(loop);
+        } else {
+          ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function triggerScreenShake() {
+      const vp = document.getElementById('main-viewport');
+      vp.classList.add('screen-shake');
+      setTimeout(() => vp.classList.remove('screen-shake'), 550);
+    }
+
+    function showEventToast(type, icon, title, subtitle) {
+      const toast = document.getElementById('event-toast');
+      toast.className = (type === 'celebrate') ? 'toast-celebrate' : 'toast-dread';
+      document.getElementById('toast-icon').innerText = icon;
+      document.getElementById('toast-title').innerText = title;
+      document.getElementById('toast-subtitle').innerText = subtitle;
+
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    function spawnFloatingEmoji(emoji) {
+      SFX.popReaction();
+      const el = document.createElement('div');
+      el.className = 'floating-emoji';
+      el.innerText = emoji;
+      el.style.left = (window.innerWidth * 0.25 + Math.random() * (window.innerWidth * 0.5)) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2900);
+    }
+
+    function switchFeedTab(tab) {
+      const isLog = (tab === 'log');
+      document.getElementById('tab-log').classList.toggle('active', isLog);
+      document.getElementById('tab-chat').classList.toggle('active', !isLog);
+      document.getElementById('game-feed').style.display = isLog ? 'flex' : 'none';
+      document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
+    }
+
+    /* ==========================================================================
+       3. FIREBASE CONFIG & DATA STRUCTURE
        ========================================================================== */
     const firebaseConfig = {
       apiKey: "AIzaSyCz1C-Msn7vVXmXiwX-dWFXOo2wBRJaxs4",
@@ -620,9 +1286,9 @@
 
     let currentRoomCode = null;
     let localPlayerId = null;
+    let viewingPlayerId = null;
     let roomRef = null;
 
-    // Default Game State Template
     const INITIAL_GAME_STATE = {
       players: {},
       playerOrder: [],
@@ -630,55 +1296,71 @@
       dice: [1, 1],
       consecutiveDoubles: 0,
       hasRolledThisTurn: false,
+      turnStartTime: Date.now(),
+      isPaused: false,
+      pausedBy: "",
       properties: {},
-      logs: ["Game room initialized."]
+      logs: ["Game room initialized."],
+      messages: [],
+      lastReaction: null,
+      lastFx: null
     };
 
     const PLAYER_COLORS = ["#e63946", "#2a9d8f", "#f4a261", "#9b5de5"];
 
-    /* ==========================================================================
-       2. TILE DEFINITIONS & CARDS
-       ========================================================================== */
+    const ICONS = {
+      train: `<svg viewBox="0 0 24 24" fill="#222"><path d="M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-4-4-8-4zm-5 13c-.83 0-1.5-.67-1.5-1.5S6.17 12 7 12s1.5.67 1.5 1.5S7.83 15 7 15zm10 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1-5H6V6h12v4z"/></svg>`,
+      electric: `<svg viewBox="0 0 24 24" fill="#d99b00"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7zm-2 18a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-1h-4v1z"/></svg>`,
+      water: `<svg viewBox="0 0 24 24" fill="#0288d1"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+      chest: `<svg viewBox="0 0 24 24" fill="#0277bd"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>`,
+      chance: `<svg viewBox="0 0 24 24" fill="#c62828"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>`,
+      diamond: `<svg viewBox="0 0 24 24" fill="#1565c0"><path d="M19 3H5L2 9l10 12L22 9l-3-6zM9.62 8l1.5-3h1.76l1.5 3h-4.76z"/></svg>`,
+      ring: `<svg viewBox="0 0 24 24" fill="#e65100"><circle cx="12" cy="14" r="7" fill="none" stroke="#e65100" stroke-width="2.5"/><polygon points="12,3 15,7 9,7" fill="#fbc02d"/></svg>`,
+      jail: `<svg viewBox="0 0 24 24" fill="#37474f"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H9V7h2v10zm6 0h-2V7h2v10z"/></svg>`,
+      police: `<svg viewBox="0 0 24 24" fill="#c62828"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>`,
+      goArrow: `<svg viewBox="0 0 24 24" fill="#c62828"><path d="M4 10v4h10v5l7-7-7-7v5z"/></svg>`
+    };
+
     const TILES = [
-      { id: 0,  name: "GO", type: "go", price: 0 },
-      { id: 1,  name: "Mediterranean Ave", type: "street", color: "brown", price: 60, rent: [2, 10, 30, 90, 160, 250], houseCost: 50 },
-      { id: 2,  name: "Community Chest", type: "community" },
-      { id: 3,  name: "Baltic Avenue", type: "street", color: "brown", price: 60, rent: [4, 20, 60, 180, 320, 450], houseCost: 50 },
-      { id: 4,  name: "Income Tax", type: "tax", amount: 200 },
-      { id: 5,  name: "Reading Railroad", type: "railroad", price: 200 },
-      { id: 6,  name: "Oriental Avenue", type: "street", color: "lightblue", price: 100, rent: [6, 30, 90, 270, 400, 550], houseCost: 50 },
-      { id: 7,  name: "Chance", type: "chance" },
-      { id: 8,  name: "Vermont Avenue", type: "street", color: "lightblue", price: 100, rent: [6, 30, 90, 270, 400, 550], houseCost: 50 },
-      { id: 9,  name: "Connecticut Ave", type: "street", color: "lightblue", price: 120, rent: [8, 40, 100, 300, 450, 600], houseCost: 50 },
-      { id: 10, name: "Jail / Just Visiting", type: "jail" },
-      { id: 11, name: "St. Charles Place", type: "street", color: "pink", price: 140, rent: [10, 50, 150, 450, 625, 750], houseCost: 100 },
-      { id: 12, name: "Electric Company", type: "utility", price: 150 },
-      { id: 13, name: "States Avenue", type: "street", color: "pink", price: 140, rent: [10, 50, 150, 450, 625, 750], houseCost: 100 },
-      { id: 14, name: "Virginia Avenue", type: "street", color: "pink", price: 160, rent: [12, 60, 180, 500, 700, 900], houseCost: 100 },
-      { id: 15, name: "Pennsylvania R.R.", type: "railroad", price: 200 },
-      { id: 16, name: "St. James Place", type: "street", color: "orange", price: 180, rent: [14, 70, 200, 550, 750, 950], houseCost: 100 },
-      { id: 17, name: "Community Chest", type: "community" },
-      { id: 18, name: "Tennessee Avenue", type: "street", color: "orange", price: 180, rent: [14, 70, 200, 550, 750, 950], houseCost: 100 },
-      { id: 19, name: "New York Avenue", type: "street", color: "orange", price: 200, rent: [16, 80, 220, 600, 800, 1000], houseCost: 100 },
+      { id: 0,  name: "GO", type: "go", price: 0, icon: ICONS.goArrow },
+      { id: 1,  name: "Mediterranean", type: "street", color: "brown", price: 60, rent: [2, 10, 30, 90, 160, 250], houseCost: 50 },
+      { id: 2,  name: "Community", type: "community", icon: ICONS.chest },
+      { id: 3,  name: "Baltic Ave", type: "street", color: "brown", price: 60, rent: [4, 20, 60, 180, 320, 450], houseCost: 50 },
+      { id: 4,  name: "Income Tax", type: "tax", amount: 200, icon: ICONS.diamond },
+      { id: 5,  name: "Reading R.R.", type: "railroad", price: 200, icon: ICONS.train },
+      { id: 6,  name: "Oriental Ave", type: "street", color: "lightblue", price: 100, rent: [6, 30, 90, 270, 400, 550], houseCost: 50 },
+      { id: 7,  name: "Chance", type: "chance", icon: ICONS.chance },
+      { id: 8,  name: "Vermont Ave", type: "street", color: "lightblue", price: 100, rent: [6, 30, 90, 270, 400, 550], houseCost: 50 },
+      { id: 9,  name: "Connecticut", type: "street", color: "lightblue", price: 120, rent: [8, 40, 100, 300, 450, 600], houseCost: 50 },
+      { id: 10, name: "Jail / Visit", type: "jail", icon: ICONS.jail },
+      { id: 11, name: "St. Charles", type: "street", color: "pink", price: 140, rent: [10, 50, 150, 450, 625, 750], houseCost: 100 },
+      { id: 12, name: "Electric Co.", type: "utility", price: 150, icon: ICONS.electric },
+      { id: 13, name: "States Ave", type: "street", color: "pink", price: 140, rent: [10, 50, 150, 450, 625, 750], houseCost: 100 },
+      { id: 14, name: "Virginia Ave", type: "street", color: "pink", price: 160, rent: [12, 60, 180, 500, 700, 900], houseCost: 100 },
+      { id: 15, name: "Penn. R.R.", type: "railroad", price: 200, icon: ICONS.train },
+      { id: 16, name: "St. James Pl.", type: "street", color: "orange", price: 180, rent: [14, 70, 200, 550, 750, 950], houseCost: 100 },
+      { id: 17, name: "Community", type: "community", icon: ICONS.chest },
+      { id: 18, name: "Tennessee", type: "street", color: "orange", price: 180, rent: [14, 70, 200, 550, 750, 950], houseCost: 100 },
+      { id: 19, name: "New York Ave", type: "street", color: "orange", price: 200, rent: [16, 80, 220, 600, 800, 1000], houseCost: 100 },
       { id: 20, name: "Free Parking", type: "freeparking" },
-      { id: 21, name: "Kentucky Avenue", type: "street", color: "red", price: 220, rent: [18, 90, 250, 700, 875, 1050], houseCost: 150 },
-      { id: 22, name: "Chance", type: "chance" },
-      { id: 23, name: "Indiana Avenue", type: "street", color: "red", price: 220, rent: [18, 90, 250, 700, 875, 1050], houseCost: 150 },
-      { id: 24, name: "Illinois Avenue", type: "street", color: "red", price: 240, rent: [20, 100, 300, 750, 925, 1100], houseCost: 150 },
-      { id: 25, name: "B. & O. Railroad", type: "railroad", price: 200 },
-      { id: 26, name: "Atlantic Avenue", type: "street", color: "yellow", price: 260, rent: [22, 110, 330, 800, 975, 1150], houseCost: 150 },
-      { id: 27, name: "Ventnor Avenue", type: "street", color: "yellow", price: 260, rent: [22, 110, 330, 800, 975, 1150], houseCost: 150 },
-      { id: 28, name: "Water Works", type: "utility", price: 150 },
-      { id: 29, name: "Marvin Gardens", type: "street", color: "yellow", price: 280, rent: [24, 120, 360, 850, 1025, 1200], houseCost: 150 },
-      { id: 30, name: "Go To Jail", type: "gotojail" },
-      { id: 31, name: "Pacific Avenue", type: "street", color: "green", price: 300, rent: [26, 130, 390, 900, 1100, 1275], houseCost: 200 },
-      { id: 32, name: "North Carolina Ave", type: "street", color: "green", price: 300, rent: [26, 130, 390, 900, 1100, 1275], houseCost: 200 },
-      { id: 33, name: "Community Chest", type: "community" },
-      { id: 34, name: "Pennsylvania Ave", type: "street", color: "green", price: 320, rent: [28, 150, 450, 1000, 1200, 1400], houseCost: 200 },
-      { id: 35, name: "Short Line", type: "railroad", price: 200 },
-      { id: 36, name: "Chance", type: "chance" },
+      { id: 21, name: "Kentucky Ave", type: "street", color: "red", price: 220, rent: [18, 90, 250, 700, 875, 1050], houseCost: 150 },
+      { id: 22, name: "Chance", type: "chance", icon: ICONS.chance },
+      { id: 23, name: "Indiana Ave", type: "street", color: "red", price: 220, rent: [18, 90, 250, 700, 875, 1050], houseCost: 150 },
+      { id: 24, name: "Illinois Ave", type: "street", color: "red", price: 240, rent: [20, 100, 300, 750, 925, 1100], houseCost: 150 },
+      { id: 25, name: "B. & O. R.R.", type: "railroad", price: 200, icon: ICONS.train },
+      { id: 26, name: "Atlantic Ave", type: "street", color: "yellow", price: 260, rent: [22, 110, 330, 800, 975, 1150], houseCost: 150 },
+      { id: 27, name: "Ventnor Ave", type: "street", color: "yellow", price: 260, rent: [22, 110, 330, 800, 975, 1150], houseCost: 150 },
+      { id: 28, name: "Water Works", type: "utility", price: 150, icon: ICONS.water },
+      { id: 29, name: "Marvin Grdns", type: "street", color: "yellow", price: 280, rent: [24, 120, 360, 850, 1025, 1200], houseCost: 150 },
+      { id: 30, name: "Go To Jail", type: "gotojail", icon: ICONS.police },
+      { id: 31, name: "Pacific Ave", type: "street", color: "green", price: 300, rent: [26, 130, 390, 900, 1100, 1275], houseCost: 200 },
+      { id: 32, name: "N. Carolina", type: "street", color: "green", price: 300, rent: [26, 130, 390, 900, 1100, 1275], houseCost: 200 },
+      { id: 33, name: "Community", type: "community", icon: ICONS.chest },
+      { id: 34, name: "Pennsylvania", type: "street", color: "green", price: 320, rent: [28, 150, 450, 1000, 1200, 1400], houseCost: 200 },
+      { id: 35, name: "Short Line", type: "railroad", price: 200, icon: ICONS.train },
+      { id: 36, name: "Chance", type: "chance", icon: ICONS.chance },
       { id: 37, name: "Park Place", type: "street", color: "darkblue", price: 350, rent: [35, 175, 500, 1100, 1300, 1500], houseCost: 200 },
-      { id: 38, name: "Luxury Tax", type: "tax", amount: 100 },
+      { id: 38, name: "Luxury Tax", type: "tax", amount: 100, icon: ICONS.ring },
       { id: 39, name: "Boardwalk", type: "street", color: "darkblue", price: 400, rent: [50, 200, 600, 1400, 1700, 2000], houseCost: 200 }
     ];
 
@@ -688,10 +1370,152 @@
       green: [31, 32, 34], darkblue: [37, 39], railroad: [5, 15, 25, 35], utility: [12, 28]
     };
 
+    const CHANCE_CARDS = [
+      { text: "Advance to GO. (Collect $200)", action: (pId) => movePlayerTo(pId, 0) },
+      { text: "Advance to Illinois Ave. If you pass GO, collect $200.", action: (pId) => movePlayerTo(pId, 24) },
+      { text: "Advance to Boardwalk.", action: (pId) => movePlayerTo(pId, 39) },
+      { text: "Bank pays you dividend of $50.", action: (pId) => creditMoney(pId, 50, "Bank Dividend") },
+      { text: "Go directly to Jail. Do not pass GO, do not collect $200.", action: (pId) => sendToJailOnline(pId) },
+      { text: "Get Out of Jail Free card! Keep this card until needed.", action: (pId) => awardJailCard(pId) }
+    ];
+
+    const COMMUNITY_CARDS = [
+      { text: "Advance to GO. (Collect $200)", action: (pId) => movePlayerTo(pId, 0) },
+      { text: "Bank error in your favor. Collect $200.", action: (pId) => creditMoney(pId, 200, "Bank Error") },
+      { text: "Doctor's fees. Pay $50.", action: (pId) => debitMoney(pId, 50, "Doctor's Fee") },
+      { text: "It is your birthday! Collect $10 from everyone.", action: (pId) => celebrateBirthday(pId) },
+      { text: "Income tax refund. Collect $50.", action: (pId) => celebrateTaxRefund(pId) },
+      { text: "Go directly to Jail. Do not pass GO, do not collect $200.", action: (pId) => sendToJailOnline(pId) },
+      { text: "Get Out of Jail Free card! Keep this card until needed.", action: (pId) => awardJailCard(pId) }
+    ];
+
+    function broadcastFx(type, icon, title, subtitle) {
+      if (!currentRoomCode) return;
+      db.ref(`rooms/${currentRoomCode}/lastFx`).set({
+        type: type, icon: icon, title: title, sub: subtitle, ts: Date.now()
+      });
+    }
+
+    function sendReaction(emoji) {
+      if (!currentRoomCode || !localPlayerId) return;
+      db.ref(`rooms/${currentRoomCode}/lastReaction`).set({
+        emoji: emoji, senderId: localPlayerId, ts: Date.now()
+      });
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text || !currentRoomCode || !currentGameState) return;
+
+      const player = currentGameState.players[localPlayerId];
+      const msgObj = {
+        sender: player ? player.name : "Guest",
+        color: player ? player.color : "#ffd15c",
+        text: text,
+        ts: Date.now()
+      };
+
+      const msgs = currentGameState.messages || [];
+      msgs.push(msgObj);
+      if (msgs.length > 35) msgs.shift();
+
+      db.ref(`rooms/${currentRoomCode}/messages`).set(msgs).then(() => {
+        input.value = '';
+      });
+    }
+
+    /* Pause Game Feature */
+    function toggleGamePause(shouldPause) {
+      if (!currentRoomCode || !currentGameState) return;
+      const player = currentGameState.players[localPlayerId];
+      const name = player ? player.name : "Player";
+
+      db.ref(`rooms/${currentRoomCode}`).update({
+        isPaused: shouldPause,
+        pausedBy: shouldPause ? name : ""
+      });
+    }
+
     /* ==========================================================================
-       3. LOBBY & FIREBASE MULTIPLAYER SYNC
+       4. DICE & COUNTDOWN TURN TIMER
        ========================================================================== */
-    let currentGameState = null;
+    let turnTimerInterval = null;
+
+    function startTurnCountdown() {
+      clearInterval(turnTimerInterval);
+      const TURN_LIMIT_SEC = 30;
+
+      turnTimerInterval = setInterval(() => {
+        if (!currentGameState || currentGameState.isPaused) return;
+
+        const startTime = currentGameState.turnStartTime || Date.now();
+        const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, TURN_LIMIT_SEC - elapsedSec);
+
+        const fillEl = document.getElementById('turn-timer-fill');
+        const textEl = document.getElementById('turn-timer-text');
+        
+        const pct = (remaining / TURN_LIMIT_SEC) * 100;
+        fillEl.style.width = `${pct}%`;
+        textEl.innerText = `${remaining}s`;
+
+        if (remaining <= 7) {
+          fillEl.classList.add('warning');
+        } else {
+          fillEl.classList.remove('warning');
+        }
+
+        // Timer Expired: If I am the active player, force pass turn!
+        if (remaining <= 0) {
+          clearInterval(turnTimerInterval);
+          const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
+          if (localPlayerId === activeId) {
+            broadcastFx('dread', '⏳', 'TIME EXPIRED!', `${currentGameState.players[activeId].name} took too long to roll! Turn passed.`);
+            endTurn();
+          }
+        }
+      }, 500);
+    }
+
+    function renderDieFace(elementId, val) {
+      const el = document.getElementById(elementId);
+      el.className = `die-face-cube die-${val}`;
+      el.innerHTML = '';
+      for (let i = 0; i < val; i++) {
+        const pip = document.createElement('div');
+        pip.className = 'pip';
+        el.appendChild(pip);
+      }
+    }
+
+    function animateDiceRoll(val1, val2, onDone) {
+      const cube1 = document.getElementById('die-cube-1');
+      const cube2 = document.getElementById('die-cube-2');
+      cube1.classList.add('rolling');
+      cube2.classList.add('rolling');
+      SFX.rollDice();
+
+      const interval = setInterval(() => {
+        renderDieFace('die-face-1', Math.floor(Math.random() * 6) + 1);
+        renderDieFace('die-face-2', Math.floor(Math.random() * 6) + 1);
+      }, 70);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        cube1.classList.remove('rolling');
+        cube2.classList.remove('rolling');
+        renderDieFace('die-face-1', val1);
+        renderDieFace('die-face-2', val2);
+        if (onDone) onDone();
+      }, 650);
+    }
+
+    /* ==========================================================================
+       5. ROOM MANAGEMENT & FIREBASE LISTENERS
+       ========================================================================== */
+    let localProcessedFxTimestamp = 0;
+    let localProcessedReactionTimestamp = 0;
 
     function generateRoomCode() {
       const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -705,6 +1529,7 @@
       const code = generateRoomCode();
       const pId = "p_" + Date.now();
       localPlayerId = pId;
+      viewingPlayerId = pId;
       currentRoomCode = code;
 
       const initial = JSON.parse(JSON.stringify(INITIAL_GAME_STATE));
@@ -715,15 +1540,14 @@
         money: 1500,
         position: 0,
         inJail: false,
-        jailTurns: 0,
+        jailCards: 0,
         bankrupt: false
       };
       initial.playerOrder = [pId];
+      initial.turnStartTime = Date.now();
       initial.logs = [`Room ${code} created by ${name}.`];
 
-      db.ref("rooms/" + code).set(initial).then(() => {
-        enterRoom(code);
-      });
+      db.ref("rooms/" + code).set(initial).then(() => enterRoom(code));
     }
 
     function joinRoomByInput() {
@@ -752,7 +1576,7 @@
             money: 1500,
             position: 0,
             inJail: false,
-            jailTurns: 0,
+            jailCards: 0,
             bankrupt: false
           };
 
@@ -761,16 +1585,18 @@
           updates[`rooms/${code}/playerOrder/${playerCount}`] = pId;
           
           let logs = state.logs || [];
-          logs.push(`${name} joined the game.`);
+          logs.push(`${name} joined the room.`);
           updates[`rooms/${code}/logs`] = logs;
 
           db.ref().update(updates).then(() => {
             localPlayerId = pId;
+            viewingPlayerId = pId;
             localStorage.setItem("monopoly_pid_" + code, pId);
             enterRoom(code);
           });
         } else {
           localPlayerId = pId;
+          viewingPlayerId = pId;
           enterRoom(code);
         }
       });
@@ -780,16 +1606,57 @@
       currentRoomCode = code;
       document.getElementById('lobby-screen').style.display = 'none';
       document.getElementById('room-display').innerText = `Room: ${code} 🔗`;
-      
-      // Update browser URL without reload
       window.history.pushState({}, "", `?room=${code}`);
 
-      // Listen for live updates
       roomRef = db.ref("rooms/" + code);
       roomRef.on("value", snapshot => {
         if (snapshot.exists()) {
+          const oldState = currentGameState;
           currentGameState = snapshot.val();
+          
+          // Synced Pause Overlay
+          const pauseOverlay = document.getElementById('pause-screen');
+          if (currentGameState.isPaused) {
+            pauseOverlay.classList.add('active');
+            document.getElementById('pause-by-label').innerText = `${currentGameState.pausedBy || 'A player'} paused the game for a break.`;
+          } else {
+            pauseOverlay.classList.remove('active');
+          }
+
+          // Synced Event Toast & Audio FX
+          if (currentGameState.lastFx && currentGameState.lastFx.ts > localProcessedFxTimestamp) {
+            localProcessedFxTimestamp = currentGameState.lastFx.ts;
+            const fx = currentGameState.lastFx;
+            showEventToast(fx.type, fx.icon, fx.title, fx.sub);
+            if (fx.type === 'celebrate') {
+              triggerConfetti();
+              if (fx.icon === '🎂') SFX.birthdaySong();
+              else SFX.fanfare();
+            } else {
+              triggerScreenShake();
+              if (fx.icon === '🚨') SFX.voidSpeedingSiren();
+              else if (fx.icon === '🔒') SFX.jailThud();
+              else if (fx.icon === '💸') SFX.taxFine();
+              else SFX.mortgageWarning();
+            }
+          }
+
+          if (currentGameState.lastReaction && currentGameState.lastReaction.ts > localProcessedReactionTimestamp) {
+            localProcessedReactionTimestamp = currentGameState.lastReaction.ts;
+            spawnFloatingEmoji(currentGameState.lastReaction.emoji);
+          }
+
+          // Dice animation
+          if (oldState && currentGameState.dice && 
+             (oldState.dice[0] !== currentGameState.dice[0] || oldState.dice[1] !== currentGameState.dice[1])) {
+            animateDiceRoll(currentGameState.dice[0], currentGameState.dice[1]);
+          } else if (currentGameState.dice) {
+            renderDieFace('die-face-1', currentGameState.dice[0]);
+            renderDieFace('die-face-2', currentGameState.dice[1]);
+          }
+          
           renderLiveGameState(currentGameState);
+          startTurnCountdown();
         }
       });
     }
@@ -802,8 +1669,22 @@
     }
 
     /* ==========================================================================
-       4. REALTIME STATE RENDERING
+       6. STATE RENDERING & CHAT
        ========================================================================== */
+    function checkColorMonopoly(pId, color) {
+      if (!COLOR_GROUPS[color] || !currentGameState.properties) return false;
+      return COLOR_GROUPS[color].every(id => 
+        currentGameState.properties[id] && currentGameState.properties[id].ownerId === pId
+      );
+    }
+
+    function checkMultipleUtilities(pId) {
+      if (!currentGameState.properties) return false;
+      return COLOR_GROUPS.utility.every(id => 
+        currentGameState.properties[id] && currentGameState.properties[id].ownerId === pId
+      );
+    }
+
     function renderLiveGameState(state) {
       if (!state || !state.playerOrder) return;
 
@@ -811,25 +1692,19 @@
       const isMyTurn = (localPlayerId === activeId);
       const activePlayer = state.players[activeId];
 
-      // Update dice
-      document.getElementById('die-1').innerText = state.dice ? state.dice[0] : 1;
-      document.getElementById('die-2').innerText = state.dice ? state.dice[1] : 1;
-
-      // Status Banner
       if (activePlayer) {
         if (isMyTurn) {
           document.getElementById('status-message').innerText = state.hasRolledThisTurn 
-            ? "Your turn: Actions complete, click End Turn!" 
+            ? "Your turn: Actions done, click End Turn!" 
             : "⭐ IT'S YOUR TURN! Roll the dice.";
         } else {
           document.getElementById('status-message').innerText = `Waiting for ${activePlayer.name}...`;
         }
       }
 
-      // Button controls (Locked to active turn)
-      document.getElementById('btn-roll').disabled = (!isMyTurn || state.hasRolledThisTurn);
-      document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn);
-      document.getElementById('btn-bankrupt').disabled = (!isMyTurn);
+      document.getElementById('btn-roll').disabled = (!isMyTurn || state.hasRolledThisTurn || state.isPaused);
+      document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused);
+      document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
 
       // Ledger
       const ledger = document.getElementById('players-ledger');
@@ -838,20 +1713,10 @@
         const p = state.players[pId];
         if (!p) return;
         const isCurrent = (pId === activeId);
+        const isSelected = (pId === viewingPlayerId);
         const card = document.createElement('div');
-        card.className = `player-card ${isCurrent ? 'active' : ''}`;
-
-        // Property pills
-        let pills = '';
-        if (state.properties) {
-          Object.keys(state.properties).forEach(tId => {
-            if (state.properties[tId].ownerId === pId) {
-              const t = TILES[tId];
-              const isM = state.properties[tId].mortgaged;
-              pills += `<span class="prop-pill color-${t.color || 'utility'} ${isM ? 'mortgaged' : ''}">${t.name}</span>`;
-            }
-          });
-        }
+        card.className = `player-card ${isCurrent ? 'active' : ''} ${isSelected ? 'selected-view' : ''}`;
+        card.onclick = () => { viewingPlayerId = pId; renderPhysicalPortfolio(state); renderLiveGameState(state); };
 
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -865,12 +1730,11 @@
             <span>${TILES[p.position].name}</span>
             <span>${p.inJail ? '🔒 In Jail' : (p.bankrupt ? '❌ Bankrupt' : 'Active')}</span>
           </div>
-          ${pills ? `<div class="prop-pill-container">${pills}</div>` : ''}
         `;
         ledger.appendChild(card);
       });
 
-      // Update tokens on board
+      // Board tokens
       TILES.forEach((_, idx) => {
         const c = document.getElementById(`tokens-tile-${idx}`);
         if (c) c.innerHTML = '';
@@ -890,7 +1754,7 @@
         }
       });
 
-      // Update property improvements (houses/mortgages)
+      // House & mortgage markers on board
       TILES.forEach((_, tId) => {
         const housesEl = document.getElementById(`houses-tile-${tId}`);
         const tileEl = document.getElementById(`tile-${tId}`);
@@ -917,19 +1781,149 @@
         }
       });
 
-      // Live Event Logs
+      // Logs
       const feed = document.getElementById('game-feed');
       if (state.logs) {
-        feed.innerHTML = state.logs.map(l => `<div class="log-entry">• ${l}</div>`).join('');
+        feed.innerHTML = state.logs.map(l => `<div style="line-height:1.35; margin-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:2px;">• ${l}</div>`).join('');
         feed.scrollTop = feed.scrollHeight;
       }
+
+      // Chat
+      const chatFeed = document.getElementById('chat-feed');
+      if (state.messages) {
+        chatFeed.innerHTML = state.messages.map(m => `
+          <div class="chat-bubble">
+            <span class="chat-author" style="color:${m.color}">${m.sender}:</span>
+            <span>${m.text}</span>
+          </div>
+        `).join('');
+        chatFeed.scrollTop = chatFeed.scrollHeight;
+      }
+
+      renderPhysicalPortfolio(state);
+    }
+
+    function renderPhysicalPortfolio(state) {
+      const targetPId = viewingPlayerId || localPlayerId;
+      const targetPlayer = state.players ? state.players[targetPId] : null;
+      if (!targetPlayer) return;
+
+      const isSelf = (targetPId === localPlayerId);
+      document.getElementById('portfolio-title').innerText = isSelf ? "Your Portfolio" : `${targetPlayer.name}'s Portfolio`;
+      document.getElementById('portfolio-owner-badge').innerText = isSelf ? "Viewing: You" : `Viewing: ${targetPlayer.name}`;
+
+      const billRack = document.getElementById('bill-rack-display');
+      billRack.innerHTML = '';
+      const denominations = [
+        { val: 500, label: "$500", class: "bill-500" },
+        { val: 100, label: "$100", class: "bill-100" },
+        { val: 50,  label: "$50",  class: "bill-50" },
+        { val: 20,  label: "$20",  class: "bill-20" },
+        { val: 10,  label: "$10",  class: "bill-10" },
+        { val: 5,   label: "$5",   class: "bill-5" },
+        { val: 1,   label: "$1",   class: "bill-1" }
+      ];
+
+      let remainingCash = targetPlayer.money;
+      denominations.forEach(d => {
+        let count = Math.floor(remainingCash / d.val);
+        if (remainingCash < 0) count = 0;
+        const b = document.createElement('div');
+        b.className = `bill-card ${d.class}`;
+        b.innerHTML = `<span>${d.label}</span><span style="font-size:0.55rem; font-weight:900;">×${count}</span>`;
+        billRack.appendChild(b);
+        remainingCash %= d.val;
+      });
+
+      const specialTray = document.getElementById('special-cards-tray');
+      specialTray.innerHTML = '';
+      if (targetPlayer.jailCards > 0) {
+        for (let i = 0; i < targetPlayer.jailCards; i++) {
+          const card = document.createElement('div');
+          card.className = 'jail-free-card';
+          card.innerHTML = `<span>⚖️</span><span>GET OUT OF JAIL FREE CARD</span>`;
+          specialTray.appendChild(card);
+        }
+      }
+
+      const deedsTray = document.getElementById('deeds-tray');
+      deedsTray.innerHTML = '';
+      const props = state.properties || {};
+      const owned = Object.keys(props).filter(id => props[id].ownerId === targetPId);
+      document.getElementById('deed-count').innerText = owned.length;
+
+      if (owned.length === 0) {
+        deedsTray.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #738b84; font-size: 0.8rem; padding: 20px 0;">No deeds held yet.</div>`;
+        return;
+      }
+
+      owned.forEach(id => {
+        const tile = TILES[id];
+        const prop = props[id];
+        const deedCard = document.createElement('div');
+        deedCard.className = `deed-card ${prop.mortgaged ? 'mortgaged-deed' : ''}`;
+
+        let detailsHtml = '';
+        if (tile.type === 'street') {
+          detailsHtml = `
+            <div class="deed-row bold"><span>Rent</span><span>$${tile.rent[0]}</span></div>
+            <div class="deed-row"><span>With 1 House</span><span>$${tile.rent[1]}</span></div>
+            <div class="deed-row"><span>With 2 Houses</span><span>$${tile.rent[2]}</span></div>
+            <div class="deed-row"><span>With 3 Houses</span><span>$${tile.rent[3]}</span></div>
+            <div class="deed-row"><span>With 4 Houses</span><span>$${tile.rent[4]}</span></div>
+            <div class="deed-row bold"><span>With HOTEL</span><span>$${tile.rent[5]}</span></div>
+            <hr class="deed-divider"/>
+            <div class="deed-row"><span>House cost:</span><span>$${tile.houseCost}</span></div>
+            <div class="deed-row"><span>Mortgage:</span><span>$${tile.price / 2}</span></div>
+          `;
+        } else if (tile.type === 'railroad') {
+          detailsHtml = `
+            <div class="deed-row"><span>1 Railroad</span><span>$25</span></div>
+            <div class="deed-row"><span>2 Railroads</span><span>$50</span></div>
+            <div class="deed-row"><span>3 Railroads</span><span>$100</span></div>
+            <div class="deed-row"><span>4 Railroads</span><span>$200</span></div>
+            <hr class="deed-divider"/>
+            <div class="deed-row"><span>Mortgage:</span><span>$100</span></div>
+          `;
+        } else if (tile.type === 'utility') {
+          detailsHtml = `
+            <p style="font-size:0.6rem; color:#444;">1 Utility owned: 4× dice.<br>Both Utilities: 10× dice.</p>
+            <hr class="deed-divider"/>
+            <div class="deed-row"><span>Mortgage:</span><span>$75</span></div>
+          `;
+        }
+
+        let actionButtons = '';
+        if (isSelf) {
+          actionButtons = `
+            <div class="deed-actions-row">
+              ${tile.type === 'street' && !prop.mortgaged && prop.houses < 5 ? `<button class="deed-btn" onclick="buildHouseOnline(${id})">+House</button>` : ''}
+              ${!prop.mortgaged ? `<button class="deed-btn" onclick="toggleMortgageOnline(${id}, true)">Mortgage</button>` : `<button class="deed-btn" onclick="toggleMortgageOnline(${id}, false)">Unmortgage</button>`}
+            </div>
+          `;
+        }
+
+        deedCard.innerHTML = `
+          <div class="deed-header color-${tile.color || 'railroad'}">
+            <span class="deed-sub">TITLE DEED</span>
+            ${tile.name}
+          </div>
+          <div class="deed-body">
+            ${detailsHtml}
+            ${prop.houses > 0 ? `<div style="font-weight:900; color:#1b7340; margin-top:2px;">Built: ${prop.houses === 5 ? '1 Hotel' : prop.houses + ' Houses'}</div>` : ''}
+            ${prop.mortgaged ? `<div style="font-weight:900; color:#b91c1c; margin-top:2px;">MORTGAGED</div>` : ''}
+            ${actionButtons}
+          </div>
+        `;
+        deedsTray.appendChild(deedCard);
+      });
     }
 
     /* ==========================================================================
-       5. GAME ACTIONS & MULTIPLAYER ENGINE
+       7. VERIFIED OFFICIAL MONOPOLY DICE RULES ENGINE
        ========================================================================== */
     function rollDice() {
-      if (!currentGameState) return;
+      if (!currentGameState || currentGameState.isPaused) return;
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       if (localPlayerId !== activeId || currentGameState.hasRolledThisTurn) return;
 
@@ -937,29 +1931,62 @@
       const d2 = Math.floor(Math.random() * 6) + 1;
       const total = d1 + d2;
       const isDouble = (d1 === d2);
+      const isBoxcars = (d1 === 6 && d2 === 6); // Highest possible dice roll: 12 (Double 6s)
+      const currentDoublesCount = isDouble ? ((currentGameState.consecutiveDoubles || 0) + 1) : 0;
       const player = currentGameState.players[activeId];
 
-      let oldPos = player.position;
-      let newPos = (oldPos + total) % 40;
-      let newMoney = player.money;
+      animateDiceRoll(d1, d2, () => {
+        // OFFICIAL RULE CHECK: 3 Consecutive Doubles = Speeding Violation -> JAIL IMMEDIATELY (Move Voided)
+        if (currentDoublesCount >= 3) {
+          const up = {};
+          up[`rooms/${currentRoomCode}/dice`] = [d1, d2];
+          up[`rooms/${currentRoomCode}/consecutiveDoubles`] = 0;
+          up[`rooms/${currentRoomCode}/hasRolledThisTurn`] = true;
+          up[`rooms/${currentRoomCode}/players/${activeId}/position`] = 10;
+          up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = true;
 
-      if (newPos < oldPos) {
-        newMoney += 200; // Passed GO
-      }
+          let logs = currentGameState.logs || [];
+          logs.push(`🚨 ${player.name} rolled 3 DOUBLES IN A ROW! Movement voided; caught speeding directly to Jail!`);
+          up[`rooms/${currentRoomCode}/logs`] = logs;
 
-      const updates = {};
-      updates[`rooms/${currentRoomCode}/dice`] = [d1, d2];
-      updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
-      updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
-      updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
+          db.ref().update(up).then(() => {
+            broadcastFx('dread', '🚨', 'SPEEDING! 3 DOUBLES VOIDED!', `${player.name} rolled 3 doubles in succession! Movement voided directly to Jail!`);
+          });
+          return;
+        }
 
-      let logs = currentGameState.logs || [];
-      logs.push(`${player.name} rolled ${d1}+${d2}=${total} and moved to ${TILES[newPos].name}.`);
-      updates[`rooms/${currentRoomCode}/logs`] = logs;
+        // OFFICIAL RULE CHECK: Highest Roll (12 = Boxcars / Double 6s) Celebrated + Extra Chance
+        if (isBoxcars) {
+          broadcastFx('celebrate', '🎲', 'BOXCARS! HIGHEST ROLL (12)!', `${player.name} rolled the maximum (6+6=12)! Extra roll awarded!`);
+        } else if (isDouble) {
+          broadcastFx('celebrate', '✨', 'DOUBLES ROLLED!', `${player.name} rolled matching ${d1}s! Extra turn awarded.`);
+        }
 
-      db.ref().update(updates).then(() => {
-        // Evaluate tile landing for active player
-        setTimeout(() => handleLandingAction(newPos, total), 300);
+        let oldPos = player.position;
+        let newPos = (oldPos + total) % 40;
+        let newMoney = player.money;
+
+        if (newPos < oldPos) {
+          newMoney += 200;
+          SFX.cashIn();
+          broadcastFx('celebrate', '💰', 'Passed GO!', `${player.name} collected $200 salary.`);
+        }
+
+        const updates = {};
+        updates[`rooms/${currentRoomCode}/dice`] = [d1, d2];
+        updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = currentDoublesCount;
+        updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
+        updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
+        updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble; // If double: player gets another roll!
+        updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now(); // Reset 30s timer for bonus roll
+
+        let logs = currentGameState.logs || [];
+        logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[newPos].name}.`);
+        updates[`rooms/${currentRoomCode}/logs`] = logs;
+
+        db.ref().update(updates).then(() => {
+          setTimeout(() => handleLandingAction(newPos, total), 300);
+        });
       });
     }
 
@@ -968,29 +1995,39 @@
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       const player = currentGameState.players[activeId];
 
-      // Property landing
       if (tile.type === "street" || tile.type === "railroad" || tile.type === "utility") {
         const prop = currentGameState.properties ? currentGameState.properties[tile.id] : null;
 
         if (!prop) {
-          // Unowned - Offer purchase
           if (player.money >= tile.price) {
             openModal(
-              "Purchase Property?",
-              `<p>Would you like to buy <strong>${tile.name}</strong> for <strong>$${tile.price}</strong>?</p>`,
+              "Purchase Title Deed?",
+              `<div style="text-align:center;">
+                 <p>Acquire deed for <strong>${tile.name}</strong> for <strong>$${tile.price}</strong>?</p>
+                 <p style="font-size:0.8rem; color:#666; margin-top:6px;">Your funds: $${player.money}</p>
+               </div>`,
               [
                 {
-                  label: "Buy",
+                  label: "Buy Deed",
                   action: () => {
                     const up = {};
                     up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - tile.price;
                     up[`rooms/${currentRoomCode}/properties/${tile.id}`] = { ownerId: activeId, houses: 0, mortgaged: false };
                     
                     let logs = currentGameState.logs || [];
-                    logs.push(`${player.name} bought ${tile.name} for $${tile.price}.`);
+                    logs.push(`${player.name} bought Title Deed: ${tile.name} for $${tile.price}.`);
                     up[`rooms/${currentRoomCode}/logs`] = logs;
 
-                    db.ref().update(up).then(closeModal);
+                    db.ref().update(up).then(() => {
+                      closeModal();
+                      if (tile.color && checkColorMonopoly(activeId, tile.color)) {
+                        broadcastFx('celebrate', '👑', 'FULL COLOR MONOPOLY!', `${player.name} owns all ${tile.color.toUpperCase()} properties! Rents are now DOUBLED!`);
+                      } else if (tile.type === "utility" && checkMultipleUtilities(activeId)) {
+                        broadcastFx('celebrate', '⚡', 'UTILITY MONOPOLY!', `${player.name} controls both Water Works and Electric Co!`);
+                      } else {
+                        SFX.cashIn();
+                      }
+                    });
                   }
                 },
                 { label: "Pass", class: "btn-secondary", action: closeModal }
@@ -998,7 +2035,6 @@
             );
           }
         } else if (prop.ownerId !== activeId && !prop.mortgaged) {
-          // Rent due
           let rent = tile.rent ? tile.rent[prop.houses || 0] : 25;
           const owner = currentGameState.players[prop.ownerId];
 
@@ -1010,69 +2046,151 @@
           logs.push(`${player.name} paid $${rent} rent to ${owner.name} for ${tile.name}.`);
           up[`rooms/${currentRoomCode}/logs`] = logs;
 
-          db.ref().update(up);
+          db.ref().update(up).then(() => {
+            if (rent >= 200) {
+              broadcastFx('dread', '💸', 'HEFTY RENT PAID!', `${player.name} paid $${rent} to ${owner.name}!`);
+            } else {
+              SFX.taxFine();
+            }
+          });
         }
+      } else if (tile.type === "chance") {
+        drawPhysicalCard("chance", activeId);
+      } else if (tile.type === "community") {
+        drawPhysicalCard("community", activeId);
       } else if (tile.type === "tax") {
         const up = {};
         up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - tile.amount;
         let logs = currentGameState.logs || [];
-        logs.push(`${player.name} paid $${tile.amount} in ${tile.name}.`);
+        logs.push(`${player.name} paid $${tile.amount} for ${tile.name}.`);
         up[`rooms/${currentRoomCode}/logs`] = logs;
-        db.ref().update(up);
+        db.ref().update(up).then(() => {
+          broadcastFx('dread', '💸', `${tile.name.toUpperCase()}!`, `${player.name} paid $${tile.amount} directly to the bank.`);
+        });
       } else if (tile.type === "gotojail") {
-        const up = {};
-        up[`rooms/${currentRoomCode}/players/${activeId}/position`] = 10;
-        up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = true;
-        let logs = currentGameState.logs || [];
-        logs.push(`🚨 ${player.name} was sent directly to Jail!`);
-        up[`rooms/${currentRoomCode}/logs`] = logs;
-        db.ref().update(up);
+        sendToJailOnline(activeId);
       }
     }
 
-    function endTurn() {
-      if (!currentGameState) return;
-      const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
-      if (localPlayerId !== activeId) return;
+    function celebrateBirthday(pId) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      let total = 0;
 
-      const nextIndex = (currentGameState.activePlayerIndex + 1) % currentGameState.playerOrder.length;
-      const updates = {
-        [`rooms/${currentRoomCode}/activePlayerIndex`]: nextIndex,
-        [`rooms/${currentRoomCode}/hasRolledThisTurn`]: false
-      };
-      db.ref().update(updates);
-    }
-
-    function openPropertyManager() {
-      if (!currentGameState) return;
-      const player = currentGameState.players[localPlayerId];
-      if (!player) return;
-
-      const props = currentGameState.properties || {};
-      const owned = Object.keys(props).filter(id => props[id].ownerId === localPlayerId);
-
-      if (owned.length === 0) {
-        openModal("Estate Portfolio", "<p>You do not currently own any properties.</p>", [{ label: "Close", action: closeModal }]);
-        return;
-      }
-
-      let html = `<div style="display:flex; flex-direction:column; gap:6px;">`;
-      owned.forEach(id => {
-        const tile = TILES[id];
-        const prop = props[id];
-        html += `
-          <div class="mgmt-row">
-            <span><strong>${tile.name}</strong> (${prop.houses === 5 ? 'Hotel' : prop.houses + ' Houses'}${prop.mortgaged ? ' | Mortgaged' : ''})</span>
-            <div>
-              ${tile.type === 'street' && !prop.mortgaged && prop.houses < 5 ? `<button class="mgmt-sm-btn" onclick="buildHouseOnline(${id})">+ House ($${tile.houseCost})</button>` : ''}
-              ${!prop.mortgaged ? `<button class="mgmt-sm-btn" onclick="toggleMortgageOnline(${id}, true)">Mortgage</button>` : `<button class="mgmt-sm-btn" onclick="toggleMortgageOnline(${id}, false)">Unmortgage</button>`}
-            </div>
-          </div>
-        `;
+      currentGameState.playerOrder.forEach(id => {
+        if (id !== pId && !currentGameState.players[id].bankrupt) {
+          up[`rooms/${currentRoomCode}/players/${id}/money`] = currentGameState.players[id].money - 10;
+          total += 10;
+        }
       });
-      html += `</div>`;
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = player.money + total;
+      
+      let logs = currentGameState.logs || [];
+      logs.push(`🎂 It is ${player.name}'s birthday! Collected $10 from everyone.`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
 
-      openModal("Estate Portfolio", html, [{ label: "Done", action: closeModal }]);
+      db.ref().update(up).then(() => {
+        broadcastFx('celebrate', '🎂', 'HAPPY BIRTHDAY!', `All players gifted $10 to ${player.name}!`);
+      });
+    }
+
+    function celebrateTaxRefund(pId) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = player.money + 50;
+      let logs = currentGameState.logs || [];
+      logs.push(`${player.name} received a $50 Income Tax Refund!`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(up).then(() => {
+        broadcastFx('celebrate', '💵', 'TAX REFUND!', `${player.name} collected $50 from the IRS!`);
+      });
+    }
+
+    function drawPhysicalCard(type, pId) {
+      const deck = (type === "chance") ? CHANCE_CARDS : COMMUNITY_CARDS;
+      const card = deck[Math.floor(Math.random() * deck.length)];
+
+      openModal(
+        `${type === 'chance' ? '❓ CHANCE CARD' : '📦 COMMUNITY CHEST'}`,
+        `<div style="text-align:center; padding:16px;">
+           <div style="font-size:2rem; margin-bottom:8px;">${type === 'chance' ? '❓' : '📦'}</div>
+           <p style="font-size:1.05rem; font-weight:700;">"${card.text}"</p>
+         </div>`,
+        [{ label: "Accept", action: () => { closeModal(); card.action(pId); } }]
+      );
+    }
+
+    function inspectDeck(type) {
+      openModal(
+        `${type === 'chance' ? 'Chance Deck' : 'Community Chest Deck'}`,
+        `<p style="text-align:center;">This is the official 3D card stack. Land on the tile to draw!</p>`,
+        [{ label: "Close", action: closeModal }]
+      );
+    }
+
+    function awardJailCard(pId) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      up[`rooms/${currentRoomCode}/players/${pId}/jailCards`] = (player.jailCards || 0) + 1;
+      let logs = currentGameState.logs || [];
+      logs.push(`${player.name} received a Get Out of Jail Free Card!`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(up).then(() => {
+        broadcastFx('celebrate', '⚖️', 'JAIL PASS ACQUIRED!', `${player.name} holds a Get Out of Jail Free card.`);
+      });
+    }
+
+    function movePlayerTo(pId, targetIndex) {
+      const player = currentGameState.players[pId];
+      let newMoney = player.money;
+      if (targetIndex < player.position) {
+        newMoney += 200;
+        SFX.cashIn();
+      }
+
+      const up = {};
+      up[`rooms/${currentRoomCode}/players/${pId}/position`] = targetIndex;
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = newMoney;
+      db.ref().update(up).then(() => handleLandingAction(targetIndex, 0));
+    }
+
+    function creditMoney(pId, amt, reason) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = player.money + amt;
+      let logs = currentGameState.logs || [];
+      logs.push(`${player.name} received $${amt} (${reason}).`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+      db.ref().update(up).then(() => SFX.cashIn());
+    }
+
+    function debitMoney(pId, amt, reason) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = player.money - amt;
+      let logs = currentGameState.logs || [];
+      logs.push(`${player.name} paid $${amt} (${reason}).`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+      db.ref().update(up).then(() => {
+        broadcastFx('dread', '💸', 'FEE CHARGED', `${player.name} paid $${amt} for ${reason}.`);
+      });
+    }
+
+    function sendToJailOnline(pId) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      up[`rooms/${currentRoomCode}/players/${pId}/position`] = 10;
+      up[`rooms/${currentRoomCode}/players/${pId}/inJail`] = true;
+      up[`rooms/${currentRoomCode}/consecutiveDoubles`] = 0;
+      let logs = currentGameState.logs || [];
+      logs.push(`🚨 ${player.name} was sent directly to Jail!`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(up).then(() => {
+        broadcastFx('dread', '🔒', 'LOCKED UP IN JAIL!', `${player.name} was sent directly to the cell!`);
+      });
     }
 
     function buildHouseOnline(tileId) {
@@ -1081,15 +2199,22 @@
       const prop = currentGameState.properties[tileId];
 
       if (player.money >= tile.houseCost && prop.houses < 5) {
+        const isHotel = (prop.houses === 4);
         const up = {};
         up[`rooms/${currentRoomCode}/players/${localPlayerId}/money`] = player.money - tile.houseCost;
         up[`rooms/${currentRoomCode}/properties/${tileId}/houses`] = prop.houses + 1;
         
         let logs = currentGameState.logs || [];
-        logs.push(`${player.name} built a house on ${tile.name}.`);
+        logs.push(`${player.name} built a ${isHotel ? 'HOTEL' : 'house'} on ${tile.name}.`);
         up[`rooms/${currentRoomCode}/logs`] = logs;
 
-        db.ref().update(up).then(openPropertyManager);
+        db.ref().update(up).then(() => {
+          if (isHotel) {
+            broadcastFx('celebrate', '🏨', 'LUXURY HOTEL ERECTED!', `${player.name} built a Hotel on ${tile.name}!`);
+          } else {
+            SFX.cashIn();
+          }
+        });
       }
     }
 
@@ -1107,20 +2232,106 @@
         up[`rooms/${currentRoomCode}/players/${localPlayerId}/money`] = player.money - cost;
         up[`rooms/${currentRoomCode}/properties/${tileId}/mortgaged`] = false;
       }
-      db.ref().update(up).then(openPropertyManager);
+
+      let logs = currentGameState.logs || [];
+      logs.push(`${player.name} ${toMortgage ? 'mortgaged' : 'unmortgaged'} ${tile.name}.`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(up).then(() => {
+        if (toMortgage) {
+          broadcastFx('dread', '🏚️', 'ESTATE MORTGAGED', `${player.name} mortgaged ${tile.name} for liquidity.`);
+        } else {
+          SFX.cashIn();
+        }
+      });
+    }
+
+    function endTurn() {
+      if (!currentGameState || currentGameState.isPaused) return;
+      const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
+      if (localPlayerId !== activeId) return;
+
+      const nextIndex = (currentGameState.activePlayerIndex + 1) % currentGameState.playerOrder.length;
+      const updates = {
+        [`rooms/${currentRoomCode}/activePlayerIndex`]: nextIndex,
+        [`rooms/${currentRoomCode}/hasRolledThisTurn`]: false,
+        [`rooms/${currentRoomCode}/consecutiveDoubles`]: 0,
+        [`rooms/${currentRoomCode}/turnStartTime`]: Date.now()
+      };
+      db.ref().update(updates);
     }
 
     function declareBankruptcy() {
       if (!confirm("Are you sure you want to declare bankruptcy?")) return;
+      const player = currentGameState.players[localPlayerId];
       const up = {};
       up[`rooms/${currentRoomCode}/players/${localPlayerId}/bankrupt`] = true;
       up[`rooms/${currentRoomCode}/players/${localPlayerId}/money`] = 0;
-      db.ref().update(up).then(endTurn);
+      
+      let logs = currentGameState.logs || [];
+      logs.push(`💀 ${player.name} has gone bankrupt and forfeited!`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(up).then(() => {
+        broadcastFx('dread', '☠️', 'BANKRUPTCY DECLARED!', `${player.name} has run out of funds and is eliminated!`);
+        endTurn();
+      });
     }
 
     /* ==========================================================================
-       6. MODAL & DEED INSPECTION
+       8. ILLUSTRATED OFFICIAL RULE BOOK MODAL
        ========================================================================== */
+    function openRuleBookModal() {
+      const rulesHtml = `
+        <div class="rule-section">
+          <div class="rule-title">🎯 Objective of the Game</div>
+          <div class="rule-text">The object of the game is to become the wealthiest player through buying, renting, and trading real estate until all other players are bankrupt.</div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🎲 Official Dice Rules (Doubles & Speeding)</div>
+          <div class="rule-text">
+            • <strong>Rolling Doubles:</strong> If you roll matching numbers, move your token, perform any actions, and <strong>roll again</strong>.<br>
+            • <strong>Highest Roll (12 / Boxcars):</strong> Double 6s is celebrated with fanfare and awards an immediate extra turn.<br>
+            • <strong>3 Consecutive Doubles (Speeding):</strong> If you roll doubles <strong>3 times in a row</strong>, your 3rd roll movement is <strong>voided immediately</strong> and you are sent directly to Jail!
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">⏳ 30-Second Turn Timer & Pause</div>
+          <div class="rule-text">
+            • Active players have <strong>30 seconds</strong> to roll their dice. If the countdown expires, your turn automatically passes to the next player.<br>
+            • Click the <strong>⏸️ Pause</strong> button at the top if any player needs to take a quick break; it freezes the timer and rolls for all devices.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🏠 Houses & Hotels</div>
+          <div class="rule-text">
+            • Once you own all properties of a color group (a complete monopoly), unmortgaged street rents are <strong>doubled</strong>.<br>
+            • You may purchase houses (and eventually hotels) on your properties to dramatically increase rent values.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🔒 Jail Rules</div>
+          <div class="rule-text">
+            You land in Jail if: (1) You land on "Go to Jail", (2) You roll 3 consecutive doubles, or (3) You draw a "Go to Jail" card. You can escape by rolling doubles on your turn, using a "Get Out of Jail Free" card, or paying a $50 fine.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🏚️ Mortgages & Bankruptcy</div>
+          <div class="rule-text">
+            • Unimproved properties can be mortgaged to the Bank for 50% of their printed cost (no rent is collected while mortgaged). To lift a mortgage, pay the Bank the mortgage value + 10% interest.<br>
+            • If you owe more than your total assets can cover and have no properties left to mortgage, you must declare Bankruptcy.
+          </div>
+        </div>
+      `;
+
+      openModal("📖 Official Monopoly Rule Book", rulesHtml, [{ label: "Close Rules", action: closeModal }]);
+    }
+
     function openModal(title, html, buttons = []) {
       document.getElementById('modal-title').innerText = title;
       document.getElementById('modal-content').innerHTML = html;
@@ -1140,7 +2351,7 @@
       document.getElementById('app-modal').classList.remove('active');
     }
 
-    /* Initialize Board Tiles */
+    /* Initialize Board */
     function setupBoardDOM() {
       const boardEl = document.getElementById('board');
       TILES.forEach((tile, index) => {
@@ -1157,15 +2368,18 @@
           ${tile.color ? `<div class="tile-bar color-${tile.color}"></div>` : ''}
           <div class="houses-display" id="houses-tile-${index}"></div>
           <div class="tile-content">
-            <span>${tile.name}</span>
-            ${tile.price ? `<span>$${tile.price}</span>` : ''}
+            <span style="line-height:1.1;">${tile.name}</span>
+            ${tile.icon ? `<div class="tile-icon">${tile.icon}</div>` : ''}
+            ${tile.price ? `<span style="font-size:0.56rem; color:#444;">$${tile.price}</span>` : ''}
           </div>
           <div class="tile-tokens" id="tokens-tile-${index}"></div>
         `;
         boardEl.appendChild(div);
       });
 
-      // Check URL for direct room invitation (e.g. ?room=ABCD)
+      renderDieFace('die-face-1', 1);
+      renderDieFace('die-face-2', 1);
+
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get("room");
       if (roomParam) {
