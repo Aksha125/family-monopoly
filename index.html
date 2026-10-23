@@ -76,7 +76,6 @@
       100% { transform: translateY(-450px) scale(0.9); opacity: 0; }
     }
 
-    /* Event Notification Toast */
     #event-toast {
       position: fixed;
       top: 24px;
@@ -117,7 +116,6 @@
     .toast-title { font-weight: 900; font-size: 1.05rem; }
     .toast-subtitle { font-size: 0.8rem; color: #e5e7eb; }
 
-    /* Synced Pause Overlay */
     .pause-overlay {
       position: fixed;
       inset: 0;
@@ -141,7 +139,6 @@
       letter-spacing: 2px;
     }
 
-    /* Multiplayer Lobby */
     .lobby-overlay {
       position: fixed;
       inset: 0;
@@ -190,7 +187,6 @@
     .lobby-input:focus { border-color: #ffd15c; }
     .lobby-btn-row { display: flex; gap: 10px; }
 
-    /* Layout */
     .game-wrapper {
       display: flex;
       flex-direction: row;
@@ -201,7 +197,6 @@
       align-items: stretch;
     }
 
-    /* Left Control Panel */
     .side-panel {
       flex: 1;
       min-width: 330px;
@@ -304,7 +299,6 @@
       font-family: monospace;
     }
 
-    /* Console & 3D Dice */
     .console-panel {
       background: #0d1513;
       border-radius: 12px;
@@ -328,7 +322,6 @@
       border-radius: 6px;
     }
 
-    /* 30-Second Turn Timer Progress Bar */
     .timer-container {
       width: 100%;
       display: flex;
@@ -441,10 +434,8 @@
     button.btn-action:hover:not(:disabled) { background: #349b73; transform: translateY(-1px); }
     button.btn-action:disabled { background: #202c28; color: #526661; cursor: not-allowed; box-shadow: none; transform: none; }
     button.btn-secondary { background: #364843; }
-    button.btn-warning { background: #d97706; }
     button.btn-danger { background: #ad2d30; }
 
-    /* Tabbed Activity Feed & Live Chat */
     .feed-container {
       flex: 1;
       display: flex;
@@ -544,7 +535,6 @@
       cursor: pointer;
     }
 
-    /* Center Board */
     .board-container {
       flex: 2;
       aspect-ratio: 1 / 1;
@@ -573,7 +563,6 @@
     }
     .tile:hover { filter: brightness(0.95); z-index: 5; }
 
-    /* Positions for 40 tiles */
     .tile-pos-0  { grid-column: 11; grid-row: 11; }
     .tile-pos-1  { grid-column: 10; grid-row: 11; }
     .tile-pos-2  { grid-column: 9;  grid-row: 11; }
@@ -750,7 +739,6 @@
     .chance-stack .stack-layer-top { background: #ffe4e6; color: #9f1239; }
     .community-stack .stack-layer-top { background: #e0f2fe; color: #0369a1; }
 
-    /* Right Player Portfolio */
     .portfolio-panel {
       flex: 1.15;
       min-width: 350px;
@@ -881,7 +869,6 @@
       cursor: pointer;
     }
 
-    /* Generic Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -918,12 +905,10 @@
     .modal-body { padding: 16px; font-size: 0.88rem; line-height: 1.45; overflow-y: auto; flex: 1; }
     .modal-footer { padding: 12px 16px; background: #f8f8f8; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #ddd; }
 
-    /* Rule Book Layout */
     .rule-section { margin-bottom: 16px; }
     .rule-title { font-weight: 800; font-size: 0.95rem; color: #1c2b27; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .rule-text { font-size: 0.82rem; color: #374151; line-height: 1.4; }
 
-    /* Colors */
     .color-brown { background: #7a3d1d; }
     .color-lightblue { background: #89cff0; color: #111 !important; }
     .color-pink { background: #d94b80; }
@@ -938,10 +923,8 @@
 </head>
 <body>
 
-  <!-- Confetti Canvas -->
   <canvas id="fx-canvas"></canvas>
 
-  <!-- Big Event Toast Banner -->
   <div id="event-toast">
     <span class="toast-icon" id="toast-icon">🎉</span>
     <div>
@@ -950,14 +933,12 @@
     </div>
   </div>
 
-  <!-- Synced Pause Screen Overlay -->
   <div class="pause-overlay" id="pause-screen">
     <div class="pause-title">⏸️ GAME PAUSED</div>
     <div style="font-size: 1.1rem; color: #9cb5af;" id="pause-by-label">Player taking a quick break...</div>
     <button class="btn-action" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleGamePause(false)">▶️ Resume Game</button>
   </div>
 
-  <!-- Multiplayer Lobby Screen -->
   <div class="lobby-overlay" id="lobby-screen">
     <div class="lobby-card">
       <h1>Monopoly Online</h1>
@@ -977,7 +958,6 @@
   </div>
 
   <div class="game-wrapper" id="main-viewport">
-    <!-- 1. Left Control Panel -->
     <div class="side-panel">
       <div class="panel-header">
         <h1>Monopoly</h1>
@@ -988,14 +968,11 @@
         </div>
       </div>
 
-      <!-- Players List -->
       <div class="players-list" id="players-ledger"></div>
 
-      <!-- Console, Timer & 3D Dice -->
       <div class="console-panel">
         <div class="turn-status-banner" id="status-message">Connecting to room...</div>
 
-        <!-- 30-Second Turn Countdown Timer -->
         <div class="timer-container">
           <span>⏳</span>
           <div class="timer-bar-bg">
@@ -1020,7 +997,6 @@
         </div>
       </div>
 
-      <!-- Tabbed Activity Feed & Live Chat Room -->
       <div class="feed-container">
         <div class="feed-tabs">
           <div class="feed-tab active" id="tab-log" onclick="switchFeedTab('log')">📋 Game Feed</div>
@@ -1049,14 +1025,12 @@
       </div>
     </div>
 
-    <!-- 2. Center 11x11 Board -->
     <div class="board-container" id="board">
       <div class="board-center">
         <div class="brand-title-box">
           <div class="brand-title">MONOPOLY</div>
         </div>
 
-        <!-- 3D Card Stacks (Chance & Community Chest) -->
         <div class="deck-slots">
           <div class="card-deck-stack chance-stack" onclick="inspectDeck('chance')">
             <div class="stack-layer stack-layer-1"></div>
@@ -1079,29 +1053,24 @@
       </div>
     </div>
 
-    <!-- 3. Right Player Portfolio -->
     <div class="portfolio-panel">
       <div class="portfolio-header">
         <h2 id="portfolio-title">Your Portfolio</h2>
         <span id="portfolio-owner-badge" style="font-size:0.75rem; color:#8fa9a3;">Viewing: You</span>
       </div>
 
-      <!-- Banknotes Denomination Tray -->
       <div class="cash-tray">
         <div class="cash-tray-title">Cash Denominations Stack</div>
         <div class="bill-rack" id="bill-rack-display"></div>
       </div>
 
-      <!-- Special Items (Get Out of Jail Card) -->
       <div class="special-cards-container" id="special-cards-tray"></div>
 
-      <!-- Physical Deeds Fan Binder -->
       <div style="font-size: 0.72rem; font-weight: 700; color: #9cb5af; text-transform: uppercase;">Title Deed Cards (<span id="deed-count">0</span>)</div>
       <div class="deeds-scroll-container" id="deeds-tray"></div>
     </div>
   </div>
 
-  <!-- Modal Popup -->
   <div class="modal-overlay" id="app-modal">
     <div class="modal-card">
       <div class="modal-header" id="modal-title">Notice</div>
@@ -1112,8 +1081,18 @@
 
   <script>
     /* ==========================================================================
-       1. AUDIO SYNTHESIZER
+       GLOBAL STATE VARIABLES (All declared at top to prevent ReferenceErrors)
        ========================================================================== */
+    var currentGameState = null;
+    var currentRoomCode = null;
+    var localPlayerId = null;
+    var viewingPlayerId = null;
+    var roomRef = null;
+    var turnTimerInterval = null;
+    var localProcessedFxTimestamp = 0;
+    var localProcessedReactionTimestamp = 0;
+
+    /* Audio Synthesizer */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
@@ -1176,9 +1155,7 @@
       }
     };
 
-    /* ==========================================================================
-       2. VISUAL FX ENGINE
-       ========================================================================== */
+    /* Canvas FX */
     const fxCanvas = document.getElementById('fx-canvas');
     const ctx = fxCanvas.getContext('2d');
     let confettiParticles = [];
@@ -1268,9 +1245,7 @@
       document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
     }
 
-    /* ==========================================================================
-       3. FIREBASE CONFIG & DATA STRUCTURE
-       ========================================================================== */
+    /* Firebase Configuration */
     const firebaseConfig = {
       apiKey: "AIzaSyCz1C-Msn7vVXmXiwX-dWFXOo2wBRJaxs4",
       authDomain: "family-monopoly-c8893.firebaseapp.com",
@@ -1283,11 +1258,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    let currentRoomCode = null;
-    let localPlayerId = null;
-    let viewingPlayerId = null;
-    let roomRef = null;
 
     const INITIAL_GAME_STATE = {
       players: {},
@@ -1425,7 +1395,6 @@
       });
     }
 
-    /* Pause Game Feature */
     function toggleGamePause(shouldPause) {
       if (!currentRoomCode || !currentGameState) return;
       const player = currentGameState.players[localPlayerId];
@@ -1437,11 +1406,7 @@
       });
     }
 
-    /* ==========================================================================
-       4. DICE & COUNTDOWN TURN TIMER
-       ========================================================================== */
-    let turnTimerInterval = null;
-
+    /* Turn Timer */
     function startTurnCountdown() {
       clearInterval(turnTimerInterval);
       const TURN_LIMIT_SEC = 30;
@@ -1466,7 +1431,6 @@
           fillEl.classList.remove('warning');
         }
 
-        // Timer Expired: If I am the active player, force pass turn!
         if (remaining <= 0) {
           clearInterval(turnTimerInterval);
           const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
@@ -1510,12 +1474,6 @@
         if (onDone) onDone();
       }, 650);
     }
-
-    /* ==========================================================================
-       5. ROOM MANAGEMENT & FIREBASE LISTENERS
-       ========================================================================== */
-    let localProcessedFxTimestamp = 0;
-    let localProcessedReactionTimestamp = 0;
 
     function generateRoomCode() {
       const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -1614,7 +1572,6 @@
           const oldState = currentGameState;
           currentGameState = snapshot.val();
           
-          // Synced Pause Overlay
           const pauseOverlay = document.getElementById('pause-screen');
           if (currentGameState.isPaused) {
             pauseOverlay.classList.add('active');
@@ -1623,7 +1580,6 @@
             pauseOverlay.classList.remove('active');
           }
 
-          // Synced Event Toast & Audio FX
           if (currentGameState.lastFx && currentGameState.lastFx.ts > localProcessedFxTimestamp) {
             localProcessedFxTimestamp = currentGameState.lastFx.ts;
             const fx = currentGameState.lastFx;
@@ -1646,7 +1602,6 @@
             spawnFloatingEmoji(currentGameState.lastReaction.emoji);
           }
 
-          // Dice animation
           if (oldState && currentGameState.dice && 
              (oldState.dice[0] !== currentGameState.dice[0] || oldState.dice[1] !== currentGameState.dice[1])) {
             animateDiceRoll(currentGameState.dice[0], currentGameState.dice[1]);
@@ -1668,9 +1623,6 @@
       });
     }
 
-    /* ==========================================================================
-       6. STATE RENDERING & CHAT
-       ========================================================================== */
     function checkColorMonopoly(pId, color) {
       if (!COLOR_GROUPS[color] || !currentGameState.properties) return false;
       return COLOR_GROUPS[color].every(id => 
@@ -1706,7 +1658,6 @@
       document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused);
       document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
 
-      // Ledger
       const ledger = document.getElementById('players-ledger');
       ledger.innerHTML = '';
       state.playerOrder.forEach(pId => {
@@ -1734,7 +1685,6 @@
         ledger.appendChild(card);
       });
 
-      // Board tokens
       TILES.forEach((_, idx) => {
         const c = document.getElementById(`tokens-tile-${idx}`);
         if (c) c.innerHTML = '';
@@ -1754,7 +1704,6 @@
         }
       });
 
-      // House & mortgage markers on board
       TILES.forEach((_, tId) => {
         const housesEl = document.getElementById(`houses-tile-${tId}`);
         const tileEl = document.getElementById(`tile-${tId}`);
@@ -1781,14 +1730,12 @@
         }
       });
 
-      // Logs
       const feed = document.getElementById('game-feed');
       if (state.logs) {
         feed.innerHTML = state.logs.map(l => `<div style="line-height:1.35; margin-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:2px;">• ${l}</div>`).join('');
         feed.scrollTop = feed.scrollHeight;
       }
 
-      // Chat
       const chatFeed = document.getElementById('chat-feed');
       if (state.messages) {
         chatFeed.innerHTML = state.messages.map(m => `
@@ -1919,9 +1866,6 @@
       });
     }
 
-    /* ==========================================================================
-       7. VERIFIED OFFICIAL MONOPOLY DICE RULES ENGINE
-       ========================================================================== */
     function rollDice() {
       if (!currentGameState || currentGameState.isPaused) return;
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
@@ -1931,12 +1875,11 @@
       const d2 = Math.floor(Math.random() * 6) + 1;
       const total = d1 + d2;
       const isDouble = (d1 === d2);
-      const isBoxcars = (d1 === 6 && d2 === 6); // Highest possible dice roll: 12 (Double 6s)
+      const isBoxcars = (d1 === 6 && d2 === 6);
       const currentDoublesCount = isDouble ? ((currentGameState.consecutiveDoubles || 0) + 1) : 0;
       const player = currentGameState.players[activeId];
 
       animateDiceRoll(d1, d2, () => {
-        // OFFICIAL RULE CHECK: 3 Consecutive Doubles = Speeding Violation -> JAIL IMMEDIATELY (Move Voided)
         if (currentDoublesCount >= 3) {
           const up = {};
           up[`rooms/${currentRoomCode}/dice`] = [d1, d2];
@@ -1955,7 +1898,6 @@
           return;
         }
 
-        // OFFICIAL RULE CHECK: Highest Roll (12 = Boxcars / Double 6s) Celebrated + Extra Chance
         if (isBoxcars) {
           broadcastFx('celebrate', '🎲', 'BOXCARS! HIGHEST ROLL (12)!', `${player.name} rolled the maximum (6+6=12)! Extra roll awarded!`);
         } else if (isDouble) {
@@ -1977,8 +1919,8 @@
         updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = currentDoublesCount;
         updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
         updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
-        updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble; // If double: player gets another roll!
-        updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now(); // Reset 30s timer for bonus roll
+        updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
+        updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now();
 
         let logs = currentGameState.logs || [];
         logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[newPos].name}.`);
@@ -2278,9 +2220,6 @@
       });
     }
 
-    /* ==========================================================================
-       8. ILLUSTRATED OFFICIAL RULE BOOK MODAL
-       ========================================================================== */
     function openRuleBookModal() {
       const rulesHtml = `
         <div class="rule-section">
@@ -2351,7 +2290,6 @@
       document.getElementById('app-modal').classList.remove('active');
     }
 
-    /* Initialize Board */
     function setupBoardDOM() {
       const boardEl = document.getElementById('board');
       TILES.forEach((tile, index) => {
