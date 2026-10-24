@@ -186,7 +186,6 @@
     }
     .lobby-input:focus { border-color: #ffd15c; }
 
-    /* Color Token Selector in Lobby */
     .color-select-label {
       font-size: 0.8rem;
       color: #a4bfb9;
@@ -360,7 +359,6 @@
       border-radius: 6px;
     }
 
-    /* 60-Second Turn Timer Progress Bar */
     .timer-container {
       width: 100%;
       display: flex;
@@ -689,7 +687,6 @@
       z-index: 3;
     }
 
-    /* Enhanced Player Tokens (Color Head with Initial & Halo) */
     .tile-tokens {
       position: absolute;
       bottom: 2px;
@@ -943,11 +940,11 @@
       background: #fff;
       color: #111;
       width: 100%;
-      max-width: 520px;
+      max-width: 580px;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 16px 45px rgba(0,0,0,0.6);
-      max-height: 85vh;
+      max-height: 88vh;
       display: flex;
       flex-direction: column;
     }
@@ -956,18 +953,19 @@
       padding: 14px;
       text-align: center;
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       background: #f1f1f1;
       border-bottom: 2px solid #ddd;
     }
-    .modal-body { padding: 16px; font-size: 0.88rem; line-height: 1.45; overflow-y: auto; flex: 1; }
+    .modal-body { padding: 18px; font-size: 0.85rem; line-height: 1.5; overflow-y: auto; flex: 1; }
     .modal-footer { padding: 12px 16px; background: #f8f8f8; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #ddd; }
 
-    .rule-section { margin-bottom: 16px; }
-    .rule-title { font-weight: 800; font-size: 0.95rem; color: #1c2b27; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .rule-text { font-size: 0.82rem; color: #374151; line-height: 1.4; }
+    .rule-section { margin-bottom: 18px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
+    .rule-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .rule-title { font-weight: 900; font-size: 1rem; color: #1c2b27; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .rule-text { font-size: 0.82rem; color: #374151; line-height: 1.45; }
+    .rule-subheading { font-weight: 700; color: #111827; margin-top: 6px; }
 
-    /* Podium Ranking List */
     .podium-item {
       display: flex;
       justify-content: space-between;
@@ -1012,7 +1010,6 @@
     <button class="btn-action" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleGamePause(false)">▶️ Resume Game</button>
   </div>
 
-  <!-- Lobby Screen with Head Color Selection -->
   <div class="lobby-overlay" id="lobby-screen">
     <div class="lobby-card">
       <h1>Monopoly Online</h1>
@@ -1060,7 +1057,6 @@
       <div class="console-panel">
         <div class="turn-status-banner" id="status-message">Connecting to room...</div>
 
-        <!-- 60-Second Countdown Timer -->
         <div class="timer-container">
           <span>⏳</span>
           <div class="timer-bar-bg">
@@ -1199,7 +1195,6 @@
       });
     }
 
-    /* Audio Synthesizer */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
@@ -1265,7 +1260,6 @@
       }
     };
 
-    /* Canvas FX */
     const fxCanvas = document.getElementById('fx-canvas');
     const ctx = fxCanvas.getContext('2d');
     let confettiParticles = [];
@@ -1355,7 +1349,6 @@
       document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
     }
 
-    /* Firebase Configuration */
     const firebaseConfig = {
       apiKey: "AIzaSyCz1C-Msn7vVXmXiwX-dWFXOo2wBRJaxs4",
       authDomain: "family-monopoly-c8893.firebaseapp.com",
@@ -1514,10 +1507,9 @@
       });
     }
 
-    /* 60-Second Turn Timer with Last 10-Second Sound Warning */
     function startTurnCountdown() {
       clearInterval(turnTimerInterval);
-      const TURN_LIMIT_SEC = 60; // Upgraded to 60 seconds
+      const TURN_LIMIT_SEC = 60;
 
       turnTimerInterval = setInterval(() => {
         if (!currentGameState || currentGameState.isPaused) return;
@@ -1533,7 +1525,6 @@
         fillEl.style.width = `${pct}%`;
         textEl.innerText = `${remaining}s`;
 
-        // Last 10-second warning state & audio chime
         if (remaining <= 10 && remaining > 0) {
           fillEl.classList.add('warning');
           if (remaining !== lastTimerAlertSecond) {
@@ -1751,7 +1742,6 @@
       );
     }
 
-    /* Renders Board State with Initial Head Badges */
     function renderLiveGameState(state) {
       if (!state || !state.playerOrder) return;
 
@@ -1773,7 +1763,6 @@
       document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused);
       document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
 
-      // Ledger with Player Initial Heads
       const ledger = document.getElementById('players-ledger');
       ledger.innerHTML = '';
       state.playerOrder.forEach(pId => {
@@ -1802,7 +1791,6 @@
         ledger.appendChild(card);
       });
 
-      // Clear & Place High-Visibility Tokens on the Board
       TILES.forEach((_, idx) => {
         const c = document.getElementById(`tokens-tile-${idx}`);
         if (c) c.innerHTML = '';
@@ -1824,7 +1812,6 @@
         }
       });
 
-      // Houses / Hotels
       TILES.forEach((_, tId) => {
         const housesEl = document.getElementById(`houses-tile-${tId}`);
         const tileEl = document.getElementById(`tile-${tId}`);
@@ -1851,14 +1838,12 @@
         }
       });
 
-      // Logs
       const feed = document.getElementById('game-feed');
       if (state.logs) {
         feed.innerHTML = state.logs.map(l => `<div style="line-height:1.35; margin-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:2px;">• ${l}</div>`).join('');
         feed.scrollTop = feed.scrollHeight;
       }
 
-      // Chat
       const chatFeed = document.getElementById('chat-feed');
       if (state.messages) {
         chatFeed.innerHTML = state.messages.map(m => `
@@ -2043,7 +2028,7 @@
         updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
         updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
         updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
-        updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now(); // Resets 60s timer for bonus roll
+        updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now();
 
         let logs = currentGameState.logs || [];
         logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[newPos].name}.`);
@@ -2343,9 +2328,6 @@
       });
     }
 
-    /* ==========================================================================
-       8. TALLY NET WORTH & END GAME FEATURE
-       ========================================================================== */
     function promptEndAndTally() {
       if (!confirm("Are you ready to tally everyone's cash, properties, and buildings to determine the winner?")) return;
       
@@ -2394,7 +2376,6 @@
         });
       });
 
-      // Rank by total net worth descending
       standings.sort((a, b) => b.total - a.total);
 
       let html = `<div style="text-align:center; margin-bottom: 14px;">
@@ -2429,34 +2410,121 @@
       openModal("🏆 Official Game Results", html, [{ label: "Close", action: closeModal }]);
     }
 
+    /* ==========================================================================
+       EXHAUSTIVE OFFICIAL MONOPOLY RULE BOOK
+       ========================================================================== */
     function openRuleBookModal() {
       const rulesHtml = `
         <div class="rule-section">
           <div class="rule-title">🎯 Objective of the Game</div>
-          <div class="rule-text">The object of the game is to become the wealthiest player through buying, renting, and trading real estate until all other players are bankrupt or the game is tallied.</div>
-        </div>
-
-        <div class="rule-section">
-          <div class="rule-title">🎲 Official Dice Rules (Doubles & Speeding)</div>
           <div class="rule-text">
-            • <strong>Rolling Doubles:</strong> If you roll matching numbers, move your token, perform any actions, and <strong>roll again</strong>.<br>
-            • <strong>Highest Roll (12 / Boxcars):</strong> Double 6s is celebrated with fanfare and awards an immediate extra turn.<br>
-            • <strong>3 Consecutive Doubles (Speeding):</strong> If you roll doubles <strong>3 times in a row</strong>, your 3rd roll movement is <strong>voided immediately</strong> and you are sent directly to Jail!
+            The object of Monopoly is to become the wealthiest player through buying, renting, and trading real estate until all opponents have been forced into complete financial bankruptcy, or by holding the highest net worth at the agreed conclusion of play.
           </div>
         </div>
 
         <div class="rule-section">
-          <div class="rule-title">⏳ 60-Second Turn Timer & Warnings</div>
+          <div class="rule-title">🎲 Turn Sequence, Dice & The "Speeding" Trap</div>
           <div class="rule-text">
-            • Active players have <strong>60 seconds</strong> to roll their dice. When the countdown hits <strong>10 seconds</strong>, audio tick warnings will sound to urge you to roll.<br>
-            • Click the <strong>⏸️ Pause</strong> button at the top if any player needs to take a break; it freezes the timer for everyone.
+            On your turn, roll both dice and move clockwise around the board by the total number of spaces thrown.
+            <div class="rule-subheading">• Consecutive Independent Rolls (Doubles):</div>
+            If you roll doubles (matching numbers on both dice), move your token, carry out the action for the space landed upon, and <strong>roll again</strong>. Each roll is an entirely separate move—rolls are never combined into a single leap.
+            <div class="rule-subheading">• The "Speeding" Penalty:</div>
+            If you throw doubles <strong>three times in succession</strong>, you do not move on the third throw. Your turn ends immediately, the movement is voided, and you are sent directly to <strong>Jail</strong>.
           </div>
         </div>
 
         <div class="rule-section">
-          <div class="rule-title">🏁 Ending the Game Early (Net Worth Tally)</div>
+          <div class="rule-title">🏠 Buying Properties & Auctions</div>
           <div class="rule-text">
-            Click <strong>🏁 Tally</strong> anytime to conclude the game. Total net worth is computed by adding liquid cash + face value of all unmortgaged deeds + half-value of mortgaged properties + construction cost of all houses/hotels.
+            Whenever you land on an unowned property (Street, Railroad, or Utility), you have the first right to purchase it from the Bank at its printed price.
+            <div class="rule-subheading">• The Official Auction Rule:</div>
+            If the player landing on the property declines to buy it at the listed price, the Banker must immediately put the property up for auction. Any player (including the one who passed) may bid, starting at any price ($1 minimum), and the highest bidder takes the deed.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">💵 Rent Collection & Monopolies</div>
+          <div class="rule-text">
+            When you land on a property owned by an opponent, you must pay the rent specified on its Title Deed.
+            <div class="rule-subheading">• Color Group Monopolies:</div>
+            Holding all properties of a single color group grants a Monopoly. The unimproved site rent on every street in that color group is <strong>automatically doubled</strong>, even if no houses are built.
+            <div class="rule-subheading">• Railroad Rent:</div>
+            $25 for 1 Railroad owned; $50 for 2; $100 for 3; and $200 for holding all 4 Railroads.
+            <div class="rule-subheading">• Utility Rent:</div>
+            If 1 Utility is owned, rent is <strong>4× the dice roll</strong> thrown. If both Utilities are owned by the same player, rent is <strong>10× the dice roll</strong> thrown.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🏗️ Building Houses & Hotels (The "Even Building" Rule)</div>
+          <div class="rule-text">
+            You may only build houses once you own every property in a color group.
+            <div class="rule-subheading">• Even Building Mandate:</div>
+            You must build evenly across the group. You cannot erect a second house on any street until you have placed one house on every street in that color group. The same rule applies to 3rd and 4th houses.
+            <div class="rule-subheading">• Upgrading to Hotels:</div>
+            Once all properties in a color set have 4 houses, you may purchase a Hotel by returning the 4 houses to the Bank and paying the hotel fee. Maximum of 1 Hotel per property.
+            <div class="rule-subheading">• Housing Shortages:</div>
+            Under standard rules, the Bank only has 32 houses and 12 hotels. If the supply runs out, players must wait for someone to sell or upgrade before building.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🏚️ Mortgaging & Selling Buildings</div>
+          <div class="rule-text">
+            Properties can be mortgaged directly to the Bank for 50% of their face value at any time during your turn.
+            <div class="rule-subheading">• Selling Buildings First:</div>
+            A property cannot be mortgaged if any houses or hotels stand on it or on any other property in its color group. All buildings in that group must first be sold back to the Bank at <strong>half-price</strong>, evenly across the group.
+            <div class="rule-subheading">• No Rent Collected:</div>
+            No rent can be collected on mortgaged properties. However, unmortgaged properties in the same color group still collect double rent.
+            <div class="rule-subheading">• Lifting a Mortgage:</div>
+            To unmortgage a property, the owner must pay the Bank the mortgage amount plus <strong>10% interest</strong>.
+            <div class="rule-subheading">• Trading Mortgaged Deeds:</div>
+            A mortgaged property may be sold or traded to another player. The new owner must immediately pay the 10% interest fee to the Bank.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🔒 Complete Jail Rules</div>
+          <div class="rule-text">
+            You are sent to Jail if: (1) You land on "Go to Jail", (2) You draw a "Go to Jail" card, or (3) You roll 3 consecutive doubles.
+            <div class="rule-subheading">• Escaping Jail (3 Methods):</div>
+            1. Roll doubles on any of your next three turns (move forward by that roll).<br>
+            2. Use a "Get Out of Jail Free" card before rolling.<br>
+            3. Pay a $50 fine to the Bank before rolling on your turn. If you fail to roll doubles on your 3rd turn in Jail, you <em>must</em> pay $50 and advance by the roll thrown.
+            <div class="rule-subheading">• Collecting Rent in Jail:</div>
+            According to official rules, you may still buy, sell, trade properties, build houses, and collect rent while imprisoned!
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🅿️ Free Parking & Taxes</div>
+          <div class="rule-text">
+            <div class="rule-subheading">• Free Parking:</div>
+            Official rules state that Free Parking is strictly a neutral resting place. No tax money, fines, or jackpots are awarded—house rules adding jackpot pools are non-standard.
+            <div class="rule-subheading">• Passing GO:</div>
+            Every time your token lands on or passes over GO, the Bank pays you a $200 salary.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">💀 Bankruptcy & Forfeiture</div>
+          <div class="rule-text">
+            If you owe more rent or taxes than you can pay after selling all buildings and mortgaging all properties, you must declare Bankruptcy.
+            <div class="rule-subheading">• Owed to an Opponent:</div>
+            You forfeit all cash and deed cards to that opponent. The recipient must immediately pay 10% interest on any mortgaged properties received.
+            <div class="rule-subheading">• Owed to the Bank (Taxes/Fines):</div>
+            All properties are handed to the Bank and immediately auctioned off to the remaining active players.
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <div class="rule-title">🏁 Ending the Game Early (Asset Tally)</div>
+          <div class="rule-text">
+            If players agree to end the match early, click the <strong>🏁 Tally</strong> button. The player with the highest total net worth is declared winner, calculated as:
+            <br>• Cash on hand
+            <br>• Full printed price of all unmortgaged properties
+            <br>• Half-price (mortgage value) of all mortgaged properties
+            <br>• Full purchase price of all houses and hotels
           </div>
         </div>
       `;
