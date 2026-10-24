@@ -139,11 +139,12 @@
       letter-spacing: 2px;
     }
 
+    /* Redesigned 2-Step Clear Lobby Screen */
     .lobby-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(10, 16, 14, 0.95);
-      backdrop-filter: blur(8px);
+      background: rgba(10, 16, 14, 0.96);
+      backdrop-filter: blur(10px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -153,68 +154,136 @@
 
     .lobby-card {
       background: #1c2b27;
-      border: 1px solid #364e47;
-      border-radius: 16px;
-      padding: 30px 26px;
-      max-width: 440px;
+      border: 1.5px solid #364e47;
+      border-radius: 18px;
+      padding: 28px 24px;
+      max-width: 520px;
       width: 100%;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
       text-align: center;
     }
 
     .lobby-card h1 {
-      font-size: 1.9rem;
+      font-size: 2.1rem;
       font-weight: 900;
       color: #ffd15c;
       letter-spacing: 2px;
       text-transform: uppercase;
+      text-shadow: 0 2px 8px rgba(255,209,92,0.3);
+    }
+
+    /* Mode Selection Tiles */
+    .mode-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 8px 0;
+    }
+
+    .mode-tile {
+      background: #131d1a;
+      border: 2px solid #283c36;
+      border-radius: 12px;
+      padding: 20px 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .mode-tile:hover {
+      background: #1e2e29;
+      border-color: #ffd15c;
+      transform: translateY(-3px);
+    }
+
+    .mode-tile.selected {
+      border-color: #ffd15c;
+      background: #243832;
+      box-shadow: 0 0 15px rgba(255,209,92,0.25);
+    }
+
+    .mode-icon { font-size: 2rem; }
+    .mode-title { font-weight: 800; font-size: 1rem; color: #fff; }
+    .mode-desc { font-size: 0.72rem; color: #9bb1ab; line-height: 1.3; }
+
+    /* Player Setup Form */
+    .setup-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      background: #141f1c;
+      border: 1px solid #23342f;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .setup-label {
+      font-size: 0.8rem;
+      color: #a4bfb9;
+      font-weight: 700;
+      margin-bottom: -4px;
     }
 
     .lobby-input {
       width: 100%;
-      padding: 11px 14px;
-      background: #131c19;
-      border: 1.5px solid #334a43;
+      padding: 12px 14px;
+      background: #0d1513;
+      border: 1.5px solid #2d423b;
       border-radius: 8px;
       color: #fff;
       font-size: 1rem;
-      text-align: center;
       outline: none;
+      transition: border-color 0.2s;
     }
     .lobby-input:focus { border-color: #ffd15c; }
 
-    .color-select-label {
-      font-size: 0.8rem;
-      color: #a4bfb9;
-      text-align: left;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
     .token-color-picker {
       display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 4px;
+      justify-content: space-around;
+      gap: 8px;
     }
+
     .color-swatch {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.3);
+      border: 3px solid rgba(255,255,255,0.25);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 0.75rem;
       transition: transform 0.2s, border-color 0.2s;
     }
     .color-swatch:hover { transform: scale(1.15); }
     .color-swatch.selected {
       border-color: #ffd15c;
-      box-shadow: 0 0 10px #ffd15c;
+      box-shadow: 0 0 12px #ffd15c;
       transform: scale(1.2);
     }
 
-    .lobby-btn-row { display: flex; gap: 10px; }
+    .invite-banner {
+      background: #253832;
+      border: 1px solid #ffd15c;
+      color: #fde68a;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
     .game-wrapper {
       display: flex;
@@ -461,10 +530,10 @@
       border: none;
       color: #fff;
       font-weight: 700;
-      padding: 9px;
-      border-radius: 6px;
+      padding: 10px;
+      border-radius: 7px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       transition: all 0.15s ease;
       box-shadow: 0 3px 6px rgba(0,0,0,0.3);
     }
@@ -1010,33 +1079,61 @@
     <button class="btn-action" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleGamePause(false)">▶️ Resume Game</button>
   </div>
 
+  <!-- Redesigned Clean 2-Step Lobby -->
   <div class="lobby-overlay" id="lobby-screen">
     <div class="lobby-card">
       <h1>Monopoly Online</h1>
-      <p style="font-size: 0.85rem; color: #a4bfb9;">Choose your nickname and token head color.</p>
 
-      <input type="text" id="player-name-input" class="lobby-input" placeholder="Enter Your Nickname" maxlength="14">
-      
-      <div>
-        <div class="color-select-label">Choose Your Token Head Color:</div>
-        <div class="token-color-picker" id="lobby-color-picker">
-          <div class="color-swatch selected" style="background:#e63946;" onclick="selectHeadColor(0)" title="Crimson Red"></div>
-          <div class="color-swatch" style="background:#2a9d8f;" onclick="selectHeadColor(1)" title="Emerald Teal"></div>
-          <div class="color-swatch" style="background:#f4a261;" onclick="selectHeadColor(2)" title="Coral Orange"></div>
-          <div class="color-swatch" style="background:#9b5de5;" onclick="selectHeadColor(3)" title="Royal Purple"></div>
-          <div class="color-swatch" style="background:#ffd15c;" onclick="selectHeadColor(4)" title="Golden Sun"></div>
-          <div class="color-swatch" style="background:#0284c7;" onclick="selectHeadColor(5)" title="Deep Cobalt"></div>
+      <!-- Auto-Invite Detection Banner if link clicked -->
+      <div class="invite-banner" id="invite-detect-banner" style="display:none;">
+        <span>🔗 Joining Family Game Room:</span>
+        <span id="detected-room-badge" style="color:#ffd15c; font-size:1.05rem;"></span>
+      </div>
+
+      <!-- Step 1: Decision Mode (Host vs Join) -->
+      <div class="mode-select-grid" id="mode-selector-grid">
+        <div class="mode-tile selected" id="tile-create-mode" onclick="setLobbyMode('create')">
+          <div class="mode-icon">👑</div>
+          <div class="mode-title">Start New Game</div>
+          <div class="mode-desc">Create a fresh room & invite your family.</div>
+        </div>
+
+        <div class="mode-tile" id="tile-join-mode" onclick="setLobbyMode('join')">
+          <div class="mode-icon">🎮</div>
+          <div class="mode-title">Join Existing Game</div>
+          <div class="mode-desc">Enter the 4-letter room code shared with you.</div>
         </div>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="btn-action" onclick="createRoom()">Host New Game</button>
-        <div style="font-size: 0.75rem; color: #7b8f8a;">— OR JOIN EXISTING —</div>
-        <div class="lobby-btn-row">
-          <input type="text" id="room-code-input" class="lobby-input" placeholder="Room Code (e.g. ABCD)" maxlength="6" style="text-transform: uppercase;">
-          <button class="btn-action btn-secondary" onclick="joinRoomByInput()">Join</button>
+      <!-- Step 2: Details & Pawn Customization -->
+      <div class="setup-section">
+        <!-- Room Code field (Visible only in Join mode) -->
+        <div id="room-code-wrapper" style="display:none;">
+          <div class="setup-label">Enter 4-Letter Room Code:</div>
+          <input type="text" id="room-code-input" class="lobby-input" placeholder="e.g. ABCD" maxlength="6" style="text-transform: uppercase; font-size: 1.15rem; font-weight:800; letter-spacing: 2px;">
+        </div>
+
+        <div>
+          <div class="setup-label">Your Nickname or Initials:</div>
+          <input type="text" id="player-name-input" class="lobby-input" placeholder="e.g. Mom, Alex, AP" maxlength="12" style="font-weight:700;">
+        </div>
+
+        <div>
+          <div class="setup-label">Choose Your Token Pawn Color:</div>
+          <div class="token-color-picker" id="lobby-color-picker">
+            <div class="color-swatch selected" style="background:#e63946;" onclick="selectHeadColor(0)" title="Crimson Red">R</div>
+            <div class="color-swatch" style="background:#2a9d8f;" onclick="selectHeadColor(1)" title="Emerald Teal">T</div>
+            <div class="color-swatch" style="background:#f4a261;" onclick="selectHeadColor(2)" title="Coral Orange">O</div>
+            <div class="color-swatch" style="background:#9b5de5;" onclick="selectHeadColor(3)" title="Royal Purple">P</div>
+            <div class="color-swatch" style="background:#ffd15c; color:#111;" onclick="selectHeadColor(4)" title="Golden Sun">Y</div>
+            <div class="color-swatch" style="background:#0284c7;" onclick="selectHeadColor(5)" title="Deep Cobalt">B</div>
+          </div>
         </div>
       </div>
+
+      <button class="btn-action" id="btn-enter-game" style="padding: 13px; font-size: 1.05rem;" onclick="handleLobbySubmit()">
+        Create & Enter Room
+      </button>
     </div>
   </div>
 
@@ -1057,6 +1154,7 @@
       <div class="console-panel">
         <div class="turn-status-banner" id="status-message">Connecting to room...</div>
 
+        <!-- 60-Second Countdown Timer -->
         <div class="timer-container">
           <span>⏳</span>
           <div class="timer-bar-bg">
@@ -1176,6 +1274,7 @@
     var localProcessedFxTimestamp = 0;
     var localProcessedReactionTimestamp = 0;
     var lastTimerAlertSecond = -1;
+    var lobbyMode = "create"; // "create" or "join"
 
     const AVAILABLE_COLORS = [
       "#e63946", // 0 Crimson Red
@@ -1195,6 +1294,39 @@
       });
     }
 
+    function setLobbyMode(mode) {
+      lobbyMode = mode;
+      const isJoin = (mode === "join");
+      document.getElementById('tile-create-mode').classList.toggle('selected', !isJoin);
+      document.getElementById('tile-join-mode').classList.toggle('selected', isJoin);
+      document.getElementById('room-code-wrapper').style.display = isJoin ? 'block' : 'none';
+      document.getElementById('btn-enter-game').innerText = isJoin ? "Join Game Room" : "Create & Enter Room";
+    }
+
+    function handleLobbySubmit() {
+      const nameInput = document.getElementById('player-name-input');
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert("Please enter your nickname or initials to continue!");
+        nameInput.focus();
+        return;
+      }
+
+      if (lobbyMode === "create") {
+        createRoom(name);
+      } else {
+        const codeInput = document.getElementById('room-code-input');
+        const code = codeInput.value.trim().toUpperCase();
+        if (!code) {
+          alert("Please enter the 4-letter room code shared by your host!");
+          codeInput.focus();
+          return;
+        }
+        joinRoom(code, name);
+      }
+    }
+
+    /* Audio Synthesizer */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
@@ -1507,6 +1639,7 @@
       });
     }
 
+    /* 60-Second Turn Timer with Last 10-Second Sound Warning */
     function startTurnCountdown() {
       clearInterval(turnTimerInterval);
       const TURN_LIMIT_SEC = 60;
@@ -1586,8 +1719,7 @@
       return code;
     }
 
-    function createRoom() {
-      const name = document.getElementById('player-name-input').value.trim() || "Player 1";
+    function createRoom(name) {
       const chosenColor = AVAILABLE_COLORS[selectedColorIndex];
       const code = generateRoomCode();
       const pId = "p_" + Date.now();
@@ -1613,16 +1745,9 @@
       db.ref("rooms/" + code).set(initial).then(() => enterRoom(code));
     }
 
-    function joinRoomByInput() {
-      const name = document.getElementById('player-name-input').value.trim() || "Guest";
-      const code = document.getElementById('room-code-input').value.trim().toUpperCase();
-      if (!code) return alert("Please enter a room code!");
-      joinRoom(code, name);
-    }
-
     function joinRoom(code, name) {
       db.ref("rooms/" + code).once("value").then(snap => {
-        if (!snap.exists()) return alert("Room does not exist!");
+        if (!snap.exists()) return alert(`Room "${code}" does not exist! Please check the code.`);
         const state = snap.val();
         
         let pId = localStorage.getItem("monopoly_pid_" + code);
@@ -1724,7 +1849,7 @@
     function copyShareLink() {
       const url = window.location.origin + window.location.pathname + `?room=${currentRoomCode}`;
       navigator.clipboard.writeText(url).then(() => {
-        alert("Invite link copied to clipboard!\n" + url);
+        alert("Invite link copied to clipboard!\nSend this to family so they join your room directly:\n" + url);
       });
     }
 
@@ -2410,9 +2535,6 @@
       openModal("🏆 Official Game Results", html, [{ label: "Close", action: closeModal }]);
     }
 
-    /* ==========================================================================
-       EXHAUSTIVE OFFICIAL MONOPOLY RULE BOOK
-       ========================================================================== */
     function openRuleBookModal() {
       const rulesHtml = `
         <div class="rule-section">
@@ -2579,10 +2701,18 @@
       renderDieFace('die-face-1', 1);
       renderDieFace('die-face-2', 1);
 
+      // Auto-detect invite link with query parameter (e.g. ?room=ABCD)
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get("room");
       if (roomParam) {
-        document.getElementById('room-code-input').value = roomParam;
+        const cleanCode = roomParam.trim().toUpperCase();
+        document.getElementById('room-code-input').value = cleanCode;
+        setLobbyMode('join');
+
+        // Hide "Start New Game" choice so family members cannot click it accidentally
+        document.getElementById('mode-selector-grid').style.display = 'none';
+        document.getElementById('invite-detect-banner').style.display = 'flex';
+        document.getElementById('detected-room-badge').innerText = cleanCode;
       }
     }
 
