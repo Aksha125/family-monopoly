@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Patil Estates - Tournament Edition</title>
+  <title>Classic Family Monopoly - Tournament Edition</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -12,14 +12,14 @@
 
   <style>
     :root {
-      --felt-bg: radial-gradient(circle at center, #1b382b 0%, #0c1a14 100%);
-      --board-wood: #2c1810;
-      --board-trim: #4a2818;
-      --board-surface: #d8ebd2;
-      --tile-bg: #fdfefe;
-      --tile-border: #1a2a1e;
-      --glass-panel: rgba(18, 30, 26, 0.85);
-      --glass-border: rgba(255, 209, 92, 0.2);
+      --felt-bg: radial-gradient(circle at center, #1b382b 0%, #0a1711 100%);
+      --board-wood: #78350f;
+      --board-trim: #b45309;
+      --board-surface: #dbeef0;
+      --tile-bg: #ffffff;
+      --tile-border: #1e2922;
+      --glass-panel: rgba(18, 30, 26, 0.88);
+      --glass-border: rgba(255, 209, 92, 0.25);
       --gold-accent: #ffd15c;
       --danger-red: #ef4444;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -84,7 +84,7 @@
       top: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
-      background: rgba(22, 35, 30, 0.95);
+      background: rgba(22, 35, 30, 0.96);
       border: 2px solid var(--gold-accent);
       box-shadow: 0 16px 40px rgba(0,0,0,0.85);
       border-radius: 40px;
@@ -106,13 +106,13 @@
 
     #event-toast.toast-celebrate {
       border-color: var(--gold-accent);
-      background: linear-gradient(135deg, rgba(28,43,39,0.95), rgba(36,61,53,0.95));
+      background: linear-gradient(135deg, rgba(28,43,39,0.96), rgba(36,61,53,0.96));
       color: var(--gold-accent);
     }
 
     #event-toast.toast-dread {
       border-color: var(--danger-red);
-      background: linear-gradient(135deg, rgba(36,20,22,0.95), rgba(59,23,26,0.95));
+      background: linear-gradient(135deg, rgba(36,20,22,0.96), rgba(59,23,26,0.96));
       color: #fca5a5;
     }
 
@@ -123,7 +123,7 @@
     .pause-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(8, 14, 12, 0.94);
+      background: rgba(8, 14, 12, 0.95);
       backdrop-filter: blur(12px);
       display: none;
       flex-direction: column;
@@ -143,7 +143,7 @@
       letter-spacing: 2px;
     }
 
-    /* Redesigned Glassmorphic Lobby */
+    /* Redesigned 3-Mode Lobby Screen */
     .lobby-overlay {
       position: fixed;
       inset: 0;
@@ -160,41 +160,41 @@
       background: #182723;
       border: 1.5px solid #364e47;
       border-radius: 20px;
-      padding: 30px 26px;
-      max-width: 530px;
+      padding: 28px 24px;
+      max-width: 580px;
       width: 100%;
       box-shadow: 0 25px 60px rgba(0,0,0,0.9);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       text-align: center;
     }
 
     .lobby-card h1 {
-      font-size: 2.2rem;
+      font-size: 2.3rem;
       font-weight: 900;
       color: var(--gold-accent);
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      text-shadow: 0 2px 10px rgba(255,209,92,0.3);
+      text-shadow: 0 2px 12px rgba(255,209,92,0.35);
     }
 
     .mode-select-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
     .mode-tile {
       background: #111a17;
       border: 2px solid #283c36;
       border-radius: 12px;
-      padding: 18px 12px;
+      padding: 16px 8px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s;
     }
 
@@ -207,12 +207,12 @@
     .mode-tile.selected {
       border-color: var(--gold-accent);
       background: #20352e;
-      box-shadow: 0 0 15px rgba(255,209,92,0.25);
+      box-shadow: 0 0 16px rgba(255,209,92,0.3);
     }
 
-    .mode-icon { font-size: 2rem; }
-    .mode-title { font-weight: 800; font-size: 0.95rem; color: #fff; }
-    .mode-desc { font-size: 0.72rem; color: #9bb1ab; line-height: 1.3; }
+    .mode-icon { font-size: 1.8rem; }
+    .mode-title { font-weight: 800; font-size: 0.88rem; color: #fff; }
+    .mode-desc { font-size: 0.68rem; color: #9bb1ab; line-height: 1.25; }
 
     .setup-section {
       display: flex;
@@ -221,7 +221,7 @@
       text-align: left;
       background: #121d19;
       border: 1px solid #243731;
-      padding: 18px;
+      padding: 16px 18px;
       border-radius: 12px;
     }
 
@@ -275,29 +275,29 @@
       transform: scale(1.22);
     }
 
-    /* Bot Selector Pill Box */
-    .bot-control-box {
+    /* Bot Pill Selector */
+    .bot-pills-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      background: #192723;
-      border: 1px dashed #3d564e;
-      border-radius: 8px;
+      gap: 8px;
     }
-
-    .btn-bot-add {
-      background: #27473d;
-      border: 1px solid #3c6d5e;
-      color: #6ee7b7;
-      padding: 6px 12px;
-      border-radius: 6px;
+    .bot-pill {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.8rem;
       font-weight: 800;
-      font-size: 0.78rem;
+      border-radius: 8px;
+      border: 1.5px solid #2f453e;
+      background: #172420;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .btn-bot-add:hover { background: #325a4e; }
+    .bot-pill.selected {
+      background: #2a7c5c;
+      border-color: #6ee7b7;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(110,231,183,0.3);
+    }
 
     .game-wrapper {
       display: flex;
@@ -309,7 +309,6 @@
       align-items: stretch;
     }
 
-    /* Glassmorphism Side Panel */
     .side-panel {
       flex: 1;
       min-width: 330px;
@@ -393,7 +392,6 @@
       border-left: 4px solid #6ee7b7;
     }
 
-    /* Low Cash Danger Animation */
     .player-card.low-cash-alert {
       border-color: var(--danger-red) !important;
       animation: alertGlow 1.2s infinite alternate;
@@ -413,14 +411,14 @@
     }
 
     .player-avatar {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       border: 2px solid #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 900;
       color: #fff;
       box-shadow: 0 2px 5px rgba(0,0,0,0.5);
@@ -679,20 +677,20 @@
       cursor: pointer;
     }
 
-    /* Modern Luxury Mahogany Board Styling */
+    /* Natural Satin Warm Oak Wood Trim Board */
     .board-container {
       flex: 2;
       aspect-ratio: 1 / 1;
       max-height: 96vh;
-      background: var(--board-surface);
-      border: 10px solid var(--board-wood);
-      outline: 2px solid var(--board-trim);
-      border-radius: 12px;
+      background: #dbeef0;
+      border: 10px solid #92400e;
+      outline: 3px solid #d97706;
+      box-shadow: 0 25px 65px rgba(0,0,0,0.85), inset 0 0 12px rgba(110,40,10,0.45);
+      border-radius: 14px;
       display: grid;
       grid-template-columns: 13.5% repeat(9, 8.11%) 13.5%;
       grid-template-rows: 13.5% repeat(9, 8.11%) 13.5%;
       position: relative;
-      box-shadow: 0 25px 65px rgba(0,0,0,0.85), inset 0 0 10px rgba(0,0,0,0.25);
     }
 
     .tile {
@@ -701,7 +699,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow: visible;
       cursor: pointer;
       color: #1a2a1e;
       font-size: 0.65rem;
@@ -770,7 +768,6 @@
     .tile-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
     .tile-icon svg { width: 100%; height: 100%; }
 
-    /* Isometric 3D Houses & Hotels */
     .houses-display {
       display: flex;
       gap: 2px;
@@ -811,7 +808,7 @@
       z-index: 3;
     }
 
-    /* Enhanced 3D Pawn Tokens with Step-by-Step Trajectory */
+    /* Highly Visible Large 3D Pawns with Floating Name Badges */
     .tile-tokens {
       position: absolute;
       bottom: 2px;
@@ -819,23 +816,45 @@
       right: 0;
       display: flex;
       flex-wrap: wrap;
-      gap: 3px;
+      gap: 4px;
       justify-content: center;
       align-items: center;
-      z-index: 8;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .board-token-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .token-nametag {
+      position: absolute;
+      top: -14px;
+      background: rgba(0,0,0,0.85);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      font-size: 0.52rem;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 3px;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
       pointer-events: none;
     }
 
     .board-token {
-      width: 22px;
-      height: 22px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      border: 2px solid #ffffff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.5);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.6);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.68rem;
+      font-size: 0.78rem;
       font-weight: 900;
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
@@ -848,18 +867,18 @@
     }
 
     @keyframes tokenPulse {
-      0% { transform: scale(1); box-shadow: 0 0 5px var(--gold-accent); }
-      100% { transform: scale(1.38); box-shadow: 0 0 16px var(--gold-accent); }
+      0% { transform: scale(1); box-shadow: 0 0 6px var(--gold-accent); }
+      100% { transform: scale(1.4); box-shadow: 0 0 18px var(--gold-accent); }
     }
 
     .board-token.token-hop {
-      transform: translateY(-16px) scale(1.25) !important;
+      transform: translateY(-18px) scale(1.3) !important;
     }
 
     .board-center {
       grid-column: 2 / span 9;
       grid-row: 2 / span 9;
-      background: radial-gradient(circle at center, #edf7ea 0%, #d8ebd2 100%);
+      background: radial-gradient(circle at center, #edf7ea 0%, #dbeef0 100%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -874,13 +893,13 @@
       border: 3.5px solid #ffffff;
       box-shadow: 0 10px 28px rgba(0,0,0,0.35);
       transform: rotate(-10deg);
-      padding: 6px 26px;
+      padding: 6px 28px;
       margin-top: 14%;
     }
     .brand-title {
-      font-size: 2.3rem;
+      font-size: 3rem;
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       color: #ffffff;
       text-shadow: 2px 2px 0px #1a2a1a;
       line-height: 1;
@@ -1141,29 +1160,46 @@
     <button class="btn-action" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleGamePause(false)">▶️ Resume Game</button>
   </div>
 
-  <!-- Redesigned Clean 2-Step Lobby with Bot Capability -->
+  <!-- Prominent 3-Choice Lobby Screen -->
   <div class="lobby-overlay" id="lobby-screen">
     <div class="lobby-card">
-      <h1>Patil Estates</h1>
+      <h1>MONOPOLY</h1>
 
       <div class="mode-select-grid" id="mode-selector-grid">
         <div class="mode-tile selected" id="tile-create-mode" onclick="setLobbyMode('create')">
           <div class="mode-icon">👑</div>
-          <div class="mode-title">Start New Game</div>
-          <div class="mode-desc">Create room & play with family or bots.</div>
+          <div class="mode-title">Host Family Game</div>
+          <div class="mode-desc">Create room & invite family.</div>
         </div>
 
         <div class="mode-tile" id="tile-join-mode" onclick="setLobbyMode('join')">
           <div class="mode-icon">🎮</div>
-          <div class="mode-title">Join Existing Game</div>
-          <div class="mode-desc">Enter the 4-letter room code shared with you.</div>
+          <div class="mode-title">Join Game</div>
+          <div class="mode-desc">Enter a 4-letter room code.</div>
+        </div>
+
+        <div class="mode-tile" id="tile-solo-mode" onclick="setLobbyMode('solo')">
+          <div class="mode-icon">🤖</div>
+          <div class="mode-title">Play Solo vs Bots</div>
+          <div class="mode-desc">Practice offline against AI.</div>
         </div>
       </div>
 
       <div class="setup-section">
+        <!-- Room Code field for Join Mode -->
         <div id="room-code-wrapper" style="display:none;">
           <label class="setup-label">Enter 4-Letter Room Code:</label>
           <input type="text" id="room-code-input" class="lobby-input" placeholder="e.g. ABCD" maxlength="6" style="text-transform: uppercase; font-size: 1.15rem; font-weight:800; letter-spacing: 2px;">
+        </div>
+
+        <!-- Bot Count selector for Solo Mode -->
+        <div id="bot-count-wrapper" style="display:none;">
+          <label class="setup-label">Select Number of AI Opponents:</label>
+          <div class="bot-pills-row">
+            <div class="bot-pill selected" id="pill-bot-1" onclick="selectBotCount(1)">1 Bot</div>
+            <div class="bot-pill" id="pill-bot-2" onclick="selectBotCount(2)">2 Bots</div>
+            <div class="bot-pill" id="pill-bot-3" onclick="selectBotCount(3)">3 Bots</div>
+          </div>
         </div>
 
         <div>
@@ -1172,7 +1208,7 @@
         </div>
 
         <div>
-          <label class="setup-label">Choose Your Token Pawn Color:</label>
+          <label class="setup-label">Choose Your Token Head Color:</label>
           <div class="token-color-picker" id="lobby-color-picker">
             <div class="color-swatch selected" style="background:#e63946;" onclick="selectHeadColor(0)" title="Crimson Red">R</div>
             <div class="color-swatch" style="background:#2a9d8f;" onclick="selectHeadColor(1)" title="Emerald Teal">T</div>
@@ -1181,15 +1217,6 @@
             <div class="color-swatch" style="background:#ffd15c; color:#111;" onclick="selectHeadColor(4)" title="Golden Sun">Y</div>
             <div class="color-swatch" style="background:#0284c7;" onclick="selectHeadColor(5)" title="Deep Cobalt">B</div>
           </div>
-        </div>
-
-        <!-- Solo / Bot Configuration (In Host Mode) -->
-        <div id="bot-config-wrapper" class="bot-control-box">
-          <div>
-            <div style="font-weight:800; font-size:0.85rem; color:#fff;">Play Solo vs Bots?</div>
-            <div style="font-size:0.7rem; color:#8fa9a3;" id="bot-count-label">Bots added: 0 (Max 3)</div>
-          </div>
-          <button class="btn-bot-add" id="btn-add-bot" onclick="addBotToLobby()">+ Add AI Bot</button>
         </div>
       </div>
 
@@ -1202,7 +1229,7 @@
   <div class="game-wrapper" id="main-viewport">
     <div class="side-panel">
       <div class="panel-header">
-        <h1>Patil Estates</h1>
+        <h1>MONOPOLY</h1>
         <div class="header-btns">
           <button class="btn-header" onclick="openRuleBookModal()" title="View Rules">📖 Rules</button>
           <button class="btn-header btn-header-gold" onclick="promptEndAndTally()" title="Tally Net Worth & Crown Winner">🏁 Tally</button>
@@ -1272,7 +1299,7 @@
     <div class="board-container" id="board">
       <div class="board-center">
         <div class="brand-title-box">
-          <div class="brand-title">PATIL ESTATES</div>
+          <div class="brand-title">MONOPOLY</div>
         </div>
 
         <div class="deck-slots">
@@ -1336,9 +1363,10 @@
     var localProcessedFxTimestamp = 0;
     var localProcessedReactionTimestamp = 0;
     var lastTimerAlertSecond = -1;
-    var lobbyMode = "create";
-    var lobbyBotsCount = 0;
+    var lobbyMode = "create"; // "create", "join", or "solo"
+    var selectedSoloBots = 1;
     var isPawnWalking = false;
+    var aiTurnInProgress = false; // Prevents simultaneous bot execution
 
     const AVAILABLE_COLORS = [
       "#e63946", // 0 Crimson Red
@@ -1364,24 +1392,28 @@
       });
     }
 
-    function setLobbyMode(mode) {
-      lobbyMode = mode;
-      const isJoin = (mode === "join");
-      document.getElementById('tile-create-mode').classList.toggle('selected', !isJoin);
-      document.getElementById('tile-join-mode').classList.toggle('selected', isJoin);
-      document.getElementById('room-code-wrapper').style.display = isJoin ? 'block' : 'none';
-      document.getElementById('bot-config-wrapper').style.display = isJoin ? 'none' : 'flex';
-      document.getElementById('btn-enter-game').innerText = isJoin ? "Join Game Room" : "Create & Enter Room";
+    function selectBotCount(n) {
+      selectedSoloBots = n;
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById(`pill-bot-${i}`).classList.toggle('selected', i === n);
+      }
     }
 
-    function addBotToLobby() {
-      if (lobbyBotsCount < 3) {
-        lobbyBotsCount++;
-        document.getElementById('bot-count-label').innerText = `Bots added: ${lobbyBotsCount} (Max 3)`;
-        if (lobbyBotsCount === 3) {
-          document.getElementById('btn-add-bot').disabled = true;
-          document.getElementById('btn-add-bot').innerText = "Limit Reached";
-        }
+    function setLobbyMode(mode) {
+      lobbyMode = mode;
+      document.getElementById('tile-create-mode').classList.toggle('selected', mode === "create");
+      document.getElementById('tile-join-mode').classList.toggle('selected', mode === "join");
+      document.getElementById('tile-solo-mode').classList.toggle('selected', mode === "solo");
+
+      document.getElementById('room-code-wrapper').style.display = (mode === "join") ? 'block' : 'none';
+      document.getElementById('bot-count-wrapper').style.display = (mode === "solo") ? 'block' : 'none';
+
+      if (mode === "create") {
+        document.getElementById('btn-enter-game').innerText = "Host & Enter Room";
+      } else if (mode === "join") {
+        document.getElementById('btn-enter-game').innerText = "Join Game Room";
+      } else {
+        document.getElementById('btn-enter-game').innerText = "Start Solo Game vs Bots";
       }
     }
 
@@ -1395,7 +1427,9 @@
       }
 
       if (lobbyMode === "create") {
-        createRoom(name, lobbyBotsCount);
+        createRoom(name, 0);
+      } else if (lobbyMode === "solo") {
+        createRoom(name, selectedSoloBots);
       } else {
         const codeInput = document.getElementById('room-code-input');
         const code = codeInput.value.trim().toUpperCase();
@@ -1571,7 +1605,7 @@
       document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
     }
 
-    /* Firebase Configuration */
+    /* Firebase Config */
     const firebaseConfig = {
       apiKey: "AIzaSyCz1C-Msn7vVXmXiwX-dWFXOo2wBRJaxs4",
       authDomain: "family-monopoly-c8893.firebaseapp.com",
@@ -1705,7 +1739,7 @@
       const player = currentGameState.players[localPlayerId];
       const msgObj = {
         sender: player ? player.name : "Guest",
-        color: player ? player.color : varColorGold(),
+        color: player ? player.color : "#ffd15c",
         text: text,
         ts: Date.now()
       };
@@ -1718,8 +1752,6 @@
         input.value = '';
       });
     }
-
-    function varColorGold() { return "#ffd15c"; }
 
     function toggleGamePause(shouldPause) {
       if (!currentRoomCode || !currentGameState) return;
@@ -1833,7 +1865,6 @@
       };
       initial.playerOrder = [pId];
 
-      // Add autonomous AI bots if requested
       for (let i = 0; i < botCount; i++) {
         const botId = "bot_" + (i + 1) + "_" + Date.now();
         const preset = BOT_PRESETS[i];
@@ -1945,7 +1976,6 @@
             spawnFloatingEmoji(currentGameState.lastReaction.emoji);
           }
 
-          // Trigger dice roll animation if dice changed
           if (oldState && currentGameState.dice && 
              (oldState.dice[0] !== currentGameState.dice[0] || oldState.dice[1] !== currentGameState.dice[1])) {
             animateDiceRoll(currentGameState.dice[0], currentGameState.dice[1]);
@@ -1957,7 +1987,6 @@
           renderLiveGameState(currentGameState);
           startTurnCountdown();
 
-          // Check if it is an AI Bot's turn and I am the host
           evaluateAITurn(currentGameState);
         }
       });
@@ -1984,7 +2013,7 @@
       );
     }
 
-    /* Renders Board State with High-Visibility Token Heads & Low-Cash Danger Indicators */
+    /* Renders High-Visibility Large Tokens with Floating Nametags */
     function renderLiveGameState(state) {
       if (!state || !state.playerOrder) return;
 
@@ -1999,7 +2028,7 @@
             : "⭐ IT'S YOUR TURN! Roll the dice.";
         } else {
           document.getElementById('status-message').innerText = activePlayer.isBot
-            ? `🤖 ${activePlayer.name} is making its move...`
+            ? `🤖 ${activePlayer.name} is thinking & making a move...`
             : `Waiting for ${activePlayer.name}...`;
         }
       }
@@ -2008,7 +2037,7 @@
       document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused || isPawnWalking);
       document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
 
-      // Ledger with Low Cash Indicator ($150 threshold)
+      // Ledger with low cash threshold
       const ledger = document.getElementById('players-ledger');
       ledger.innerHTML = '';
       state.playerOrder.forEach(pId => {
@@ -2040,7 +2069,7 @@
         ledger.appendChild(card);
       });
 
-      // Clear & Place High-Visibility Tokens on the Board (Skip if pawn is walking)
+      // Clear & Place Tokens with Nametags
       if (!isPawnWalking) {
         TILES.forEach((_, idx) => {
           const c = document.getElementById(`tokens-tile-${idx}`);
@@ -2052,14 +2081,24 @@
           if (p && !p.bankrupt) {
             const c = document.getElementById(`tokens-tile-${p.position}`);
             if (c) {
+              const wrapper = document.createElement('div');
+              wrapper.className = 'board-token-wrapper';
+              wrapper.id = `token-wrapper-${pId}`;
+
+              const nametag = document.createElement('div');
+              nametag.className = 'token-nametag';
+              nametag.innerText = p.name ? p.name.substring(0, 7) : 'P';
+
               const token = document.createElement('div');
               const isTurn = (pId === activeId);
               token.className = `board-token ${isTurn ? 'token-active-turn' : ''}`;
               token.id = `board-token-${pId}`;
               token.style.background = p.color;
               token.innerText = p.name ? p.name.charAt(0).toUpperCase() : '?';
-              token.title = `${p.name} ($${p.money})`;
-              c.appendChild(token);
+
+              wrapper.appendChild(nametag);
+              wrapper.appendChild(token);
+              c.appendChild(wrapper);
             }
           }
         });
@@ -2114,16 +2153,17 @@
       renderPhysicalPortfolio(state);
     }
 
-    /* Step-by-Step Animated Tile-by-Tile Hop Engine */
+    /* Step-by-Step Walking Animation */
     function animatePawnStepWalk(pId, fromTile, steps, onComplete) {
       isPawnWalking = true;
       let currentTile = fromTile;
       let remainingSteps = steps;
 
+      const wrapperEl = document.getElementById(`token-wrapper-${pId}`);
       const tokenEl = document.getElementById(`board-token-${pId}`);
 
       function nextStep() {
-        if (remainingSteps <= 0) {
+        if (remainingSteps <= 0 || (currentGameState && currentGameState.isPaused)) {
           isPawnWalking = false;
           if (onComplete) onComplete(currentTile);
           return;
@@ -2132,18 +2172,17 @@
         currentTile = (currentTile + 1) % 40;
         remainingSteps--;
 
-        // Hop animation and wooden tap sound
         SFX.stepWood();
         const nextContainer = document.getElementById(`tokens-tile-${currentTile}`);
-        if (tokenEl && nextContainer) {
-          tokenEl.classList.add('token-hop');
+        if (wrapperEl && nextContainer) {
+          if (tokenEl) tokenEl.classList.add('token-hop');
           setTimeout(() => {
-            nextContainer.appendChild(tokenEl);
-            tokenEl.classList.remove('token-hop');
-          }, 110);
+            nextContainer.appendChild(wrapperEl);
+            if (tokenEl) tokenEl.classList.remove('token-hop');
+          }, 120);
         }
 
-        setTimeout(nextStep, 220); // 220ms per step feels natural and smooth
+        setTimeout(nextStep, 250); // Steady, clear 250ms cadence
       }
 
       nextStep();
@@ -2285,14 +2324,14 @@
     }
 
     function rollDice() {
-      if (!currentGameState || currentGameState.isPaused || isPawnWalking) return;
+      if (!currentGameState || currentGameState.isPaused || isPawnWalking || aiTurnInProgress) return;
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       if (localPlayerId !== activeId || currentGameState.hasRolledThisTurn) return;
 
-      executeTurnRoll(activeId);
+      executeTurnRoll(activeId, false);
     }
 
-    function executeTurnRoll(activeId) {
+    function executeTurnRoll(activeId, isBot = false) {
       const d1 = Math.floor(Math.random() * 6) + 1;
       const d2 = Math.floor(Math.random() * 6) + 1;
       const total = d1 + d2;
@@ -2316,6 +2355,9 @@
 
           db.ref().update(up).then(() => {
             broadcastFx('dread', '🚨', 'SPEEDING! 3 DOUBLES VOIDED!', `${player.name} caught speeding directly to Jail!`);
+            if (isBot) {
+              setTimeout(() => { endTurn(); aiTurnInProgress = false; }, 2000);
+            }
           });
           return;
         }
@@ -2326,7 +2368,7 @@
           broadcastFx('celebrate', '✨', 'DOUBLES ROLLED!', `${player.name} rolled matching ${d1}s! Extra turn awarded.`);
         }
 
-        // Physical Step-by-Step Hop Animation
+        // Step-by-step walk
         animatePawnStepWalk(activeId, player.position, total, (newPos) => {
           let newMoney = player.money;
           if (newPos < player.position) {
@@ -2348,13 +2390,13 @@
           updates[`rooms/${currentRoomCode}/logs`] = logs;
 
           db.ref().update(updates).then(() => {
-            handleLandingAction(newPos, total);
+            handleLandingAction(newPos, total, isBot, isDouble);
           });
         });
       });
     }
 
-    function handleLandingAction(tileIndex, diceTotal) {
+    function handleLandingAction(tileIndex, diceTotal, isBot = false, wasDouble = false) {
       const tile = TILES[tileIndex];
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       const player = currentGameState.players[activeId];
@@ -2363,8 +2405,7 @@
         const prop = currentGameState.properties ? currentGameState.properties[tile.id] : null;
 
         if (!prop) {
-          // If human player, show purchase modal
-          if (!player.isBot) {
+          if (!isBot) {
             if (player.money >= tile.price) {
               openModal(
                 "Purchase Title Deed?",
@@ -2385,10 +2426,15 @@
               );
             }
           } else {
-            // AI Bot logic: Buy if cash after purchase remains >= $150 safety buffer
-            if (player.money - tile.price >= 150) {
-              executePropertyBuy(activeId, tile);
-            }
+            // Natural pause for bot before purchasing
+            setTimeout(() => {
+              if (currentGameState && currentGameState.isPaused) return;
+              if (player.money - tile.price >= 150) {
+                executePropertyBuy(activeId, tile);
+              }
+              finishBotTurnDecision(wasDouble);
+            }, 1500);
+            return;
           }
         } else if (prop.ownerId !== activeId && !prop.mortgaged) {
           let rent = tile.rent ? tile.rent[prop.houses || 0] : 25;
@@ -2406,13 +2452,17 @@
           db.ref().update(up).then(() => {
             if (remainingFunds < 150 && !player.bankrupt) {
               SFX.lowCashAlarm();
-              showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s liquid funds are below $150!`);
+              showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s balance dropped to $${remainingFunds}!`);
             } else if (rent >= 200) {
               broadcastFx('dread', '💸', 'HEFTY RENT PAID!', `${player.name} paid $${rent} to ${owner.name}!`);
             } else {
               SFX.taxFine();
             }
+            if (isBot) {
+              setTimeout(() => finishBotTurnDecision(wasDouble), 1500);
+            }
           });
+          return;
         }
       } else if (tile.type === "chance") {
         drawPhysicalCard("chance", activeId);
@@ -2428,13 +2478,45 @@
         db.ref().update(up).then(() => {
           if (remainingFunds < 150) {
             SFX.lowCashAlarm();
-            showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s liquid funds are below $150!`);
+            showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s balance dropped to $${remainingFunds}!`);
           } else {
             broadcastFx('dread', '💸', `${tile.name.toUpperCase()}!`, `${player.name} paid $${tile.amount} to the bank.`);
           }
+          if (isBot) {
+            setTimeout(() => finishBotTurnDecision(wasDouble), 1500);
+          }
         });
+        return;
       } else if (tile.type === "gotojail") {
         sendToJailOnline(activeId);
+        if (isBot) {
+          setTimeout(() => finishBotTurnDecision(false), 1500);
+          return;
+        }
+      }
+
+      if (isBot) {
+        setTimeout(() => finishBotTurnDecision(wasDouble), 1500);
+      }
+    }
+
+    function finishBotTurnDecision(wasDouble) {
+      if (currentGameState && currentGameState.isPaused) {
+        aiTurnInProgress = false;
+        return;
+      }
+
+      if (wasDouble) {
+        // Roll again on doubles with natural pause
+        setTimeout(() => {
+          const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
+          executeTurnRoll(activeId, true);
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          endTurn();
+          aiTurnInProgress = false;
+        }, 1200);
       }
     }
 
@@ -2463,22 +2545,22 @@
       });
     }
 
-    /* Autonomous AI Bot Turn Engine */
+    /* Sequential AI Turn Engine (Strictly single-bot execution) */
     function evaluateAITurn(state) {
+      if (aiTurnInProgress || state.isPaused || isPawnWalking) return;
+
       const activeId = state.playerOrder[state.activePlayerIndex];
       const player = state.players[activeId];
 
-      // If the host is in the room and the active player is an AI Bot
-      if (player && player.isBot && state.playerOrder[0] === localPlayerId && !state.isPaused) {
-        if (!state.hasRolledThisTurn) {
-          setTimeout(() => {
-            if (!isPawnWalking) executeTurnRoll(activeId);
-          }, 1400); // Natural 1.4s thinking delay
-        } else {
-          setTimeout(() => {
-            endTurn();
-          }, 1200);
-        }
+      if (player && player.isBot && state.playerOrder[0] === localPlayerId) {
+        aiTurnInProgress = true;
+        setTimeout(() => {
+          if (!currentGameState || currentGameState.isPaused) {
+            aiTurnInProgress = false;
+            return;
+          }
+          executeTurnRoll(activeId, true);
+        }, 1600); // 1.6s natural human-paced pause before rolling
       }
     }
 
@@ -2765,7 +2847,7 @@
         <div class="rule-section">
           <div class="rule-title">🎯 Objective of the Game</div>
           <div class="rule-text">
-            The object of the game is to become the wealthiest player through buying, renting, and trading real estate until opponents forfeit or the match is concluded by asset tally.
+            The object of Monopoly is to become the wealthiest player through buying, renting, and trading real estate until opponents forfeit or the match is concluded by asset tally.
           </div>
         </div>
 
@@ -2818,7 +2900,7 @@
         </div>
       `;
 
-      openModal("📖 Official Rule Book", rulesHtml, [{ label: "Close Rules", action: closeModal }]);
+      openModal("📖 Official Monopoly Rule Book", rulesHtml, [{ label: "Close Rules", action: closeModal }]);
     }
 
     function openModal(title, html, buttons = []) {
