@@ -143,7 +143,6 @@
       letter-spacing: 2px;
     }
 
-    /* Redesigned 3-Mode Lobby Screen */
     .lobby-overlay {
       position: fixed;
       inset: 0;
@@ -275,7 +274,6 @@
       transform: scale(1.22);
     }
 
-    /* Bot Pill Selector */
     .bot-pills-row {
       display: flex;
       gap: 8px;
@@ -808,7 +806,6 @@
       z-index: 3;
     }
 
-    /* Highly Visible Large 3D Pawns with Floating Name Badges */
     .tile-tokens {
       position: absolute;
       bottom: 2px;
@@ -1363,10 +1360,10 @@
     var localProcessedFxTimestamp = 0;
     var localProcessedReactionTimestamp = 0;
     var lastTimerAlertSecond = -1;
-    var lobbyMode = "create"; // "create", "join", or "solo"
+    var lobbyMode = "create";
     var selectedSoloBots = 1;
     var isPawnWalking = false;
-    var aiTurnInProgress = false; // Prevents simultaneous bot execution
+    var aiTurnInProgress = false;
 
     const AVAILABLE_COLORS = [
       "#e63946", // 0 Crimson Red
@@ -1442,7 +1439,6 @@
       }
     }
 
-    /* Web Audio Synthesizer */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
@@ -1515,7 +1511,6 @@
       }
     };
 
-    /* Canvas FX */
     const fxCanvas = document.getElementById('fx-canvas');
     const ctx = fxCanvas.getContext('2d');
     let confettiParticles = [];
@@ -1605,7 +1600,6 @@
       document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
     }
 
-    /* Firebase Config */
     const firebaseConfig = {
       apiKey: "AIzaSyCz1C-Msn7vVXmXiwX-dWFXOo2wBRJaxs4",
       authDomain: "family-monopoly-c8893.firebaseapp.com",
@@ -1764,6 +1758,7 @@
       });
     }
 
+    /* Fixed Countdown Timer: Handles Both Human and Bot Timeouts */
     function startTurnCountdown() {
       clearInterval(turnTimerInterval);
       const TURN_LIMIT_SEC = 60;
@@ -1795,8 +1790,13 @@
         if (remaining <= 0) {
           clearInterval(turnTimerInterval);
           const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
-          if (localPlayerId === activeId) {
-            broadcastFx('dread', '⏳', 'TIME EXPIRED!', `${currentGameState.players[activeId].name} ran out of time! Turn passed.`);
+          const activePlayer = currentGameState.players[activeId];
+          const isHost = (currentGameState.playerOrder[0] === localPlayerId);
+
+          // If human player times out, pass turn
+          // If bot times out and local user is host, pass turn to resolve deadlock
+          if (localPlayerId === activeId || (activePlayer && activePlayer.isBot && isHost)) {
+            broadcastFx('dread', '⏳', 'TIME EXPIRED!', `${activePlayer ? activePlayer.name : 'Player'} ran out of time! Turn passed.`);
             endTurn();
           }
         }
@@ -2013,7 +2013,6 @@
       );
     }
 
-    /* Renders High-Visibility Large Tokens with Floating Nametags */
     function renderLiveGameState(state) {
       if (!state || !state.playerOrder) return;
 
@@ -2028,7 +2027,7 @@
             : "⭐ IT'S YOUR TURN! Roll the dice.";
         } else {
           document.getElementById('status-message').innerText = activePlayer.isBot
-            ? `🤖 ${activePlayer.name} is thinking & making a move...`
+            ? `🤖 ${activePlayer.name} is making its move...`
             : `Waiting for ${activePlayer.name}...`;
         }
       }
@@ -2037,7 +2036,6 @@
       document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused || isPawnWalking);
       document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
 
-      // Ledger with low cash threshold
       const ledger = document.getElementById('players-ledger');
       ledger.innerHTML = '';
       state.playerOrder.forEach(pId => {
@@ -2069,7 +2067,6 @@
         ledger.appendChild(card);
       });
 
-      // Clear & Place Tokens with Nametags
       if (!isPawnWalking) {
         TILES.forEach((_, idx) => {
           const c = document.getElementById(`tokens-tile-${idx}`);
@@ -2104,7 +2101,6 @@
         });
       }
 
-      // Houses / Hotels
       TILES.forEach((_, tId) => {
         const housesEl = document.getElementById(`houses-tile-${tId}`);
         const tileEl = document.getElementById(`tile-${tId}`);
@@ -2131,14 +2127,12 @@
         }
       });
 
-      // Logs
       const feed = document.getElementById('game-feed');
       if (state.logs) {
         feed.innerHTML = state.logs.map(l => `<div style="line-height:1.35; margin-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:2px;">• ${l}</div>`).join('');
         feed.scrollTop = feed.scrollHeight;
       }
 
-      // Chat
       const chatFeed = document.getElementById('chat-feed');
       if (state.messages) {
         chatFeed.innerHTML = state.messages.map(m => `
@@ -2153,7 +2147,6 @@
       renderPhysicalPortfolio(state);
     }
 
-    /* Step-by-Step Walking Animation */
     function animatePawnStepWalk(pId, fromTile, steps, onComplete) {
       isPawnWalking = true;
       let currentTile = fromTile;
@@ -2182,7 +2175,7 @@
           }, 120);
         }
 
-        setTimeout(nextStep, 250); // Steady, clear 250ms cadence
+        setTimeout(nextStep, 250);
       }
 
       nextStep();
@@ -2356,7 +2349,7 @@
           db.ref().update(up).then(() => {
             broadcastFx('dread', '🚨', 'SPEEDING! 3 DOUBLES VOIDED!', `${player.name} caught speeding directly to Jail!`);
             if (isBot) {
-              setTimeout(() => { endTurn(); aiTurnInProgress = false; }, 2000);
+              setTimeout(() => { endTurn(); }, 1800);
             }
           });
           return;
@@ -2368,7 +2361,6 @@
           broadcastFx('celebrate', '✨', 'DOUBLES ROLLED!', `${player.name} rolled matching ${d1}s! Extra turn awarded.`);
         }
 
-        // Step-by-step walk
         animatePawnStepWalk(activeId, player.position, total, (newPos) => {
           let newMoney = player.money;
           if (newPos < player.position) {
@@ -2426,14 +2418,13 @@
               );
             }
           } else {
-            // Natural pause for bot before purchasing
             setTimeout(() => {
               if (currentGameState && currentGameState.isPaused) return;
               if (player.money - tile.price >= 150) {
                 executePropertyBuy(activeId, tile);
               }
               finishBotTurnDecision(wasDouble);
-            }, 1500);
+            }, 1400);
             return;
           }
         } else if (prop.ownerId !== activeId && !prop.mortgaged) {
@@ -2459,7 +2450,7 @@
               SFX.taxFine();
             }
             if (isBot) {
-              setTimeout(() => finishBotTurnDecision(wasDouble), 1500);
+              setTimeout(() => finishBotTurnDecision(wasDouble), 1400);
             }
           });
           return;
@@ -2483,20 +2474,20 @@
             broadcastFx('dread', '💸', `${tile.name.toUpperCase()}!`, `${player.name} paid $${tile.amount} to the bank.`);
           }
           if (isBot) {
-            setTimeout(() => finishBotTurnDecision(wasDouble), 1500);
+            setTimeout(() => finishBotTurnDecision(wasDouble), 1400);
           }
         });
         return;
       } else if (tile.type === "gotojail") {
         sendToJailOnline(activeId);
         if (isBot) {
-          setTimeout(() => finishBotTurnDecision(false), 1500);
+          setTimeout(() => finishBotTurnDecision(false), 1400);
           return;
         }
       }
 
       if (isBot) {
-        setTimeout(() => finishBotTurnDecision(wasDouble), 1500);
+        setTimeout(() => finishBotTurnDecision(wasDouble), 1400);
       }
     }
 
@@ -2507,15 +2498,13 @@
       }
 
       if (wasDouble) {
-        // Roll again on doubles with natural pause
         setTimeout(() => {
           const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
           executeTurnRoll(activeId, true);
-        }, 1500);
+        }, 1400);
       } else {
         setTimeout(() => {
           endTurn();
-          aiTurnInProgress = false;
         }, 1200);
       }
     }
@@ -2545,13 +2534,13 @@
       });
     }
 
-    /* Sequential AI Turn Engine (Strictly single-bot execution) */
     function evaluateAITurn(state) {
       if (aiTurnInProgress || state.isPaused || isPawnWalking) return;
 
       const activeId = state.playerOrder[state.activePlayerIndex];
       const player = state.players[activeId];
 
+      // Execute AI turn only if active player is a bot and current client is host
       if (player && player.isBot && state.playerOrder[0] === localPlayerId) {
         aiTurnInProgress = true;
         setTimeout(() => {
@@ -2560,7 +2549,7 @@
             return;
           }
           executeTurnRoll(activeId, true);
-        }, 1600); // 1.6s natural human-paced pause before rolling
+        }, 1500);
       }
     }
 
@@ -2732,6 +2721,9 @@
 
     function endTurn() {
       if (!currentGameState || currentGameState.isPaused || isPawnWalking) return;
+      
+      aiTurnInProgress = false; // Always clear bot lock when passing turn
+      
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       const nextIndex = (currentGameState.activePlayerIndex + 1) % currentGameState.playerOrder.length;
       const updates = {
