@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classic Family Monopoly - Tournament Edition</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Patil Estates - Tournament Edition</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -12,14 +12,16 @@
 
   <style>
     :root {
-      --board-bg: #dbeed6;
-      --board-border: #132213;
-      --tile-bg: #fbfdfa;
-      --tile-border: #233526;
-      --panel-bg: #121c19;
-      --card-panel: #1a2723;
-      --text-light: #f3f6f4;
-      --text-dark: #1b2820;
+      --felt-bg: radial-gradient(circle at center, #1b382b 0%, #0c1a14 100%);
+      --board-wood: #2c1810;
+      --board-trim: #4a2818;
+      --board-surface: #d8ebd2;
+      --tile-bg: #fdfefe;
+      --tile-border: #1a2a1e;
+      --glass-panel: rgba(18, 30, 26, 0.85);
+      --glass-border: rgba(255, 209, 92, 0.2);
+      --gold-accent: #ffd15c;
+      --danger-red: #ef4444;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
@@ -32,8 +34,8 @@
 
     body {
       font-family: var(--font-family);
-      background: radial-gradient(circle at center, #182622 0%, #0a100e 100%);
-      color: var(--text-light);
+      background: var(--felt-bg);
+      color: #f3f6f4;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -64,7 +66,7 @@
     .floating-emoji {
       position: fixed;
       bottom: 20px;
-      font-size: 2.4rem;
+      font-size: 2.6rem;
       pointer-events: none;
       z-index: 1200;
       animation: floatUp 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
@@ -82,11 +84,11 @@
       top: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
-      background: #1c2b27;
-      border: 2px solid #ffd15c;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.85);
+      background: rgba(22, 35, 30, 0.95);
+      border: 2px solid var(--gold-accent);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.85);
       border-radius: 40px;
-      padding: 14px 32px;
+      padding: 14px 34px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -94,6 +96,7 @@
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
       opacity: 0;
       pointer-events: none;
+      backdrop-filter: blur(8px);
     }
 
     #event-toast.show {
@@ -102,14 +105,14 @@
     }
 
     #event-toast.toast-celebrate {
-      border-color: #ffd15c;
-      background: linear-gradient(135deg, #1c2b27, #243d35);
-      color: #ffd15c;
+      border-color: var(--gold-accent);
+      background: linear-gradient(135deg, rgba(28,43,39,0.95), rgba(36,61,53,0.95));
+      color: var(--gold-accent);
     }
 
     #event-toast.toast-dread {
-      border-color: #ef4444;
-      background: linear-gradient(135deg, #241416, #3b171a);
+      border-color: var(--danger-red);
+      background: linear-gradient(135deg, rgba(36,20,22,0.95), rgba(59,23,26,0.95));
       color: #fca5a5;
     }
 
@@ -120,8 +123,8 @@
     .pause-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(8, 14, 12, 0.92);
-      backdrop-filter: blur(10px);
+      background: rgba(8, 14, 12, 0.94);
+      backdrop-filter: blur(12px);
       display: none;
       flex-direction: column;
       justify-content: center;
@@ -134,18 +137,18 @@
     .pause-overlay.active { display: flex; }
 
     .pause-title {
-      font-size: 2.4rem;
+      font-size: 2.6rem;
       font-weight: 900;
-      color: #ffd15c;
+      color: var(--gold-accent);
       letter-spacing: 2px;
     }
 
-    /* Redesigned 2-Step Clear Lobby Screen */
+    /* Redesigned Glassmorphic Lobby */
     .lobby-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(10, 16, 14, 0.96);
-      backdrop-filter: blur(10px);
+      background: rgba(8, 14, 12, 0.96);
+      backdrop-filter: blur(12px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -154,13 +157,13 @@
     }
 
     .lobby-card {
-      background: #1c2b27;
+      background: #182723;
       border: 1.5px solid #364e47;
-      border-radius: 18px;
-      padding: 28px 24px;
-      max-width: 520px;
+      border-radius: 20px;
+      padding: 30px 26px;
+      max-width: 530px;
       width: 100%;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.9);
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -168,27 +171,25 @@
     }
 
     .lobby-card h1 {
-      font-size: 2.1rem;
+      font-size: 2.2rem;
       font-weight: 900;
-      color: #ffd15c;
+      color: var(--gold-accent);
       letter-spacing: 2px;
       text-transform: uppercase;
-      text-shadow: 0 2px 8px rgba(255,209,92,0.3);
+      text-shadow: 0 2px 10px rgba(255,209,92,0.3);
     }
 
-    /* Mode Selection Tiles */
     .mode-select-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
-      margin: 8px 0;
     }
 
     .mode-tile {
-      background: #131d1a;
+      background: #111a17;
       border: 2px solid #283c36;
       border-radius: 12px;
-      padding: 20px 14px;
+      padding: 18px 12px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -198,29 +199,28 @@
     }
 
     .mode-tile:hover {
-      background: #1e2e29;
-      border-color: #ffd15c;
-      transform: translateY(-3px);
+      background: #1a2a25;
+      border-color: var(--gold-accent);
+      transform: translateY(-2px);
     }
 
     .mode-tile.selected {
-      border-color: #ffd15c;
-      background: #243832;
+      border-color: var(--gold-accent);
+      background: #20352e;
       box-shadow: 0 0 15px rgba(255,209,92,0.25);
     }
 
     .mode-icon { font-size: 2rem; }
-    .mode-title { font-weight: 800; font-size: 1rem; color: #fff; }
+    .mode-title { font-weight: 800; font-size: 0.95rem; color: #fff; }
     .mode-desc { font-size: 0.72rem; color: #9bb1ab; line-height: 1.3; }
 
-    /* Player Setup Form */
     .setup-section {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       text-align: left;
-      background: #141f1c;
-      border: 1px solid #23342f;
+      background: #121d19;
+      border: 1px solid #243731;
       padding: 18px;
       border-radius: 12px;
     }
@@ -230,50 +230,74 @@
       color: #a4bfb9;
       font-weight: 700;
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
+
+    .lobby-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #090f0d;
+      border: 1.5px solid #2d423b;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .lobby-input:focus { border-color: var(--gold-accent); }
 
     .token-color-picker {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
       padding-top: 4px;
     }
 
     .color-swatch {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.25);
+      border: 3px solid rgba(255,255,255,0.3);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
       color: #fff;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       transition: transform 0.2s, border-color 0.2s;
     }
     .color-swatch:hover { transform: scale(1.15); }
     .color-swatch.selected {
-      border-color: #ffd15c;
-      box-shadow: 0 0 12px #ffd15c;
-      transform: scale(1.2);
+      border-color: var(--gold-accent);
+      box-shadow: 0 0 14px var(--gold-accent);
+      transform: scale(1.22);
     }
 
-    .invite-banner {
-      background: #253832;
-      border: 1px solid #ffd15c;
-      color: #fde68a;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
+    /* Bot Selector Pill Box */
+    .bot-control-box {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
+      padding: 10px 14px;
+      background: #192723;
+      border: 1px dashed #3d564e;
+      border-radius: 8px;
     }
+
+    .btn-bot-add {
+      background: #27473d;
+      border: 1px solid #3c6d5e;
+      color: #6ee7b7;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-bot-add:hover { background: #325a4e; }
 
     .game-wrapper {
       display: flex;
@@ -285,18 +309,20 @@
       align-items: stretch;
     }
 
+    /* Glassmorphism Side Panel */
     .side-panel {
       flex: 1;
       min-width: 330px;
       max-width: 380px;
-      background: var(--panel-bg);
-      border-radius: 14px;
-      border: 1px solid #283a35;
+      background: var(--glass-panel);
+      backdrop-filter: blur(14px);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
       padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      box-shadow: 0 16px 45px rgba(0,0,0,0.65);
       overflow: hidden;
     }
 
@@ -311,7 +337,7 @@
     .panel-header h1 {
       font-size: 1.25rem;
       font-weight: 900;
-      color: #ffd15c;
+      color: var(--gold-accent);
       letter-spacing: 1px;
     }
 
@@ -333,7 +359,7 @@
       transition: all 0.15s;
     }
     .btn-header:hover { background: #2f4740; }
-    .btn-header-gold { background: #7c5c10; color: #fde68a; border-color: #ffd15c; }
+    .btn-header-gold { background: #7c5c10; color: #fde68a; border-color: var(--gold-accent); }
     .btn-header-gold:hover { background: #926f18; }
 
     .players-list {
@@ -341,12 +367,12 @@
       flex-direction: column;
       gap: 6px;
       overflow-y: auto;
-      max-height: 170px;
+      max-height: 180px;
       padding-right: 4px;
     }
 
     .player-card {
-      background: #192622;
+      background: #172420;
       border-radius: 8px;
       padding: 8px 10px;
       border: 2px solid transparent;
@@ -358,13 +384,24 @@
     }
 
     .player-card.active {
-      border-color: #ffd15c;
-      background: #243731;
+      border-color: var(--gold-accent);
+      background: #21332c;
       box-shadow: 0 0 12px rgba(255, 209, 92, 0.2);
     }
 
     .player-card.selected-view {
       border-left: 4px solid #6ee7b7;
+    }
+
+    /* Low Cash Danger Animation */
+    .player-card.low-cash-alert {
+      border-color: var(--danger-red) !important;
+      animation: alertGlow 1.2s infinite alternate;
+    }
+
+    @keyframes alertGlow {
+      0% { box-shadow: 0 0 4px rgba(239,68,68,0.4); }
+      100% { box-shadow: 0 0 14px rgba(239,68,68,0.9); }
     }
 
     .player-identity {
@@ -376,8 +413,8 @@
     }
 
     .player-avatar {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       border: 2px solid #fff;
       display: flex;
@@ -386,6 +423,7 @@
       font-size: 0.65rem;
       font-weight: 900;
       color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
     .player-balance {
@@ -393,6 +431,16 @@
       font-weight: 800;
       color: #6ee7b7;
       font-family: monospace;
+    }
+
+    .balance-danger {
+      color: #f87171 !important;
+      animation: blinkText 1.2s infinite;
+    }
+
+    @keyframes blinkText {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
     .console-panel {
@@ -411,7 +459,7 @@
       width: 100%;
       font-size: 0.8rem;
       font-weight: 700;
-      color: #ffd15c;
+      color: var(--gold-accent);
       text-align: center;
       background: rgba(255, 209, 92, 0.1);
       padding: 6px;
@@ -425,7 +473,7 @@
       gap: 8px;
       font-size: 0.75rem;
       font-weight: 800;
-      color: #ffd15c;
+      color: var(--gold-accent);
     }
 
     .timer-bar-bg {
@@ -439,10 +487,10 @@
     .timer-bar-fill {
       height: 100%;
       width: 100%;
-      background: #ffd15c;
+      background: var(--gold-accent);
       transition: width 1s linear, background 0.3s;
     }
-    .timer-bar-fill.warning { background: #ef4444; }
+    .timer-bar-fill.warning { background: var(--danger-red); }
 
     .dice-stage {
       display: flex;
@@ -561,8 +609,8 @@
     }
     .feed-tab.active {
       background: #0d1513;
-      color: #ffd15c;
-      border-bottom: 2px solid #ffd15c;
+      color: var(--gold-accent);
+      border-bottom: 2px solid var(--gold-accent);
     }
 
     .tab-content {
@@ -618,7 +666,7 @@
       font-size: 0.75rem;
       outline: none;
     }
-    .chat-text-input:focus { border-color: #ffd15c; }
+    .chat-text-input:focus { border-color: var(--gold-accent); }
 
     .chat-send-btn {
       background: #2a7c5c;
@@ -631,18 +679,20 @@
       cursor: pointer;
     }
 
+    /* Modern Luxury Mahogany Board Styling */
     .board-container {
       flex: 2;
       aspect-ratio: 1 / 1;
       max-height: 96vh;
-      background: var(--board-bg);
-      border: 4px solid var(--board-border);
-      border-radius: 8px;
+      background: var(--board-surface);
+      border: 10px solid var(--board-wood);
+      outline: 2px solid var(--board-trim);
+      border-radius: 12px;
       display: grid;
       grid-template-columns: 13.5% repeat(9, 8.11%) 13.5%;
       grid-template-rows: 13.5% repeat(9, 8.11%) 13.5%;
       position: relative;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      box-shadow: 0 25px 65px rgba(0,0,0,0.85), inset 0 0 10px rgba(0,0,0,0.25);
     }
 
     .tile {
@@ -653,11 +703,11 @@
       flex-direction: column;
       overflow: hidden;
       cursor: pointer;
-      color: var(--text-dark);
+      color: #1a2a1e;
       font-size: 0.65rem;
       transition: filter 0.15s;
     }
-    .tile:hover { filter: brightness(0.95); z-index: 5; }
+    .tile:hover { filter: brightness(0.96); z-index: 5; }
 
     .tile-pos-0  { grid-column: 11; grid-row: 11; }
     .tile-pos-1  { grid-column: 10; grid-row: 11; }
@@ -700,10 +750,10 @@
     .tile-pos-38 { grid-column: 11; grid-row: 9; }
     .tile-pos-39 { grid-column: 11; grid-row: 10; }
 
-    .tile-bar { height: 21%; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.4); }
-    .tile-bottom .tile-bar { order: 1; border-bottom: 0; border-top: 1px solid rgba(0,0,0,0.4); }
-    .tile-left .tile-bar { width: 22%; height: 100%; position: absolute; right: 0; top: 0; border-left: 1px solid rgba(0,0,0,0.4); }
-    .tile-right .tile-bar { width: 22%; height: 100%; position: absolute; left: 0; top: 0; border-right: 1px solid rgba(0,0,0,0.4); }
+    .tile-bar { height: 21%; width: 100%; border-bottom: 1.5px solid rgba(0,0,0,0.5); box-shadow: inset 0 2px 4px rgba(255,255,255,0.3); }
+    .tile-bottom .tile-bar { order: 1; border-bottom: 0; border-top: 1.5px solid rgba(0,0,0,0.5); }
+    .tile-left .tile-bar { width: 22%; height: 100%; position: absolute; right: 0; top: 0; border-left: 1.5px solid rgba(0,0,0,0.5); }
+    .tile-right .tile-bar { width: 22%; height: 100%; position: absolute; left: 0; top: 0; border-right: 1.5px solid rgba(0,0,0,0.5); }
 
     .tile-content {
       flex: 1;
@@ -713,16 +763,17 @@
       justify-content: space-between;
       padding: 3px 2px;
       text-align: center;
-      font-size: 0.56rem;
+      font-size: 0.58rem;
       font-weight: 700;
     }
 
     .tile-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
     .tile-icon svg { width: 100%; height: 100%; }
 
+    /* Isometric 3D Houses & Hotels */
     .houses-display {
       display: flex;
-      gap: 1.5px;
+      gap: 2px;
       justify-content: center;
       position: absolute;
       width: 100%;
@@ -730,13 +781,27 @@
       left: 0;
       z-index: 2;
     }
-    .house-dot { width: 6px; height: 6px; background: #138f49; border-radius: 1px; border: 0.5px solid #084924; }
-    .hotel-dot { width: 14px; height: 6px; background: #d02028; border-radius: 1px; border: 0.5px solid #630e12; }
+    .house-dot {
+      width: 8px;
+      height: 8px;
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      border: 1px solid #064e3b;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .hotel-dot {
+      width: 16px;
+      height: 8px;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      border: 1px solid #7f1d1d;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
 
     .mortgage-stripe {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(45deg, rgba(200,30,30,0.4), rgba(200,30,30,0.4) 6px, transparent 6px, transparent 12px);
+      background: repeating-linear-gradient(45deg, rgba(200,30,30,0.45), rgba(200,30,30,0.45) 6px, transparent 6px, transparent 12px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -746,6 +811,7 @@
       z-index: 3;
     }
 
+    /* Enhanced 3D Pawn Tokens with Step-by-Step Trajectory */
     .tile-tokens {
       position: absolute;
       bottom: 2px;
@@ -756,60 +822,65 @@
       gap: 3px;
       justify-content: center;
       align-items: center;
-      z-index: 6;
+      z-index: 8;
       pointer-events: none;
     }
 
     .board-token {
-      width: 18px;
-      height: 18px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       border: 2px solid #ffffff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.6rem;
+      font-size: 0.68rem;
       font-weight: 900;
       color: #ffffff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .board-token.token-active-turn {
-      animation: tokenPulse 1.2s infinite alternate;
-      border-color: #ffd15c;
+      animation: tokenPulse 1.1s infinite alternate;
+      border-color: var(--gold-accent);
     }
 
     @keyframes tokenPulse {
-      0% { transform: scale(1); box-shadow: 0 0 4px #ffd15c; }
-      100% { transform: scale(1.35); box-shadow: 0 0 14px #ffd15c; }
+      0% { transform: scale(1); box-shadow: 0 0 5px var(--gold-accent); }
+      100% { transform: scale(1.38); box-shadow: 0 0 16px var(--gold-accent); }
+    }
+
+    .board-token.token-hop {
+      transform: translateY(-16px) scale(1.25) !important;
     }
 
     .board-center {
       grid-column: 2 / span 9;
       grid-row: 2 / span 9;
-      background: radial-gradient(circle at center, #e3f2df 0%, #d4e8cf 100%);
+      background: radial-gradient(circle at center, #edf7ea 0%, #d8ebd2 100%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       padding: 20px;
       position: relative;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.06);
     }
 
     .brand-title-box {
       background: #cf1c24;
       border: 3.5px solid #ffffff;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
       transform: rotate(-10deg);
       padding: 6px 26px;
       margin-top: 14%;
     }
     .brand-title {
-      font-size: 3rem;
+      font-size: 2.3rem;
       font-weight: 900;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       color: #ffffff;
       text-shadow: 2px 2px 0px #1a2a1a;
       line-height: 1;
@@ -857,14 +928,15 @@
       flex: 1.15;
       min-width: 350px;
       max-width: 420px;
-      background: var(--panel-bg);
-      border-radius: 14px;
-      border: 1px solid #283a35;
+      background: var(--glass-panel);
+      backdrop-filter: blur(14px);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
       padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      box-shadow: 0 16px 45px rgba(0,0,0,0.65);
       overflow: hidden;
     }
 
@@ -875,7 +947,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    .portfolio-header h2 { font-size: 1.05rem; color: #ffd15c; font-weight: 800; }
+    .portfolio-header h2 { font-size: 1.05rem; color: var(--gold-accent); font-weight: 800; }
 
     .cash-tray {
       background: #0d1513;
@@ -939,7 +1011,7 @@
       border: 1.5px solid #111;
       border-radius: 6px;
       overflow: hidden;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       display: flex;
       flex-direction: column;
       font-size: 0.65rem;
@@ -986,7 +1058,7 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.82);
       display: none;
       align-items: center;
       justify-content: center;
@@ -1000,9 +1072,9 @@
       color: #111;
       width: 100%;
       max-width: 580px;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 16px 45px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
       max-height: 88vh;
       display: flex;
       flex-direction: column;
@@ -1069,23 +1141,16 @@
     <button class="btn-action" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleGamePause(false)">▶️ Resume Game</button>
   </div>
 
-  <!-- Redesigned Clean 2-Step Lobby -->
+  <!-- Redesigned Clean 2-Step Lobby with Bot Capability -->
   <div class="lobby-overlay" id="lobby-screen">
     <div class="lobby-card">
-      <h1>Monopoly Online</h1>
+      <h1>Patil Estates</h1>
 
-      <!-- Auto-Invite Detection Banner if link clicked -->
-      <div class="invite-banner" id="invite-detect-banner" style="display:none;">
-        <span>🔗 Joining Family Game Room:</span>
-        <span id="detected-room-badge" style="color:#ffd15c; font-size:1.05rem;"></span>
-      </div>
-
-      <!-- Step 1: Decision Mode (Host vs Join) -->
       <div class="mode-select-grid" id="mode-selector-grid">
         <div class="mode-tile selected" id="tile-create-mode" onclick="setLobbyMode('create')">
           <div class="mode-icon">👑</div>
           <div class="mode-title">Start New Game</div>
-          <div class="mode-desc">Create a fresh room & invite your family.</div>
+          <div class="mode-desc">Create room & play with family or bots.</div>
         </div>
 
         <div class="mode-tile" id="tile-join-mode" onclick="setLobbyMode('join')">
@@ -1095,21 +1160,19 @@
         </div>
       </div>
 
-      <!-- Step 2: Details & Pawn Customization -->
       <div class="setup-section">
-        <!-- Room Code field (Visible only in Join mode) -->
         <div id="room-code-wrapper" style="display:none;">
-          <div class="setup-label">Enter 4-Letter Room Code:</div>
+          <label class="setup-label">Enter 4-Letter Room Code:</label>
           <input type="text" id="room-code-input" class="lobby-input" placeholder="e.g. ABCD" maxlength="6" style="text-transform: uppercase; font-size: 1.15rem; font-weight:800; letter-spacing: 2px;">
         </div>
 
         <div>
-          <div class="setup-label">Your Nickname or Initials:</div>
+          <label class="setup-label">Your Nickname or Initials:</label>
           <input type="text" id="player-name-input" class="lobby-input" placeholder="e.g. Mom, Alex, AP" maxlength="12" style="font-weight:700;">
         </div>
 
         <div>
-          <div class="setup-label">Choose Your Token Pawn Color:</div>
+          <label class="setup-label">Choose Your Token Pawn Color:</label>
           <div class="token-color-picker" id="lobby-color-picker">
             <div class="color-swatch selected" style="background:#e63946;" onclick="selectHeadColor(0)" title="Crimson Red">R</div>
             <div class="color-swatch" style="background:#2a9d8f;" onclick="selectHeadColor(1)" title="Emerald Teal">T</div>
@@ -1118,6 +1181,15 @@
             <div class="color-swatch" style="background:#ffd15c; color:#111;" onclick="selectHeadColor(4)" title="Golden Sun">Y</div>
             <div class="color-swatch" style="background:#0284c7;" onclick="selectHeadColor(5)" title="Deep Cobalt">B</div>
           </div>
+        </div>
+
+        <!-- Solo / Bot Configuration (In Host Mode) -->
+        <div id="bot-config-wrapper" class="bot-control-box">
+          <div>
+            <div style="font-weight:800; font-size:0.85rem; color:#fff;">Play Solo vs Bots?</div>
+            <div style="font-size:0.7rem; color:#8fa9a3;" id="bot-count-label">Bots added: 0 (Max 3)</div>
+          </div>
+          <button class="btn-bot-add" id="btn-add-bot" onclick="addBotToLobby()">+ Add AI Bot</button>
         </div>
       </div>
 
@@ -1130,7 +1202,7 @@
   <div class="game-wrapper" id="main-viewport">
     <div class="side-panel">
       <div class="panel-header">
-        <h1>Monopoly</h1>
+        <h1>Patil Estates</h1>
         <div class="header-btns">
           <button class="btn-header" onclick="openRuleBookModal()" title="View Rules">📖 Rules</button>
           <button class="btn-header btn-header-gold" onclick="promptEndAndTally()" title="Tally Net Worth & Crown Winner">🏁 Tally</button>
@@ -1200,7 +1272,7 @@
     <div class="board-container" id="board">
       <div class="board-center">
         <div class="brand-title-box">
-          <div class="brand-title">MONOPOLY</div>
+          <div class="brand-title">PATIL ESTATES</div>
         </div>
 
         <div class="deck-slots">
@@ -1264,7 +1336,9 @@
     var localProcessedFxTimestamp = 0;
     var localProcessedReactionTimestamp = 0;
     var lastTimerAlertSecond = -1;
-    var lobbyMode = "create"; // "create" or "join"
+    var lobbyMode = "create";
+    var lobbyBotsCount = 0;
+    var isPawnWalking = false;
 
     const AVAILABLE_COLORS = [
       "#e63946", // 0 Crimson Red
@@ -1275,6 +1349,12 @@
       "#0284c7"  // 5 Deep Cobalt
     ];
     let selectedColorIndex = 0;
+
+    const BOT_PRESETS = [
+      { name: "Bot Warren", color: "#9b5de5" },
+      { name: "Bot Charlie", color: "#f4a261" },
+      { name: "Bot George", color: "#0284c7" }
+    ];
 
     function selectHeadColor(idx) {
       selectedColorIndex = idx;
@@ -1290,7 +1370,19 @@
       document.getElementById('tile-create-mode').classList.toggle('selected', !isJoin);
       document.getElementById('tile-join-mode').classList.toggle('selected', isJoin);
       document.getElementById('room-code-wrapper').style.display = isJoin ? 'block' : 'none';
+      document.getElementById('bot-config-wrapper').style.display = isJoin ? 'none' : 'flex';
       document.getElementById('btn-enter-game').innerText = isJoin ? "Join Game Room" : "Create & Enter Room";
+    }
+
+    function addBotToLobby() {
+      if (lobbyBotsCount < 3) {
+        lobbyBotsCount++;
+        document.getElementById('bot-count-label').innerText = `Bots added: ${lobbyBotsCount} (Max 3)`;
+        if (lobbyBotsCount === 3) {
+          document.getElementById('btn-add-bot').disabled = true;
+          document.getElementById('btn-add-bot').innerText = "Limit Reached";
+        }
+      }
     }
 
     function handleLobbySubmit() {
@@ -1303,7 +1395,7 @@
       }
 
       if (lobbyMode === "create") {
-        createRoom(name);
+        createRoom(name, lobbyBotsCount);
       } else {
         const codeInput = document.getElementById('room-code-input');
         const code = codeInput.value.trim().toUpperCase();
@@ -1316,7 +1408,7 @@
       }
     }
 
-    /* Audio Synthesizer */
+    /* Web Audio Synthesizer */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
@@ -1354,12 +1446,19 @@
         playTone(200, 'square', 0.05, 0.08);
         setTimeout(() => playTone(240, 'square', 0.05, 0.08), 60);
       },
+      stepWood: () => {
+        playTone(320, 'sine', 0.04, 0.12);
+      },
       popReaction: () => {
         playTone(520, 'sine', 0.08, 0.15);
         setTimeout(() => playTone(840, 'sine', 0.12, 0.12), 40);
       },
       timerTick: () => {
         playTone(700, 'sine', 0.06, 0.08);
+      },
+      lowCashAlarm: () => {
+        playTone(160, 'sawtooth', 0.18, 0.2);
+        setTimeout(() => playTone(120, 'sawtooth', 0.28, 0.22), 120);
       },
       jailThud: () => {
         playTone(180, 'sawtooth', 0.25, 0.2);
@@ -1382,6 +1481,7 @@
       }
     };
 
+    /* Canvas FX */
     const fxCanvas = document.getElementById('fx-canvas');
     const ctx = fxCanvas.getContext('2d');
     let confettiParticles = [];
@@ -1471,6 +1571,7 @@
       document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
     }
 
+    /* Firebase Configuration */
     const firebaseConfig = {
       apiKey: "AIzaSyCz1C-Msn7vVXmXiwX-dWFXOo2wBRJaxs4",
       authDomain: "family-monopoly-c8893.firebaseapp.com",
@@ -1564,16 +1665,16 @@
     };
 
     const CHANCE_CARDS = [
-      { text: "Advance to GO. (Collect $200)", action: (pId) => movePlayerTo(pId, 0) },
-      { text: "Advance to Illinois Ave. If you pass GO, collect $200.", action: (pId) => movePlayerTo(pId, 24) },
-      { text: "Advance to Boardwalk.", action: (pId) => movePlayerTo(pId, 39) },
+      { text: "Advance to GO. (Collect $200)", action: (pId) => stepAnimateMoveTo(pId, 0) },
+      { text: "Advance to Illinois Ave. If you pass GO, collect $200.", action: (pId) => stepAnimateMoveTo(pId, 24) },
+      { text: "Advance to Boardwalk.", action: (pId) => stepAnimateMoveTo(pId, 39) },
       { text: "Bank pays you dividend of $50.", action: (pId) => creditMoney(pId, 50, "Bank Dividend") },
       { text: "Go directly to Jail. Do not pass GO, do not collect $200.", action: (pId) => sendToJailOnline(pId) },
       { text: "Get Out of Jail Free card! Keep this card until needed.", action: (pId) => awardJailCard(pId) }
     ];
 
     const COMMUNITY_CARDS = [
-      { text: "Advance to GO. (Collect $200)", action: (pId) => movePlayerTo(pId, 0) },
+      { text: "Advance to GO. (Collect $200)", action: (pId) => stepAnimateMoveTo(pId, 0) },
       { text: "Bank error in your favor. Collect $200.", action: (pId) => creditMoney(pId, 200, "Bank Error") },
       { text: "Doctor's fees. Pay $50.", action: (pId) => debitMoney(pId, 50, "Doctor's Fee") },
       { text: "It is your birthday! Collect $10 from everyone.", action: (pId) => celebrateBirthday(pId) },
@@ -1604,7 +1705,7 @@
       const player = currentGameState.players[localPlayerId];
       const msgObj = {
         sender: player ? player.name : "Guest",
-        color: player ? player.color : "#ffd15c",
+        color: player ? player.color : varColorGold(),
         text: text,
         ts: Date.now()
       };
@@ -1618,6 +1719,8 @@
       });
     }
 
+    function varColorGold() { return "#ffd15c"; }
+
     function toggleGamePause(shouldPause) {
       if (!currentRoomCode || !currentGameState) return;
       const player = currentGameState.players[localPlayerId];
@@ -1629,7 +1732,6 @@
       });
     }
 
-    /* 60-Second Turn Timer with Last 10-Second Sound Warning */
     function startTurnCountdown() {
       clearInterval(turnTimerInterval);
       const TURN_LIMIT_SEC = 60;
@@ -1709,7 +1811,7 @@
       return code;
     }
 
-    function createRoom(name) {
+    function createRoom(name, botCount = 0) {
       const chosenColor = AVAILABLE_COLORS[selectedColorIndex];
       const code = generateRoomCode();
       const pId = "p_" + Date.now();
@@ -1726,11 +1828,31 @@
         position: 0,
         inJail: false,
         jailCards: 0,
-        bankrupt: false
+        bankrupt: false,
+        isBot: false
       };
       initial.playerOrder = [pId];
+
+      // Add autonomous AI bots if requested
+      for (let i = 0; i < botCount; i++) {
+        const botId = "bot_" + (i + 1) + "_" + Date.now();
+        const preset = BOT_PRESETS[i];
+        initial.players[botId] = {
+          id: botId,
+          name: preset.name,
+          color: preset.color,
+          money: 1500,
+          position: 0,
+          inJail: false,
+          jailCards: 0,
+          bankrupt: false,
+          isBot: true
+        };
+        initial.playerOrder.push(botId);
+      }
+
       initial.turnStartTime = Date.now();
-      initial.logs = [`Room ${code} created by ${name}.`];
+      initial.logs = [`Room ${code} created by ${name}${botCount > 0 ? ` with ${botCount} AI bot(s)` : ''}.`];
 
       db.ref("rooms/" + code).set(initial).then(() => enterRoom(code));
     }
@@ -1755,7 +1877,8 @@
             position: 0,
             inJail: false,
             jailCards: 0,
-            bankrupt: false
+            bankrupt: false,
+            isBot: false
           };
 
           const updates = {};
@@ -1822,6 +1945,7 @@
             spawnFloatingEmoji(currentGameState.lastReaction.emoji);
           }
 
+          // Trigger dice roll animation if dice changed
           if (oldState && currentGameState.dice && 
              (oldState.dice[0] !== currentGameState.dice[0] || oldState.dice[1] !== currentGameState.dice[1])) {
             animateDiceRoll(currentGameState.dice[0], currentGameState.dice[1]);
@@ -1832,6 +1956,9 @@
           
           renderLiveGameState(currentGameState);
           startTurnCountdown();
+
+          // Check if it is an AI Bot's turn and I am the host
+          evaluateAITurn(currentGameState);
         }
       });
     }
@@ -1839,7 +1966,7 @@
     function copyShareLink() {
       const url = window.location.origin + window.location.pathname + `?room=${currentRoomCode}`;
       navigator.clipboard.writeText(url).then(() => {
-        alert("Invite link copied to clipboard!\nSend this to family so they join your room directly:\n" + url);
+        alert("Invite link copied to clipboard!\nSend this link to family to join directly:\n" + url);
       });
     }
 
@@ -1857,6 +1984,7 @@
       );
     }
 
+    /* Renders Board State with High-Visibility Token Heads & Low-Cash Danger Indicators */
     function renderLiveGameState(state) {
       if (!state || !state.playerOrder) return;
 
@@ -1870,14 +1998,17 @@
             ? "Your turn: Actions done, click End Turn!" 
             : "⭐ IT'S YOUR TURN! Roll the dice.";
         } else {
-          document.getElementById('status-message').innerText = `Waiting for ${activePlayer.name}...`;
+          document.getElementById('status-message').innerText = activePlayer.isBot
+            ? `🤖 ${activePlayer.name} is making its move...`
+            : `Waiting for ${activePlayer.name}...`;
         }
       }
 
-      document.getElementById('btn-roll').disabled = (!isMyTurn || state.hasRolledThisTurn || state.isPaused);
-      document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused);
+      document.getElementById('btn-roll').disabled = (!isMyTurn || state.hasRolledThisTurn || state.isPaused || isPawnWalking);
+      document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused || isPawnWalking);
       document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
 
+      // Ledger with Low Cash Indicator ($150 threshold)
       const ledger = document.getElementById('players-ledger');
       ledger.innerHTML = '';
       state.playerOrder.forEach(pId => {
@@ -1885,48 +2016,56 @@
         if (!p) return;
         const isCurrent = (pId === activeId);
         const isSelected = (pId === viewingPlayerId);
+        const isLowCash = (!p.bankrupt && p.money < 150);
         const initialLetter = p.name ? p.name.charAt(0).toUpperCase() : '?';
         const card = document.createElement('div');
-        card.className = `player-card ${isCurrent ? 'active' : ''} ${isSelected ? 'selected-view' : ''}`;
+        card.className = `player-card ${isCurrent ? 'active' : ''} ${isSelected ? 'selected-view' : ''} ${isLowCash ? 'low-cash-alert' : ''}`;
         card.onclick = () => { viewingPlayerId = pId; renderPhysicalPortfolio(state); renderLiveGameState(state); };
 
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div class="player-identity">
               <span class="player-avatar" style="background:${p.color};">${initialLetter}</span>
-              <span>${p.name} ${pId === localPlayerId ? '(You)' : ''}</span>
+              <span>${p.name} ${pId === localPlayerId ? '(You)' : (p.isBot ? '🤖' : '')}</span>
             </div>
-            <div class="player-balance">$${p.money}</div>
+            <div class="player-balance ${isLowCash ? 'balance-danger' : ''}">
+              ${isLowCash ? '⚠️ ' : ''}$${p.money}
+            </div>
           </div>
           <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#8fa9a3;">
             <span>${TILES[p.position].name}</span>
-            <span>${p.inJail ? '🔒 In Jail' : (p.bankrupt ? '❌ Bankrupt' : 'Active')}</span>
+            <span>${p.inJail ? '🔒 In Jail' : (p.bankrupt ? '❌ Bankrupt' : (isLowCash ? 'CRITICAL FUNDS' : 'Active'))}</span>
           </div>
         `;
         ledger.appendChild(card);
       });
 
-      TILES.forEach((_, idx) => {
-        const c = document.getElementById(`tokens-tile-${idx}`);
-        if (c) c.innerHTML = '';
-      });
+      // Clear & Place High-Visibility Tokens on the Board (Skip if pawn is walking)
+      if (!isPawnWalking) {
+        TILES.forEach((_, idx) => {
+          const c = document.getElementById(`tokens-tile-${idx}`);
+          if (c) c.innerHTML = '';
+        });
 
-      state.playerOrder.forEach(pId => {
-        const p = state.players[pId];
-        if (p && !p.bankrupt) {
-          const c = document.getElementById(`tokens-tile-${p.position}`);
-          if (c) {
-            const token = document.createElement('div');
-            const isTurn = (pId === activeId);
-            token.className = `board-token ${isTurn ? 'token-active-turn' : ''}`;
-            token.style.background = p.color;
-            token.innerText = p.name ? p.name.charAt(0).toUpperCase() : '?';
-            token.title = `${p.name} ($${p.money})`;
-            c.appendChild(token);
+        state.playerOrder.forEach(pId => {
+          const p = state.players[pId];
+          if (p && !p.bankrupt) {
+            const c = document.getElementById(`tokens-tile-${p.position}`);
+            if (c) {
+              const token = document.createElement('div');
+              const isTurn = (pId === activeId);
+              token.className = `board-token ${isTurn ? 'token-active-turn' : ''}`;
+              token.id = `board-token-${pId}`;
+              token.style.background = p.color;
+              token.innerText = p.name ? p.name.charAt(0).toUpperCase() : '?';
+              token.title = `${p.name} ($${p.money})`;
+              c.appendChild(token);
+            }
           }
-        }
-      });
+        });
+      }
 
+      // Houses / Hotels
       TILES.forEach((_, tId) => {
         const housesEl = document.getElementById(`houses-tile-${tId}`);
         const tileEl = document.getElementById(`tile-${tId}`);
@@ -1953,12 +2092,14 @@
         }
       });
 
+      // Logs
       const feed = document.getElementById('game-feed');
       if (state.logs) {
         feed.innerHTML = state.logs.map(l => `<div style="line-height:1.35; margin-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:2px;">• ${l}</div>`).join('');
         feed.scrollTop = feed.scrollHeight;
       }
 
+      // Chat
       const chatFeed = document.getElementById('chat-feed');
       if (state.messages) {
         chatFeed.innerHTML = state.messages.map(m => `
@@ -1971,6 +2112,60 @@
       }
 
       renderPhysicalPortfolio(state);
+    }
+
+    /* Step-by-Step Animated Tile-by-Tile Hop Engine */
+    function animatePawnStepWalk(pId, fromTile, steps, onComplete) {
+      isPawnWalking = true;
+      let currentTile = fromTile;
+      let remainingSteps = steps;
+
+      const tokenEl = document.getElementById(`board-token-${pId}`);
+
+      function nextStep() {
+        if (remainingSteps <= 0) {
+          isPawnWalking = false;
+          if (onComplete) onComplete(currentTile);
+          return;
+        }
+
+        currentTile = (currentTile + 1) % 40;
+        remainingSteps--;
+
+        // Hop animation and wooden tap sound
+        SFX.stepWood();
+        const nextContainer = document.getElementById(`tokens-tile-${currentTile}`);
+        if (tokenEl && nextContainer) {
+          tokenEl.classList.add('token-hop');
+          setTimeout(() => {
+            nextContainer.appendChild(tokenEl);
+            tokenEl.classList.remove('token-hop');
+          }, 110);
+        }
+
+        setTimeout(nextStep, 220); // 220ms per step feels natural and smooth
+      }
+
+      nextStep();
+    }
+
+    function stepAnimateMoveTo(pId, targetIndex) {
+      const player = currentGameState.players[pId];
+      let steps = (targetIndex - player.position + 40) % 40;
+      if (steps === 0) steps = 40;
+
+      animatePawnStepWalk(pId, player.position, steps, (finalPos) => {
+        let newMoney = player.money;
+        if (finalPos < player.position || targetIndex === 0) {
+          newMoney += 200;
+          SFX.cashIn();
+        }
+
+        const up = {};
+        up[`rooms/${currentRoomCode}/players/${pId}/position`] = finalPos;
+        up[`rooms/${currentRoomCode}/players/${pId}/money`] = newMoney;
+        db.ref().update(up).then(() => handleLandingAction(finalPos, 0));
+      });
     }
 
     function renderPhysicalPortfolio(state) {
@@ -2090,10 +2285,14 @@
     }
 
     function rollDice() {
-      if (!currentGameState || currentGameState.isPaused) return;
+      if (!currentGameState || currentGameState.isPaused || isPawnWalking) return;
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       if (localPlayerId !== activeId || currentGameState.hasRolledThisTurn) return;
 
+      executeTurnRoll(activeId);
+    }
+
+    function executeTurnRoll(activeId) {
       const d1 = Math.floor(Math.random() * 6) + 1;
       const d2 = Math.floor(Math.random() * 6) + 1;
       const total = d1 + d2;
@@ -2112,11 +2311,11 @@
           up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = true;
 
           let logs = currentGameState.logs || [];
-          logs.push(`🚨 ${player.name} rolled 3 DOUBLES IN A ROW! Movement voided; caught speeding directly to Jail!`);
+          logs.push(`🚨 ${player.name} rolled 3 DOUBLES IN A ROW! Caught speeding directly to Jail!`);
           up[`rooms/${currentRoomCode}/logs`] = logs;
 
           db.ref().update(up).then(() => {
-            broadcastFx('dread', '🚨', 'SPEEDING! 3 DOUBLES VOIDED!', `${player.name} rolled 3 doubles in succession! Movement voided directly to Jail!`);
+            broadcastFx('dread', '🚨', 'SPEEDING! 3 DOUBLES VOIDED!', `${player.name} caught speeding directly to Jail!`);
           });
           return;
         }
@@ -2127,30 +2326,30 @@
           broadcastFx('celebrate', '✨', 'DOUBLES ROLLED!', `${player.name} rolled matching ${d1}s! Extra turn awarded.`);
         }
 
-        let oldPos = player.position;
-        let newPos = (oldPos + total) % 40;
-        let newMoney = player.money;
+        // Physical Step-by-Step Hop Animation
+        animatePawnStepWalk(activeId, player.position, total, (newPos) => {
+          let newMoney = player.money;
+          if (newPos < player.position) {
+            newMoney += 200;
+            SFX.cashIn();
+            broadcastFx('celebrate', '💰', 'Passed GO!', `${player.name} collected $200 salary.`);
+          }
 
-        if (newPos < oldPos) {
-          newMoney += 200;
-          SFX.cashIn();
-          broadcastFx('celebrate', '💰', 'Passed GO!', `${player.name} collected $200 salary.`);
-        }
+          const updates = {};
+          updates[`rooms/${currentRoomCode}/dice`] = [d1, d2];
+          updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = currentDoublesCount;
+          updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
+          updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
+          updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
+          updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now();
 
-        const updates = {};
-        updates[`rooms/${currentRoomCode}/dice`] = [d1, d2];
-        updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = currentDoublesCount;
-        updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
-        updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
-        updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
-        updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now();
+          let logs = currentGameState.logs || [];
+          logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[newPos].name}.`);
+          updates[`rooms/${currentRoomCode}/logs`] = logs;
 
-        let logs = currentGameState.logs || [];
-        logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[newPos].name}.`);
-        updates[`rooms/${currentRoomCode}/logs`] = logs;
-
-        db.ref().update(updates).then(() => {
-          setTimeout(() => handleLandingAction(newPos, total), 300);
+          db.ref().update(updates).then(() => {
+            handleLandingAction(newPos, total);
+          });
         });
       });
     }
@@ -2164,47 +2363,40 @@
         const prop = currentGameState.properties ? currentGameState.properties[tile.id] : null;
 
         if (!prop) {
-          if (player.money >= tile.price) {
-            openModal(
-              "Purchase Title Deed?",
-              `<div style="text-align:center;">
-                 <p>Acquire deed for <strong>${tile.name}</strong> for <strong>$${tile.price}</strong>?</p>
-                 <p style="font-size:0.8rem; color:#666; margin-top:6px;">Your funds: $${player.money}</p>
-               </div>`,
-              [
-                {
-                  label: "Buy Deed",
-                  action: () => {
-                    const up = {};
-                    up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - tile.price;
-                    up[`rooms/${currentRoomCode}/properties/${tile.id}`] = { ownerId: activeId, houses: 0, mortgaged: false };
-                    
-                    let logs = currentGameState.logs || [];
-                    logs.push(`${player.name} bought Title Deed: ${tile.name} for $${tile.price}.`);
-                    up[`rooms/${currentRoomCode}/logs`] = logs;
-
-                    db.ref().update(up).then(() => {
+          // If human player, show purchase modal
+          if (!player.isBot) {
+            if (player.money >= tile.price) {
+              openModal(
+                "Purchase Title Deed?",
+                `<div style="text-align:center;">
+                   <p>Acquire deed for <strong>${tile.name}</strong> for <strong>$${tile.price}</strong>?</p>
+                   <p style="font-size:0.8rem; color:#666; margin-top:6px;">Your funds: $${player.money}</p>
+                 </div>`,
+                [
+                  {
+                    label: "Buy Deed",
+                    action: () => {
+                      executePropertyBuy(activeId, tile);
                       closeModal();
-                      if (tile.color && checkColorMonopoly(activeId, tile.color)) {
-                        broadcastFx('celebrate', '👑', 'FULL COLOR MONOPOLY!', `${player.name} owns all ${tile.color.toUpperCase()} properties! Rents are now DOUBLED!`);
-                      } else if (tile.type === "utility" && checkMultipleUtilities(activeId)) {
-                        broadcastFx('celebrate', '⚡', 'UTILITY MONOPOLY!', `${player.name} controls both Water Works and Electric Co!`);
-                      } else {
-                        SFX.cashIn();
-                      }
-                    });
-                  }
-                },
-                { label: "Pass", class: "btn-secondary", action: closeModal }
-              ]
-            );
+                    }
+                  },
+                  { label: "Pass", class: "btn-secondary", action: closeModal }
+                ]
+              );
+            }
+          } else {
+            // AI Bot logic: Buy if cash after purchase remains >= $150 safety buffer
+            if (player.money - tile.price >= 150) {
+              executePropertyBuy(activeId, tile);
+            }
           }
         } else if (prop.ownerId !== activeId && !prop.mortgaged) {
           let rent = tile.rent ? tile.rent[prop.houses || 0] : 25;
           const owner = currentGameState.players[prop.ownerId];
 
           const up = {};
-          up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - rent;
+          const remainingFunds = player.money - rent;
+          up[`rooms/${currentRoomCode}/players/${activeId}/money`] = remainingFunds;
           up[`rooms/${currentRoomCode}/players/${owner.id}/money`] = owner.money + rent;
 
           let logs = currentGameState.logs || [];
@@ -2212,7 +2404,10 @@
           up[`rooms/${currentRoomCode}/logs`] = logs;
 
           db.ref().update(up).then(() => {
-            if (rent >= 200) {
+            if (remainingFunds < 150 && !player.bankrupt) {
+              SFX.lowCashAlarm();
+              showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s liquid funds are below $150!`);
+            } else if (rent >= 200) {
               broadcastFx('dread', '💸', 'HEFTY RENT PAID!', `${player.name} paid $${rent} to ${owner.name}!`);
             } else {
               SFX.taxFine();
@@ -2225,15 +2420,65 @@
         drawPhysicalCard("community", activeId);
       } else if (tile.type === "tax") {
         const up = {};
-        up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - tile.amount;
+        const remainingFunds = player.money - tile.amount;
+        up[`rooms/${currentRoomCode}/players/${activeId}/money`] = remainingFunds;
         let logs = currentGameState.logs || [];
         logs.push(`${player.name} paid $${tile.amount} for ${tile.name}.`);
         up[`rooms/${currentRoomCode}/logs`] = logs;
         db.ref().update(up).then(() => {
-          broadcastFx('dread', '💸', `${tile.name.toUpperCase()}!`, `${player.name} paid $${tile.amount} directly to the bank.`);
+          if (remainingFunds < 150) {
+            SFX.lowCashAlarm();
+            showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s liquid funds are below $150!`);
+          } else {
+            broadcastFx('dread', '💸', `${tile.name.toUpperCase()}!`, `${player.name} paid $${tile.amount} to the bank.`);
+          }
         });
       } else if (tile.type === "gotojail") {
         sendToJailOnline(activeId);
+      }
+    }
+
+    function executePropertyBuy(pId, tile) {
+      const player = currentGameState.players[pId];
+      const up = {};
+      const newBalance = player.money - tile.price;
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = newBalance;
+      up[`rooms/${currentRoomCode}/properties/${tile.id}`] = { ownerId: pId, houses: 0, mortgaged: false };
+      
+      let logs = currentGameState.logs || [];
+      logs.push(`${player.name} bought Title Deed: ${tile.name} for $${tile.price}.`);
+      up[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(up).then(() => {
+        if (newBalance < 150) {
+          SFX.lowCashAlarm();
+          showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s balance dropped to $${newBalance}!`);
+        } else if (tile.color && checkColorMonopoly(pId, tile.color)) {
+          broadcastFx('celebrate', '👑', 'FULL COLOR MONOPOLY!', `${player.name} owns all ${tile.color.toUpperCase()} properties! Rents are now DOUBLED!`);
+        } else if (tile.type === "utility" && checkMultipleUtilities(pId)) {
+          broadcastFx('celebrate', '⚡', 'UTILITY MONOPOLY!', `${player.name} controls both Water Works and Electric Co!`);
+        } else {
+          SFX.cashIn();
+        }
+      });
+    }
+
+    /* Autonomous AI Bot Turn Engine */
+    function evaluateAITurn(state) {
+      const activeId = state.playerOrder[state.activePlayerIndex];
+      const player = state.players[activeId];
+
+      // If the host is in the room and the active player is an AI Bot
+      if (player && player.isBot && state.playerOrder[0] === localPlayerId && !state.isPaused) {
+        if (!state.hasRolledThisTurn) {
+          setTimeout(() => {
+            if (!isPawnWalking) executeTurnRoll(activeId);
+          }, 1400); // Natural 1.4s thinking delay
+        } else {
+          setTimeout(() => {
+            endTurn();
+          }, 1200);
+        }
       }
     }
 
@@ -2307,20 +2552,6 @@
       });
     }
 
-    function movePlayerTo(pId, targetIndex) {
-      const player = currentGameState.players[pId];
-      let newMoney = player.money;
-      if (targetIndex < player.position) {
-        newMoney += 200;
-        SFX.cashIn();
-      }
-
-      const up = {};
-      up[`rooms/${currentRoomCode}/players/${pId}/position`] = targetIndex;
-      up[`rooms/${currentRoomCode}/players/${pId}/money`] = newMoney;
-      db.ref().update(up).then(() => handleLandingAction(targetIndex, 0));
-    }
-
     function creditMoney(pId, amt, reason) {
       const player = currentGameState.players[pId];
       const up = {};
@@ -2334,12 +2565,18 @@
     function debitMoney(pId, amt, reason) {
       const player = currentGameState.players[pId];
       const up = {};
-      up[`rooms/${currentRoomCode}/players/${pId}/money`] = player.money - amt;
+      const remainingFunds = player.money - amt;
+      up[`rooms/${currentRoomCode}/players/${pId}/money`] = remainingFunds;
       let logs = currentGameState.logs || [];
       logs.push(`${player.name} paid $${amt} (${reason}).`);
       up[`rooms/${currentRoomCode}/logs`] = logs;
       db.ref().update(up).then(() => {
-        broadcastFx('dread', '💸', 'FEE CHARGED', `${player.name} paid $${amt} for ${reason}.`);
+        if (remainingFunds < 150) {
+          SFX.lowCashAlarm();
+          showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s balance dropped to $${remainingFunds}!`);
+        } else {
+          broadcastFx('dread', '💸', 'FEE CHARGED', `${player.name} paid $${amt} for ${reason}.`);
+        }
       });
     }
 
@@ -2412,10 +2649,8 @@
     }
 
     function endTurn() {
-      if (!currentGameState || currentGameState.isPaused) return;
+      if (!currentGameState || currentGameState.isPaused || isPawnWalking) return;
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
-      if (localPlayerId !== activeId) return;
-
       const nextIndex = (currentGameState.activePlayerIndex + 1) % currentGameState.playerOrder.length;
       const updates = {
         [`rooms/${currentRoomCode}/activePlayerIndex`]: nextIndex,
@@ -2530,7 +2765,7 @@
         <div class="rule-section">
           <div class="rule-title">🎯 Objective of the Game</div>
           <div class="rule-text">
-            The object of Monopoly is to become the wealthiest player through buying, renting, and trading real estate until all opponents have been forced into complete financial bankruptcy, or by holding the highest net worth at the agreed conclusion of play.
+            The object of the game is to become the wealthiest player through buying, renting, and trading real estate until opponents forfeit or the match is concluded by asset tally.
           </div>
         </div>
 
@@ -2539,109 +2774,51 @@
           <div class="rule-text">
             On your turn, roll both dice and move clockwise around the board by the total number of spaces thrown.
             <div class="rule-subheading">• Consecutive Independent Rolls (Doubles):</div>
-            If you roll doubles (matching numbers on both dice), move your token, carry out the action for the space landed upon, and <strong>roll again</strong>. Each roll is an entirely separate move—rolls are never combined into a single leap.
+            If you roll doubles (matching numbers on both dice), move your token, carry out the action for the space landed upon, and <strong>roll again</strong>. Each roll is an entirely separate move.
             <div class="rule-subheading">• The "Speeding" Penalty:</div>
             If you throw doubles <strong>three times in succession</strong>, you do not move on the third throw. Your turn ends immediately, the movement is voided, and you are sent directly to <strong>Jail</strong>.
           </div>
         </div>
 
         <div class="rule-section">
-          <div class="rule-title">🏠 Buying Properties & Auctions</div>
+          <div class="rule-title">🏠 Buying Properties & Color Monopolies</div>
           <div class="rule-text">
-            Whenever you land on an unowned property (Street, Railroad, or Utility), you have the first right to purchase it from the Bank at its printed price.
-            <div class="rule-subheading">• The Official Auction Rule:</div>
-            If the player landing on the property declines to buy it at the listed price, the Banker must immediately put the property up for auction. Any player (including the one who passed) may bid, starting at any price ($1 minimum), and the highest bidder takes the deed.
-          </div>
-        </div>
-
-        <div class="rule-section">
-          <div class="rule-title">💵 Rent Collection & Monopolies</div>
-          <div class="rule-text">
-            When you land on a property owned by an opponent, you must pay the rent specified on its Title Deed.
+            Whenever you land on an unowned property, you have the first right to purchase it at its printed price.
             <div class="rule-subheading">• Color Group Monopolies:</div>
             Holding all properties of a single color group grants a Monopoly. The unimproved site rent on every street in that color group is <strong>automatically doubled</strong>, even if no houses are built.
-            <div class="rule-subheading">• Railroad Rent:</div>
-            $25 for 1 Railroad owned; $50 for 2; $100 for 3; and $200 for holding all 4 Railroads.
-            <div class="rule-subheading">• Utility Rent:</div>
-            If 1 Utility is owned, rent is <strong>4× the dice roll</strong> thrown. If both Utilities are owned by the same player, rent is <strong>10× the dice roll</strong> thrown.
           </div>
         </div>
 
         <div class="rule-section">
           <div class="rule-title">🏗️ Building Houses & Hotels (The "Even Building" Rule)</div>
           <div class="rule-text">
-            You may only build houses once you own every property in a color group.
-            <div class="rule-subheading">• Even Building Mandate:</div>
-            You must build evenly across the group. You cannot erect a second house on any street until you have placed one house on every street in that color group. The same rule applies to 3rd and 4th houses.
-            <div class="rule-subheading">• Upgrading to Hotels:</div>
-            Once all properties in a color set have 4 houses, you may purchase a Hotel by returning the 4 houses to the Bank and paying the hotel fee. Maximum of 1 Hotel per property.
-            <div class="rule-subheading">• Housing Shortages:</div>
-            Under standard rules, the Bank only has 32 houses and 12 hotels. If the supply runs out, players must wait for someone to sell or upgrade before building.
+            You must build evenly across the group. You cannot erect a second house on any street until you have placed one house on every street in that color group.
           </div>
         </div>
 
         <div class="rule-section">
           <div class="rule-title">🏚️ Mortgaging & Selling Buildings</div>
           <div class="rule-text">
-            Properties can be mortgaged directly to the Bank for 50% of their face value at any time during your turn.
-            <div class="rule-subheading">• Selling Buildings First:</div>
-            A property cannot be mortgaged if any houses or hotels stand on it or on any other property in its color group. All buildings in that group must first be sold back to the Bank at <strong>half-price</strong>, evenly across the group.
-            <div class="rule-subheading">• No Rent Collected:</div>
-            No rent can be collected on mortgaged properties. However, unmortgaged properties in the same color group still collect double rent.
-            <div class="rule-subheading">• Lifting a Mortgage:</div>
-            To unmortgage a property, the owner must pay the Bank the mortgage amount plus <strong>10% interest</strong>.
-            <div class="rule-subheading">• Trading Mortgaged Deeds:</div>
-            A mortgaged property may be sold or traded to another player. The new owner must immediately pay the 10% interest fee to the Bank.
+            Properties can be mortgaged directly to the Bank for 50% of their face value. All buildings on that color group must first be sold back to the Bank at half-price before mortgaging.
           </div>
         </div>
 
         <div class="rule-section">
-          <div class="rule-title">🔒 Complete Jail Rules</div>
+          <div class="rule-title">🔒 Jail Rules</div>
           <div class="rule-text">
-            You are sent to Jail if: (1) You land on "Go to Jail", (2) You draw a "Go to Jail" card, or (3) You roll 3 consecutive doubles.
-            <div class="rule-subheading">• Escaping Jail (3 Methods):</div>
-            1. Roll doubles on any of your next three turns (move forward by that roll).<br>
-            2. Use a "Get Out of Jail Free" card before rolling.<br>
-            3. Pay a $50 fine to the Bank before rolling on your turn. If you fail to roll doubles on your 3rd turn in Jail, you <em>must</em> pay $50 and advance by the roll thrown.
-            <div class="rule-subheading">• Collecting Rent in Jail:</div>
-            According to official rules, you may still buy, sell, trade properties, build houses, and collect rent while imprisoned!
-          </div>
-        </div>
-
-        <div class="rule-section">
-          <div class="rule-title">🅿️ Free Parking & Taxes</div>
-          <div class="rule-text">
-            <div class="rule-subheading">• Free Parking:</div>
-            Official rules state that Free Parking is strictly a neutral resting place. No tax money, fines, or jackpots are awarded—house rules adding jackpot pools are non-standard.
-            <div class="rule-subheading">• Passing GO:</div>
-            Every time your token lands on or passes over GO, the Bank pays you a $200 salary.
-          </div>
-        </div>
-
-        <div class="rule-section">
-          <div class="rule-title">💀 Bankruptcy & Forfeiture</div>
-          <div class="rule-text">
-            If you owe more rent or taxes than you can pay after selling all buildings and mortgaging all properties, you must declare Bankruptcy.
-            <div class="rule-subheading">• Owed to an Opponent:</div>
-            You forfeit all cash and deed cards to that opponent. The recipient must immediately pay 10% interest on any mortgaged properties received.
-            <div class="rule-subheading">• Owed to the Bank (Taxes/Fines):</div>
-            All properties are handed to the Bank and immediately auctioned off to the remaining active players.
+            You are sent to Jail if you land on "Go to Jail", draw a Jail card, or roll 3 consecutive doubles. You can escape by rolling doubles, using a Get Out of Jail card, or paying a $50 fine.
           </div>
         </div>
 
         <div class="rule-section">
           <div class="rule-title">🏁 Ending the Game Early (Asset Tally)</div>
           <div class="rule-text">
-            If players agree to end the match early, click the <strong>🏁 Tally</strong> button. The player with the highest total net worth is declared winner, calculated as:
-            <br>• Cash on hand
-            <br>• Full printed price of all unmortgaged properties
-            <br>• Half-price (mortgage value) of all mortgaged properties
-            <br>• Full purchase price of all houses and hotels
+            Click <strong>🏁 Tally</strong> anytime to conclude the game. Total net worth is computed by adding liquid cash + face value of all unmortgaged deeds + half-value of mortgaged properties + construction cost of all houses/hotels.
           </div>
         </div>
       `;
 
-      openModal("📖 Official Monopoly Rule Book", rulesHtml, [{ label: "Close Rules", action: closeModal }]);
+      openModal("📖 Official Rule Book", rulesHtml, [{ label: "Close Rules", action: closeModal }]);
     }
 
     function openModal(title, html, buttons = []) {
@@ -2691,18 +2868,12 @@
       renderDieFace('die-face-1', 1);
       renderDieFace('die-face-2', 1);
 
-      // Auto-detect invite link with query parameter (e.g. ?room=ABCD)
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get("room");
       if (roomParam) {
         const cleanCode = roomParam.trim().toUpperCase();
         document.getElementById('room-code-input').value = cleanCode;
         setLobbyMode('join');
-
-        // Hide "Start New Game" choice so family members cannot click it accidentally
-        document.getElementById('mode-selector-grid').style.display = 'none';
-        document.getElementById('invite-detect-banner').style.display = 'flex';
-        document.getElementById('detected-room-badge').innerText = cleanCode;
       }
     }
 
