@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Classic Family Monopoly - Tournament Edition</title>
+  <title>Classic Family Monopoly - Tournament Tabletop Edition</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -18,8 +18,8 @@
       --board-surface: #dbeef0;
       --tile-bg: #ffffff;
       --tile-border: #1e2922;
-      --glass-panel: rgba(18, 30, 26, 0.92);
-      --glass-border: rgba(255, 209, 92, 0.25);
+      --glass-panel: rgba(18, 30, 26, 0.94);
+      --glass-border: rgba(255, 209, 92, 0.28);
       --gold-accent: #ffd15c;
       --danger-red: #ef4444;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -40,80 +40,139 @@
       position: relative;
     }
 
-    .screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-2px, 0, 0); }
-      20%, 80% { transform: translate3d(4px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-      40%, 60% { transform: translate3d(6px, 0, 0); }
-    }
-
     #fx-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
 
-    /* Flying Banknote and Deed Animation */
+    /* Flying Banknotes and Deed Cards */
     .flying-bill {
       position: fixed;
-      width: 48px;
-      height: 26px;
+      width: 52px;
+      height: 28px;
       border-radius: 3px;
-      border: 1px solid rgba(0,0,0,0.4);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      border: 1px solid rgba(0,0,0,0.5);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.7);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 900;
       color: #111;
       pointer-events: none;
-      z-index: 2000;
+      z-index: 2200;
       transition: all 0.85s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .flying-deed {
       position: fixed;
-      width: 55px;
-      height: 70px;
+      width: 58px;
+      height: 74px;
       border-radius: 4px;
       border: 1.5px solid #111;
       background: #fff;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.7);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.8);
       pointer-events: none;
-      z-index: 2000;
+      z-index: 2200;
       transition: all 0.9s cubic-bezier(0.25, 1, 0.5, 1);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      font-size: 0.45rem;
+      font-size: 0.48rem;
       font-weight: 800;
       color: #111;
       text-align: center;
     }
 
-    .floating-emoji {
-      position: fixed;
-      bottom: 20px;
-      font-size: 2.6rem;
+    .floating-cash-tag {
+      position: absolute;
+      font-weight: 900;
+      font-size: 1.15rem;
       pointer-events: none;
-      z-index: 1200;
-      animation: floatUp 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      z-index: 15;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      animation: floatCash 2.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
-    @keyframes floatUp {
-      0% { transform: translateY(0) scale(0.6); opacity: 0; }
-      15% { opacity: 1; transform: translateY(-40px) scale(1.2); }
+    .cash-tag-plus { color: #34d399; }
+    .cash-tag-minus { color: #f87171; }
+    @keyframes floatCash {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      15% { transform: translateY(-12px) scale(1.2); opacity: 1; }
       80% { opacity: 1; }
-      100% { transform: translateY(-450px) scale(0.9); opacity: 0; }
+      100% { transform: translateY(-50px) scale(0.9); opacity: 0; }
     }
+
+    /* Homescapes Style Silent Comic Thought Balloons */
+    .thought-balloon {
+      position: absolute;
+      top: -46px;
+      background: #ffffff;
+      color: #1f2937;
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 5px 8px;
+      border-radius: 12px;
+      border: 1.5px solid #374151;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      white-space: normal;
+      width: 145px;
+      text-align: center;
+      line-height: 1.25;
+      pointer-events: none;
+      z-index: 25;
+      animation: popBalloon 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .thought-balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 7px 6px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+    }
+    @keyframes popBalloon {
+      0% { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Dedicated Director's Player Banner */
+    #directors-banner {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      background: linear-gradient(135deg, rgba(20, 32, 28, 0.98), rgba(28, 46, 39, 0.98));
+      border: 2px solid var(--gold-accent);
+      box-shadow: 0 16px 45px rgba(0,0,0,0.85);
+      border-radius: 30px;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1150;
+      transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      opacity: 0;
+      pointer-events: auto;
+      backdrop-filter: blur(10px);
+      max-width: 90vw;
+    }
+    #directors-banner.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .banner-icon { font-size: 1.8rem; }
+    .banner-content { text-align: left; }
+    .banner-title { font-weight: 900; font-size: 1rem; color: var(--gold-accent); }
+    .banner-subtitle { font-size: 0.82rem; color: #f3f4f6; margin-top: 2px; line-height: 1.3; }
 
     #event-toast {
       position: fixed;
-      top: 24px;
+      bottom: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(-100px);
+      transform: translateX(-50%) translateY(100px);
       background: rgba(22, 35, 30, 0.96);
       border: 2px solid var(--gold-accent);
       box-shadow: 0 16px 40px rgba(0,0,0,0.85);
       border-radius: 40px;
-      padding: 14px 34px;
+      padding: 12px 30px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -124,20 +183,10 @@
       backdrop-filter: blur(8px);
     }
     #event-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    #event-toast.toast-celebrate {
-      border-color: var(--gold-accent);
-      background: linear-gradient(135deg, rgba(28,43,39,0.96), rgba(36,61,53,0.96));
-      color: var(--gold-accent);
-    }
-    #event-toast.toast-dread {
-      border-color: var(--danger-red);
-      background: linear-gradient(135deg, rgba(36,20,22,0.96), rgba(59,23,26,0.96));
-      color: #fca5a5;
-    }
-    .toast-icon { font-size: 1.8rem; }
-    .toast-title { font-weight: 900; font-size: 1.05rem; }
-    .toast-subtitle { font-size: 0.8rem; color: #e5e7eb; }
+    #event-toast.toast-celebrate { border-color: var(--gold-accent); color: var(--gold-accent); }
+    #event-toast.toast-dread { border-color: var(--danger-red); color: #fca5a5; }
 
+    /* Pause Screen */
     .pause-overlay {
       position: fixed;
       inset: 0;
@@ -154,6 +203,7 @@
     .pause-overlay.active { display: flex; }
     .pause-title { font-size: 2.6rem; font-weight: 900; color: var(--gold-accent); letter-spacing: 2px; }
 
+    /* 3-Choice Lobby */
     .lobby-overlay {
       position: fixed;
       inset: 0;
@@ -317,6 +367,8 @@
     .btn-header:hover { background: #2f4740; }
     .btn-header-gold { background: #7c5c10; color: #fde68a; border-color: var(--gold-accent); }
     .btn-header-gold:hover { background: #926f18; }
+    .btn-header-inspect { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
+    .btn-header-inspect:hover { background: #2563eb; color: #fff; }
 
     .bank-vault-box {
       background: linear-gradient(135deg, #13241e, #1c362c);
@@ -352,7 +404,6 @@
     }
     .player-card.active { border-color: var(--gold-accent); background: #21332c; box-shadow: 0 0 12px rgba(255, 209, 92, 0.2); }
     .player-card.selected-view { border-left: 4px solid #6ee7b7; }
-    .player-card.player-afk { opacity: 0.65; border-style: dashed; }
     .player-card.low-cash-alert { border-color: var(--danger-red) !important; animation: alertGlow 1.2s infinite alternate; }
     @keyframes alertGlow { 0% { box-shadow: 0 0 4px rgba(239,68,68,0.4); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9); } }
 
@@ -371,8 +422,7 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
     .player-balance { font-size: 1.05rem; font-weight: 800; color: #6ee7b7; font-family: monospace; }
-    .balance-danger { color: #f87171 !important; animation: blinkText 1.2s infinite; }
-    @keyframes blinkText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .balance-danger { color: #f87171 !important; }
 
     .console-panel {
       background: #0d1513;
@@ -460,7 +510,23 @@
     .die-5 .pip:nth-child(5) { grid-column: 3; grid-row: 3; }
     .die-6 { grid-template: 1fr 1fr 1fr / 1fr 1fr; }
 
-    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+    /* Controls Grid: Clean Tabletop Buttons (Bankruptcy Removed) */
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+    .movement-mode-row { width: 100%; display: flex; justify-content: center; margin-bottom: 4px; }
+    .mode-toggle-btn {
+      background: #172420;
+      border: 1px solid #2f453e;
+      color: #9cb5af;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-toggle-btn.mode-manual { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
+    .mode-toggle-btn.mode-auto { background: #2a7c5c; color: #a7f3d0; border-color: #10b981; }
+
     button.btn-action {
       background: #2a7c5c;
       border: none;
@@ -476,8 +542,8 @@
     button.btn-action:hover:not(:disabled) { background: #349b73; transform: translateY(-1px); }
     button.btn-action:disabled { background: #202c28; color: #526661; cursor: not-allowed; box-shadow: none; transform: none; }
     button.btn-secondary { background: #364843; }
-    button.btn-danger { background: #ad2d30; }
 
+    /* Feed Container with Smart-Lock Scroll */
     .feed-container {
       flex: 1;
       display: flex;
@@ -487,6 +553,7 @@
       border: 1px solid #1c2b26;
       overflow: hidden;
       min-height: 160px;
+      position: relative;
     }
     .feed-tabs { display: flex; background: #141f1c; border-bottom: 1px solid #20312c; }
     .feed-tab {
@@ -510,6 +577,22 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+    }
+    .scroll-jump-pill {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+      cursor: pointer;
+      display: none;
+      z-index: 10;
     }
     .chat-bubble { line-height: 1.3; margin-bottom: 3px; word-break: break-word; }
     .chat-author { font-weight: 800; margin-right: 4px; }
@@ -546,7 +629,7 @@
     .chat-text-input:focus { border-color: var(--gold-accent); }
     .chat-send-btn { background: #2a7c5c; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
 
-    /* Satin Warm Oak Wood Trim Board */
+    /* Satin Warm Oak Wood Board */
     .board-container {
       flex: 2;
       aspect-ratio: 1 / 1;
@@ -622,22 +705,20 @@
     .tile-left .tile-bar { width: 22%; height: 100%; position: absolute; right: 0; top: 0; border-left: 1.5px solid rgba(0,0,0,0.5); }
     .tile-right .tile-bar { width: 22%; height: 100%; position: absolute; left: 0; top: 0; border-right: 1.5px solid rgba(0,0,0,0.5); }
 
-    .owner-shield-badge {
+    /* Bold Property Corner Ownership Ribbon */
+    .owner-corner-ribbon {
       position: absolute;
-      top: 1px;
-      right: 2px;
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      border: 1.5px solid #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.55rem;
+      top: 0;
+      right: 0;
+      padding: 2px 5px;
+      font-size: 0.6rem;
       font-weight: 900;
       color: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.6);
-      z-index: 4;
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      z-index: 6;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .tile-content {
@@ -683,9 +764,9 @@
       justify-content: center;
       align-items: center;
       z-index: 10;
-      pointer-events: none;
+      pointer-events: auto;
     }
-    .board-token-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; }
+    .board-token-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .token-nametag {
       position: absolute;
       top: -14px;
@@ -715,8 +796,14 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
       transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .board-token.token-active-turn { animation: tokenPulse 1.1s infinite alternate; border-color: var(--gold-accent); }
-    @keyframes tokenPulse { 0% { transform: scale(1); box-shadow: 0 0 6px var(--gold-accent); } 100% { transform: scale(1.4); box-shadow: 0 0 18px var(--gold-accent); } }
+    .board-token.token-active-turn {
+      animation: tokenPulse 1.1s infinite alternate;
+      border-color: var(--gold-accent);
+    }
+    @keyframes tokenPulse {
+      0% { transform: scale(1); box-shadow: 0 0 6px var(--gold-accent); }
+      100% { transform: scale(1.4); box-shadow: 0 0 18px var(--gold-accent); }
+    }
     .board-token.token-hop { transform: translateY(-18px) scale(1.3) !important; }
 
     .board-center {
@@ -785,26 +872,63 @@
     .portfolio-header { border-bottom: 1px solid #2a3d37; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
     .portfolio-header h2 { font-size: 1.05rem; color: var(--gold-accent); font-weight: 800; }
 
-    .cash-tray { background: #0d1513; border-radius: 8px; padding: 8px; border: 1px solid #20312c; display: flex; flex-direction: column; gap: 6px; }
+    /* Permanent Placards & Downward-Offset Paper Bill Stacks */
+    .cash-tray {
+      background: #0d1513;
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid #20312c;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
     .cash-tray-title { font-size: 0.7rem; font-weight: 700; color: #9cb5af; text-transform: uppercase; }
-    .bill-rack { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
-    .bill-card {
-      min-width: 44px;
-      height: 28px;
-      border-radius: 4px;
-      border: 1px solid rgba(0,0,0,0.3);
+    .placards-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px 2px 10px 2px;
+    }
+    .placard-slot {
+      min-width: 46px;
+      height: 52px;
+      background: #141f1c;
+      border: 1.5px dashed #283e37;
+      border-radius: 6px;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 2px;
+    }
+    .placard-label { font-size: 0.62rem; font-weight: 800; color: #637873; }
+    .cascading-stack {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 16px;
+      cursor: pointer;
+    }
+    .fanned-bill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 24px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
       justify-content: center;
       font-size: 0.65rem;
-      font-weight: 800;
+      font-weight: 900;
       color: #111;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
       transition: transform 0.15s;
     }
-    .bill-card:hover { transform: translateY(-2px); }
+    .fanned-bill:hover { transform: translateY(-4px) !important; }
+
     .bill-500 { background: #fde047; }
     .bill-100 { background: #bae6fd; }
     .bill-50  { background: #fed7aa; }
@@ -813,47 +937,59 @@
     .bill-5   { background: #fbcfe8; }
     .bill-1   { background: #ffffff; }
 
-    .special-cards-container { display: flex; gap: 8px; }
-    .jail-free-card {
-      background: #fffbeb;
-      border: 1.5px solid #d97706;
-      color: #92400e;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    /* Downward Offset Shingle Property Deck Tray */
+    .deeds-scroll-container {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-right: 4px;
     }
-
-    .deeds-scroll-container { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-right: 4px; }
-    .deed-card {
-      background: #ffffff;
-      color: #111111;
-      border: 1.5px solid #111;
+    .shingle-group-stack {
+      background: #141f1c;
+      border: 1px solid #243831;
       border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      padding: 6px;
       display: flex;
       flex-direction: column;
-      font-size: 0.65rem;
-      line-height: 1.25;
+      gap: 4px;
       position: relative;
-      transition: transform 0.15s;
     }
-    .deed-card:hover { transform: translateY(-2px); }
-    .deed-card.mortgaged-deed { filter: grayscale(0.8); opacity: 0.7; }
-    .deed-header { padding: 5px 4px; text-align: center; font-weight: 900; color: #fff; font-size: 0.72rem; text-transform: uppercase; border-bottom: 1.5px solid #111; }
-    .deed-sub { font-size: 0.55rem; font-weight: 600; display: block; opacity: 0.9; }
-    .deed-body { padding: 6px 7px; display: flex; flex-direction: column; gap: 2px; flex: 1; justify-content: space-between; }
-    .deed-row { display: flex; justify-content: space-between; border-bottom: 0.5px solid #eee; padding-bottom: 1px; }
-    .deed-row.bold { font-weight: 800; }
-    .deed-divider { border: 0; border-top: 1px solid #111; margin: 3px 0; }
-    .deed-actions-row { display: flex; gap: 4px; margin-top: 4px; }
-    .deed-btn { flex: 1; font-size: 0.62rem; font-weight: 800; padding: 3px 0; border-radius: 4px; border: 1px solid #888; background: #f1f4f2; cursor: pointer; }
+    .shingle-group-title {
+      font-size: 0.65rem;
+      font-weight: 900;
+      color: var(--gold-accent);
+      border-bottom: 1px solid #20312c;
+      padding-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .shingle-deck-container {
+      position: relative;
+      min-height: 48px;
+    }
+    .shingle-card {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 38px;
+      background: #fff;
+      color: #111;
+      border: 1.5px solid #111;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.18s, z-index 0.1s;
+    }
+    .shingle-card:hover { transform: translateY(-8px) scale(1.02); z-index: 10 !important; }
+    .shingle-card-bar { height: 12px; width: 100%; border-bottom: 1px solid #111; }
+    .shingle-card-body { padding: 2px 4px; font-size: 0.58rem; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
 
-    /* Modal Framework */
+    /* Modals */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -881,7 +1017,6 @@
     .modal-body { padding: 18px; font-size: 0.85rem; line-height: 1.5; overflow-y: auto; flex: 1; }
     .modal-footer { padding: 12px 16px; background: #f8f8f8; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #ddd; }
 
-    /* Tactical Cash Checkout Modal */
     .checkout-bill-slot {
       display: flex;
       flex-wrap: wrap;
@@ -890,6 +1025,7 @@
       padding: 10px;
       background: #f3f4f6;
       border-radius: 8px;
+      justify-content: center;
     }
     .checkout-bill-item {
       padding: 8px 12px;
@@ -903,39 +1039,6 @@
     }
     .checkout-bill-item:hover { transform: scale(1.06); }
 
-    /* Trade Table Split Layout */
-    .trade-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .trade-side-box {
-      background: #f9fafb;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 260px;
-      overflow-y: auto;
-    }
-    .trade-side-title { font-weight: 900; font-size: 0.85rem; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
-    .trade-item-row { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; cursor: pointer; }
-
-    /* Auction Gavel Stage */
-    .auction-stage-box {
-      text-align: center;
-      padding: 14px;
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      border: 2px solid #f59e0b;
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-    .auction-gavel-icon { font-size: 2.8rem; animation: gavelWobble 0.8s infinite alternate; }
-    @keyframes gavelWobble { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
-
     .color-brown { background: #7a3d1d; }
     .color-lightblue { background: #89cff0; color: #111 !important; }
     .color-pink { background: #d94b80; }
@@ -946,27 +1049,37 @@
     .color-darkblue { background: #185adb; }
     .color-railroad { background: #37474f; }
     .color-utility { background: #607d8b; }
+    .color-jailpass { background: #d97706; }
   </style>
 </head>
 <body>
 
   <canvas id="fx-canvas"></canvas>
 
-  <div id="event-toast">
-    <span class="toast-icon" id="toast-icon">🎉</span>
-    <div>
-      <div class="toast-title" id="toast-title">Title</div>
-      <div class="toast-subtitle" id="toast-subtitle">Subtitle</div>
+  <!-- Director's Player Banner (High Visibility & Relaxed Timing) -->
+  <div id="directors-banner">
+    <div class="banner-icon" id="banner-icon">📋</div>
+    <div class="banner-content">
+      <div class="banner-title" id="banner-title">Director's Notice</div>
+      <div class="banner-subtitle" id="banner-subtitle">Official directives appear here for unhurried reading.</div>
     </div>
   </div>
 
-  <!-- Voluntary Pause or Forfeit Screen -->
+  <div id="event-toast">
+    <span class="toast-icon" id="toast-icon">🎉</span>
+    <div>
+      <div class="toast-title" id="toast-title">Notice</div>
+      <div class="toast-subtitle" id="toast-subtitle">Message</div>
+    </div>
+  </div>
+
+  <!-- Exact Freeze Pause Screen -->
   <div class="pause-overlay" id="pause-screen">
     <div class="pause-title">⏸️ GAME PAUSED</div>
     <div style="font-size: 1.1rem; color: #9cb5af;" id="pause-by-label">Player taking a quick break...</div>
     <div style="display: flex; gap: 12px; margin-top: 10px;">
-      <button class="btn-action" style="padding: 12px 24px; font-size: 0.95rem;" onclick="toggleGamePause(false)">▶️ I'm Back (Resume)</button>
-      <button class="btn-action btn-danger" style="padding: 12px 24px; font-size: 0.95rem;" onclick="voluntarySurrenderGame()">🚪 Liquidate & Forfeit</button>
+      <button class="btn-action" style="padding: 12px 24px; font-size: 0.95rem;" onclick="toggleGamePause(false)">▶️ Resume at Exact Second</button>
+      <button class="btn-action btn-danger" style="padding: 12px 24px; font-size: 0.95rem; background:#ad2d30;" onclick="handleVoluntaryQuitGame()">🚪 Forfeit & Exit to Lobby</button>
     </div>
   </div>
 
@@ -1040,21 +1153,21 @@
         <h1>MONOPOLY</h1>
         <div class="header-btns">
           <button class="btn-header" onclick="openRuleBookModal()" title="View Rules">📖 Rules</button>
-          <button class="btn-header" onclick="openTradeTableModal()" title="Trade with Players">🤝 Trade</button>
+          <button class="btn-header btn-header-inspect" onclick="toggleTacticalInspection()" title="Freeze to Inspect Board">🔍 Inspect</button>
           <button class="btn-header btn-header-gold" onclick="promptEndAndTally()" title="Tally Net Worth">🏁 Tally</button>
           <button class="btn-header" id="btn-pause-toggle" onclick="handlePauseToggle()" title="Pause Game">⏸️</button>
           <span class="btn-header" id="room-display" onclick="copyShareLink()" title="Copy Invite Link">Room: ----</span>
         </div>
       </div>
 
-      <!-- Live Bank Vault Overview -->
+      <!-- Live Banker Vault Overview -->
       <div class="bank-vault-box">
         <div>
-          <span class="bank-vault-title">🏦 Bank Vault:</span>
+          <span class="bank-vault-title">🏦 Banker Vault:</span>
           <span class="bank-vault-metric" id="bank-cash-val">$20,580</span>
         </div>
         <div>
-          <span style="color:#9cb5af; font-size:0.7rem;">Deeds Available:</span>
+          <span style="color:#9cb5af; font-size:0.7rem;">Deeds Left:</span>
           <span class="bank-vault-metric" id="bank-deeds-val">28</span>
         </div>
       </div>
@@ -1063,6 +1176,11 @@
 
       <div class="console-panel">
         <div class="turn-status-banner" id="status-message">Connecting to room...</div>
+
+        <!-- Movement Mode Switch: Manual Count vs Auto-Hop -->
+        <div class="movement-mode-row">
+          <button class="mode-toggle-btn mode-auto" id="btn-movement-mode" onclick="toggleMovementMode()">⚡ Movement Mode: Auto-Hop</button>
+        </div>
 
         <div class="timer-container">
           <span>⏳</span>
@@ -1084,18 +1202,20 @@
         <div class="controls-grid">
           <button class="btn-action" id="btn-roll" onclick="rollDice()" disabled>Roll Dice</button>
           <button class="btn-action btn-secondary" id="btn-end-turn" onclick="endTurn()" disabled>End Turn</button>
-          <button class="btn-action btn-danger" id="btn-bankrupt" onclick="declareBankruptcy()">Bankrupt</button>
         </div>
       </div>
 
+      <!-- Smart-Lock Feed Container -->
       <div class="feed-container">
         <div class="feed-tabs">
           <div class="feed-tab active" id="tab-log" onclick="switchFeedTab('log')">📋 Game Feed</div>
           <div class="feed-tab" id="tab-chat" onclick="switchFeedTab('chat')">💬 Live Chat</div>
         </div>
 
-        <div class="tab-content" id="game-feed"></div>
-        <div class="tab-content" id="chat-feed" style="display: none;"></div>
+        <div class="tab-content" id="game-feed" onscroll="handleFeedScroll()"></div>
+        <div class="tab-content" id="chat-feed" style="display: none;" onscroll="handleChatScroll()"></div>
+
+        <div class="scroll-jump-pill" id="scroll-jump-pill" onclick="jumpToFeedBottom()">⬇️ New Activity (Click to view)</div>
 
         <div class="chat-dock">
           <div class="emoji-tray">
@@ -1151,14 +1271,15 @@
         <span id="portfolio-owner-badge" style="font-size:0.75rem; color:#8fa9a3;">Viewing: You</span>
       </div>
 
+      <!-- Permanent Placards with Downward-Offset Paper Bill Stacks -->
       <div class="cash-tray">
-        <div class="cash-tray-title">Your Physical Banknotes (Click Bill to Make Change)</div>
-        <div class="bill-rack" id="bill-rack-display"></div>
+        <div class="cash-tray-title">Your Cash Drawer (Permanent Placards)</div>
+        <div class="placards-container" id="placards-rack-display"></div>
       </div>
 
       <div class="special-cards-container" id="special-cards-tray"></div>
 
-      <div style="font-size: 0.72rem; font-weight: 700; color: #9cb5af; text-transform: uppercase;">Title Deed Cards (<span id="deed-count">0</span>)</div>
+      <div style="font-size: 0.72rem; font-weight: 700; color: #9cb5af; text-transform: uppercase;">Title Deed Shingle Stacks (<span id="deed-count">0</span>)</div>
       <div class="deeds-scroll-container" id="deeds-tray"></div>
     </div>
   </div>
@@ -1181,7 +1302,7 @@
     var viewingPlayerId = null;
     var roomRef = null;
     var turnTimerInterval = null;
-    var auctionTimerInterval = null;
+    var idleTriviaInterval = null;
     var localProcessedFxTimestamp = 0;
     var localProcessedReactionTimestamp = 0;
     var lastTimerAlertSecond = -1;
@@ -1189,8 +1310,15 @@
     var selectedSoloBots = 1;
     var isPawnWalking = false;
     var aiTurnInProgress = false;
+    var exactRemainingSeconds = 60; // Discrete integer stopwatch
+    var isInspectPaused = false;
+    var isModalOpen = false;
+    var movementMode = "auto"; // "manual" or "auto"
+    var pendingManualDestination = null;
+    var isFeedAtBottom = true;
+    var isChatAtBottom = true;
 
-    const AVAILABLE_COLORS = [
+    const ALL_COLOR_OPTIONS = [
       "#e63946", // Crimson Red
       "#2a9d8f", // Emerald Teal
       "#f4a261", // Coral Orange
@@ -1200,10 +1328,22 @@
     ];
     let selectedColorIndex = 0;
 
-    const BOT_PRESETS = [
-      { name: "Bot Warren", color: "#9b5de5" },
-      { name: "Bot Charlie", color: "#f4a261" },
-      { name: "Bot George", color: "#0284c7" }
+    const MONOPOLY_TRIVIA = [
+      "Did you know? In WWII, British intelligence hid escape maps, compasses, and real currency inside Monopoly sets sent to POWs.",
+      "The longest recorded game of Monopoly played continuously lasted 70 days straight!",
+      "The original 1903 Landlord's Game by Lizzie Magie was created to demonstrate the dangers of land monopolies.",
+      "Marvin Gardens is actually a real neighborhood in Margate City, NJ—and Parker Brothers misspelled it from 'Mervin'!",
+      "The standard Monopoly set has exactly 32 green houses and 12 red hotels."
+    ];
+
+    const DENOMINATIONS = [
+      { val: 500, label: "$500", class: "bill-500" },
+      { val: 100, label: "$100", class: "bill-100" },
+      { val: 50,  label: "$50",  class: "bill-50" },
+      { val: 20,  label: "$20",  class: "bill-20" },
+      { val: 10,  label: "$10",  class: "bill-10" },
+      { val: 5,   label: "$5",   class: "bill-5" },
+      { val: 1,   label: "$1",   class: "bill-1" }
     ];
 
     function selectHeadColor(idx) {
@@ -1292,10 +1432,6 @@
         setTimeout(() => playTone(780, 'sine', 0.1, 0.1), 50);
       },
       billRustle: () => playTone(400, 'triangle', 0.06, 0.12),
-      gavelBang: () => {
-        playTone(140, 'square', 0.12, 0.22);
-        setTimeout(() => playTone(80, 'sawtooth', 0.2, 0.25), 50);
-      },
       timerTick: () => playTone(700, 'sine', 0.06, 0.08),
       lowCashAlarm: () => {
         playTone(160, 'sawtooth', 0.18, 0.2);
@@ -1376,8 +1512,8 @@
       document.body.appendChild(bill);
 
       setTimeout(() => {
-        bill.style.left = `${toRect.left + toRect.width / 2 - 24}px`;
-        bill.style.top = `${toRect.top + toRect.height / 2 - 13}px`;
+        bill.style.left = `${toRect.left + toRect.width / 2 - 26}px`;
+        bill.style.top = `${toRect.top + toRect.height / 2 - 14}px`;
         bill.style.transform = `scale(0.8) rotate(${Math.floor(Math.random() * 30 - 15)}deg)`;
         bill.style.opacity = '0.9';
       }, 40);
@@ -1398,13 +1534,35 @@
       document.body.appendChild(deed);
 
       setTimeout(() => {
-        deed.style.left = `${toRect.left + toRect.width / 2 - 27}px`;
-        deed.style.top = `${toRect.top + toRect.height / 2 - 35}px`;
+        deed.style.left = `${toRect.left + toRect.width / 2 - 29}px`;
+        deed.style.top = `${toRect.top + toRect.height / 2 - 37}px`;
         deed.style.transform = `scale(0.85) rotate(${Math.floor(Math.random() * 20 - 10)}deg)`;
         deed.style.opacity = '0.9';
       }, 40);
 
       setTimeout(() => deed.remove(), 950);
+    }
+
+    function triggerInWorldCashTag(tileId, text, isPlus = true) {
+      const tileEl = document.getElementById(`tile-${tileId}`);
+      if (!tileEl) return;
+      const tag = document.createElement('div');
+      tag.className = `floating-cash-tag ${isPlus ? 'cash-tag-plus' : 'cash-tag-minus'}`;
+      tag.innerText = text;
+      tag.style.left = '30%';
+      tag.style.top = '20%';
+      tileEl.appendChild(tag);
+      setTimeout(() => tag.remove(), 2300);
+    }
+
+    function showDirectorsBanner(icon, title, subtitle, durationMs = 8500) {
+      const banner = document.getElementById('directors-banner');
+      document.getElementById('banner-icon').innerText = icon;
+      document.getElementById('banner-title').innerText = title;
+      document.getElementById('banner-subtitle').innerText = subtitle;
+
+      banner.classList.add('show');
+      setTimeout(() => banner.classList.remove('show'), durationMs);
     }
 
     function showEventToast(type, icon, title, subtitle) {
@@ -1415,7 +1573,7 @@
       document.getElementById('toast-subtitle').innerText = subtitle;
 
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3200);
+      setTimeout(() => toast.classList.remove('show'), 3800);
     }
 
     function spawnFloatingEmoji(emoji) {
@@ -1427,12 +1585,46 @@
       setTimeout(() => el.remove(), 2900);
     }
 
+    /* Smart Scroll Locking for Feeds */
+    function handleFeedScroll() {
+      const el = document.getElementById('game-feed');
+      isFeedAtBottom = (el.scrollHeight - el.scrollTop - el.clientHeight <= 35);
+      const pill = document.getElementById('scroll-jump-pill');
+      if (isFeedAtBottom) pill.style.display = 'none';
+    }
+
+    function handleChatScroll() {
+      const el = document.getElementById('chat-feed');
+      isChatAtBottom = (el.scrollHeight - el.scrollTop - el.clientHeight <= 35);
+    }
+
+    function jumpToFeedBottom() {
+      const el = document.getElementById('game-feed');
+      el.scrollTop = el.scrollHeight;
+      isFeedAtBottom = true;
+      document.getElementById('scroll-jump-pill').style.display = 'none';
+    }
+
     function switchFeedTab(tab) {
       const isLog = (tab === 'log');
       document.getElementById('tab-log').classList.toggle('active', isLog);
       document.getElementById('tab-chat').classList.toggle('active', !isLog);
       document.getElementById('game-feed').style.display = isLog ? 'flex' : 'none';
       document.getElementById('chat-feed').style.display = isLog ? 'none' : 'flex';
+    }
+
+    function toggleMovementMode() {
+      movementMode = (movementMode === "auto") ? "manual" : "auto";
+      const btn = document.getElementById('btn-movement-mode');
+      if (movementMode === "manual") {
+        btn.className = "mode-toggle-btn mode-manual";
+        btn.innerText = "✋ Movement Mode: Manual Count";
+        showDirectorsBanner('✋', 'Manual Movement Active', 'When you roll, you will count out and tap your destination tile on the board yourself.');
+      } else {
+        btn.className = "mode-toggle-btn mode-auto";
+        btn.innerText = "⚡ Movement Mode: Auto-Hop";
+        showDirectorsBanner('⚡', 'Auto-Hop Mode Active', 'Pawns will automatically hop to their destination after the 2.5s roll announcement.');
+      }
     }
 
     /* Firebase Configuration */
@@ -1459,15 +1651,15 @@
       turnStartTime: Date.now(),
       isPaused: false,
       pausedBy: "",
+      frozenSecondsRemaining: 60,
       properties: {},
       logs: ["Game room initialized."],
       messages: [],
       lastReaction: null,
       lastFx: null,
       bankCash: 20580,
-      activeTrade: null,
-      activeAuction: null,
-      activeLiquidationVote: null
+      ledgers: {},
+      liveSettlement: null
     };
 
     const ICONS = {
@@ -1533,16 +1725,16 @@
     };
 
     const CHANCE_CARDS = [
-      { text: "Advance to GO. (Collect $200)", action: (pId) => stepAnimateMoveTo(pId, 0) },
-      { text: "Advance to Illinois Ave. If you pass GO, collect $200.", action: (pId) => stepAnimateMoveTo(pId, 24) },
-      { text: "Advance to Boardwalk.", action: (pId) => stepAnimateMoveTo(pId, 39) },
-      { text: "Bank pays you dividend of $50.", action: (pId) => creditMoney(pId, 50, "Bank Dividend") },
+      { text: "Advance to GO. (Collect $200)", action: (pId) => stepAnimateMoveTo(pId, 0, true) },
+      { text: "Advance to Illinois Ave. If you pass GO, collect $200.", action: (pId) => stepAnimateMoveTo(pId, 24, true) },
+      { text: "Advance to Boardwalk.", action: (pId) => stepAnimateMoveTo(pId, 39, true) },
+      { text: "Banker pays you dividend of $50.", action: (pId) => creditMoney(pId, 50, "Bank Dividend") },
       { text: "Go directly to Jail. Do not pass GO, do not collect $200.", action: (pId) => sendToJailOnline(pId) },
       { text: "Get Out of Jail Free card! Keep this card until needed.", action: (pId) => awardJailCard(pId) }
     ];
 
     const COMMUNITY_CARDS = [
-      { text: "Advance to GO. (Collect $200)", action: (pId) => stepAnimateMoveTo(pId, 0) },
+      { text: "Advance to GO. (Collect $200)", action: (pId) => stepAnimateMoveTo(pId, 0, true) },
       { text: "Bank error in your favor. Collect $200.", action: (pId) => creditMoney(pId, 200, "Bank Error") },
       { text: "Doctor's fees. Pay $50.", action: (pId) => debitMoney(pId, 50, "Doctor's Fee") },
       { text: "It is your birthday! Collect $10 from everyone.", action: (pId) => celebrateBirthday(pId) },
@@ -1581,29 +1773,17 @@
       db.ref(`rooms/${currentRoomCode}/messages`).set(msgs).then(() => { input.value = ''; });
     }
 
-    /* Pause and Step-Away Controls */
+    /* Pause and Inspection Freezes */
     function handlePauseToggle() {
       if (!currentRoomCode || !currentGameState) return;
       const player = currentGameState.players[localPlayerId];
-      const isSolo = Object.values(currentGameState.players).some(p => p.isBot);
+      const nextState = !currentGameState.isPaused;
 
-      if (isSolo) {
-        const nextState = !currentGameState.isPaused;
-        db.ref(`rooms/${currentRoomCode}`).update({
-          isPaused: nextState,
-          pausedBy: nextState ? player.name : ""
-        });
-      } else {
-        const isAfk = !(player.isAfk);
-        const updates = {};
-        updates[`rooms/${currentRoomCode}/players/${localPlayerId}/isAfk`] = isAfk;
-        updates[`rooms/${currentRoomCode}/players/${localPlayerId}/afkSince`] = isAfk ? Date.now() : null;
-        
-        let logs = currentGameState.logs || [];
-        logs.push(`${player.name} is now ${isAfk ? 'away (AFK)' : 'back in the room'}.`);
-        updates[`rooms/${currentRoomCode}/logs`] = logs;
-        db.ref().update(updates);
-      }
+      db.ref(`rooms/${currentRoomCode}`).update({
+        isPaused: nextState,
+        pausedBy: nextState ? player.name : "",
+        frozenSecondsRemaining: exactRemainingSeconds
+      });
     }
 
     function toggleGamePause(shouldPause) {
@@ -1611,63 +1791,117 @@
       const player = currentGameState.players[localPlayerId];
       db.ref(`rooms/${currentRoomCode}`).update({
         isPaused: shouldPause,
-        pausedBy: shouldPause ? player.name : ""
+        pausedBy: shouldPause ? player.name : "",
+        frozenSecondsRemaining: exactRemainingSeconds
       });
     }
 
-    function voluntarySurrenderGame() {
-      if (!confirm("Are you sure you want to forfeit and liquidate all your assets back to the Bank?")) return;
-      toggleGamePause(false);
-      declareBankruptcy();
+    function toggleTacticalInspection() {
+      isInspectPaused = !isInspectPaused;
+      const player = currentGameState ? currentGameState.players[localPlayerId] : null;
+      const name = player ? player.name : "Player";
+
+      if (isInspectPaused) {
+        showDirectorsBanner('🔍', `${name} is Inspecting the Board`, "Timer and game actions are frozen. Take your time to review properties and history.");
+      } else {
+        showDirectorsBanner('▶️', 'Game Clock Resumed', "Resuming exact timer and game actions.");
+      }
+      document.querySelector('.btn-header-inspect').innerText = isInspectPaused ? "▶️ Resume" : "🔍 Inspect";
     }
 
-    /* Turn Countdown */
+    /* Clean Separation: Voluntary Forfeit & Complete Lobby Exit */
+    function handleVoluntaryQuitGame() {
+      if (!confirm("Are you sure you want to forfeit? All your cash and title deeds will surrender to the Banker, and you will leave the room.")) return;
+      
+      const player = currentGameState.players[localPlayerId];
+      const updates = {};
+
+      // 1. Remove from playerOrder
+      const newOrder = currentGameState.playerOrder.filter(id => id !== localPlayerId);
+      updates[`rooms/${currentRoomCode}/playerOrder`] = newOrder;
+
+      // 2. Adjust activePlayerIndex if needed
+      if (currentGameState.playerOrder[currentGameState.activePlayerIndex] === localPlayerId) {
+        updates[`rooms/${currentRoomCode}/activePlayerIndex`] = newOrder.length ? (currentGameState.activePlayerIndex % newOrder.length) : 0;
+        updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = false;
+        updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = 0;
+        updates[`rooms/${currentRoomCode}/frozenSecondsRemaining`] = 60;
+      }
+
+      // 3. Surrender Deeds to Banker
+      const props = currentGameState.properties || {};
+      Object.keys(props).forEach(tId => {
+        if (props[tId].ownerId === localPlayerId) {
+          updates[`rooms/${currentRoomCode}/properties/${tId}`] = null;
+        }
+      });
+
+      // 4. Return cash to Bank Vault
+      updates[`rooms/${currentRoomCode}/bankCash`] = (currentGameState.bankCash || 20580) + player.money;
+
+      // 5. Delete player record
+      updates[`rooms/${currentRoomCode}/players/${localPlayerId}`] = null;
+
+      let logs = currentGameState.logs || [];
+      logs.push(`🚪 ${player.name} forfeited and left the room. Deeds returned to Banker.`);
+      updates[`rooms/${currentRoomCode}/logs`] = logs;
+
+      db.ref().update(updates).then(() => {
+        // Disconnect listener and return to clean lobby
+        if (roomRef) roomRef.off();
+        localStorage.removeItem("monopoly_pid_" + currentRoomCode);
+        window.location.href = window.location.pathname; // Clean lobby reload
+      });
+    }
+
+    /* Discrete Integer Stopwatch (No Background Catch-Up Drift) */
     function startTurnCountdown() {
       clearInterval(turnTimerInterval);
       const TURN_LIMIT_SEC = 60;
 
       turnTimerInterval = setInterval(() => {
-        if (!currentGameState || currentGameState.isPaused) return;
+        if (!currentGameState || currentGameState.isPaused || isInspectPaused || isModalOpen) return;
 
         const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
-        const activePlayer = currentGameState.players[activeId];
+        const isMyTurn = (localPlayerId === activeId);
 
-        if (activePlayer && activePlayer.isAfk) {
-          document.getElementById('turn-timer-text').innerText = "PAUSED (AFK)";
+        // Infinite Freeze on Human Turn Post-Roll
+        if (isMyTurn && currentGameState.hasRolledThisTurn) {
+          document.getElementById('turn-timer-text').innerText = "UNHURRIED";
+          document.getElementById('turn-timer-fill').style.width = '100%';
           return;
         }
 
-        const startTime = currentGameState.turnStartTime || Date.now();
-        const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
-        const remaining = Math.max(0, TURN_LIMIT_SEC - elapsedSec);
+        exactRemainingSeconds--;
 
         const fillEl = document.getElementById('turn-timer-fill');
         const textEl = document.getElementById('turn-timer-text');
         
-        const pct = (remaining / TURN_LIMIT_SEC) * 100;
-        fillEl.style.width = `${pct}%`;
-        textEl.innerText = `${remaining}s`;
+        const pct = (exactRemainingSeconds / TURN_LIMIT_SEC) * 100;
+        fillEl.style.width = `${Math.max(0, pct)}%`;
+        textEl.innerText = `${Math.max(0, exactRemainingSeconds)}s`;
 
-        if (remaining <= 10 && remaining > 0) {
+        if (exactRemainingSeconds <= 10 && exactRemainingSeconds > 0) {
           fillEl.classList.add('warning');
-          if (remaining !== lastTimerAlertSecond) {
-            lastTimerAlertSecond = remaining;
+          if (exactRemainingSeconds !== lastTimerAlertSecond) {
+            lastTimerAlertSecond = exactRemainingSeconds;
             SFX.timerTick();
           }
         } else {
           fillEl.classList.remove('warning');
         }
 
-        if (remaining <= 0) {
+        if (exactRemainingSeconds <= 0) {
           clearInterval(turnTimerInterval);
+          const activePlayer = currentGameState.players[activeId];
           const isHost = (currentGameState.playerOrder[0] === localPlayerId);
 
-          if (localPlayerId === activeId || (activePlayer && activePlayer.isBot && isHost)) {
-            broadcastFx('dread', '⏳', 'TIME EXPIRED!', `${activePlayer ? activePlayer.name : 'Player'} ran out of time! Turn passed.`);
+          if (isMyTurn || (activePlayer && activePlayer.isBot && isHost)) {
+            broadcastFx('dread', '⏳', 'TIME EXPIRED!', `${activePlayer ? activePlayer.name : 'Player'} timed out! Turn passed.`);
             endTurn();
           }
         }
-      }, 500);
+      }, 1000);
     }
 
     function renderDieFace(elementId, val) {
@@ -1710,51 +1944,61 @@
       return code;
     }
 
+    /* Dynamic Color Exclusion: Bots Never Share Your Color */
     function createRoom(name, botCount = 0) {
-      const chosenColor = AVAILABLE_COLORS[selectedColorIndex];
+      const chosenColor = ALL_COLOR_OPTIONS[selectedColorIndex];
       const code = generateRoomCode();
       const pId = "p_" + Date.now();
       localPlayerId = pId;
       viewingPlayerId = pId;
       currentRoomCode = code;
 
+      const remainingColors = ALL_COLOR_OPTIONS.filter(c => c !== chosenColor);
+
       const initial = JSON.parse(JSON.stringify(INITIAL_GAME_STATE));
       initial.players[pId] = {
         id: pId,
-        name: name,
+        name,
         color: chosenColor,
         money: 1500,
         position: 0,
         inJail: false,
+        jailTurns: 0,
         jailCards: 0,
         bankrupt: false,
-        isBot: false,
-        isAfk: false
+        isBot: false
       };
       initial.playerOrder = [pId];
+      initial.ledgers[pId] = [`Start: Received $1,500 initial bankroll.`];
 
       for (let i = 0; i < botCount; i++) {
         const botId = "bot_" + (i + 1) + "_" + Date.now();
-        const preset = BOT_PRESETS[i];
+        const botName = (i === 0) ? "Bot Warren" : (i === 1 ? "Bot Charlie" : "Bot George");
+        const botColor = remainingColors[i % remainingColors.length];
+
         initial.players[botId] = {
           id: botId,
-          name: preset.name,
-          color: preset.color,
+          name: botName,
+          color: botColor,
           money: 1500,
           position: 0,
           inJail: false,
+          jailTurns: 0,
           jailCards: 0,
           bankrupt: false,
-          isBot: true,
-          isAfk: false
+          isBot: true
         };
         initial.playerOrder.push(botId);
+        initial.ledgers[botId] = [`Start: Received $1,500 initial bankroll.`];
       }
 
       initial.turnStartTime = Date.now();
       initial.logs = [`Room ${code} created by ${name}${botCount > 0 ? ` with ${botCount} AI bot(s)` : ''}.`];
 
-      db.ref("rooms/" + code).set(initial).then(() => enterRoom(code));
+      db.ref("rooms/" + code).set(initial).then(() => {
+        enterRoom(code);
+        showOpeningBankrollModal();
+      });
     }
 
     function joinRoom(code, name) {
@@ -1768,23 +2012,24 @@
           const playerCount = state.playerOrder ? state.playerOrder.length : 0;
           if (playerCount >= 4) return alert("This room is full (max 4 players)!");
 
-          const chosenColor = AVAILABLE_COLORS[selectedColorIndex];
+          const chosenColor = ALL_COLOR_OPTIONS[selectedColorIndex];
           const newPlayer = {
             id: pId,
-            name: name,
+            name,
             color: chosenColor,
             money: 1500,
             position: 0,
             inJail: false,
+            jailTurns: 0,
             jailCards: 0,
             bankrupt: false,
-            isBot: false,
-            isAfk: false
+            isBot: false
           };
 
           const updates = {};
           updates[`rooms/${code}/players/${pId}`] = newPlayer;
           updates[`rooms/${code}/playerOrder/${playerCount}`] = pId;
+          updates[`rooms/${code}/ledgers/${pId}`] = [`Start: Received $1,500 initial bankroll.`];
           
           let logs = state.logs || [];
           logs.push(`${name} joined the room.`);
@@ -1795,6 +2040,7 @@
             viewingPlayerId = pId;
             localStorage.setItem("monopoly_pid_" + code, pId);
             enterRoom(code);
+            showOpeningBankrollModal();
           });
         } else {
           localPlayerId = pId;
@@ -1819,7 +2065,7 @@
           const pauseOverlay = document.getElementById('pause-screen');
           if (currentGameState.isPaused) {
             pauseOverlay.classList.add('active');
-            document.getElementById('pause-by-label').innerText = `${currentGameState.pausedBy || 'A player'} paused the game for a break.`;
+            document.getElementById('pause-by-label').innerText = `${currentGameState.pausedBy || 'A player'} paused the game.`;
           } else {
             pauseOverlay.classList.remove('active');
           }
@@ -1832,10 +2078,7 @@
               triggerConfetti();
               SFX.fanfare();
             } else {
-              triggerScreenShake();
-              if (fx.icon === '🚨') SFX.voidSpeedingSiren();
-              else if (fx.icon === '🔒') SFX.jailThud();
-              else SFX.taxFine();
+              SFX.taxFine();
             }
           }
 
@@ -1851,11 +2094,6 @@
             renderDieFace('die-face-1', currentGameState.dice[0]);
             renderDieFace('die-face-2', currentGameState.dice[1]);
           }
-
-          // Live Watchers for Auctions, Trades, and Liquidation Votes
-          handleLiveTradeModal(currentGameState);
-          handleLiveAuctionModal(currentGameState);
-          handleLiveLiquidationVote(currentGameState);
           
           renderLiveGameState(currentGameState);
           startTurnCountdown();
@@ -1863,6 +2101,8 @@
           evaluateAITurn(currentGameState);
         }
       });
+
+      startIdleTriviaEngine();
     }
 
     function copyShareLink() {
@@ -1877,14 +2117,7 @@
       );
     }
 
-    function checkMultipleUtilities(pId) {
-      if (!currentGameState.properties) return false;
-      return COLOR_GROUPS.utility.every(id => 
-        currentGameState.properties[id] && currentGameState.properties[id].ownerId === pId
-      );
-    }
-
-    /* Renders Board State & Building Badges */
+    /* Renders Board State & Owner Corner Ribbons */
     function renderLiveGameState(state) {
       if (!state || !state.playerOrder) return;
 
@@ -1894,51 +2127,70 @@
 
       if (activePlayer) {
         if (isMyTurn) {
-          document.getElementById('status-message').innerText = state.hasRolledThisTurn 
-            ? "Your turn: Actions complete, click End Turn!" 
-            : "⭐ IT'S YOUR TURN! Roll the dice.";
+          if (activePlayer.inJail) {
+            document.getElementById('status-message').innerText = `🔒 YOU ARE IN JAIL! (Attempt ${activePlayer.jailTurns || 0}/3 to roll doubles)`;
+          } else {
+            document.getElementById('status-message').innerText = state.hasRolledThisTurn 
+              ? "Your turn: Actions unhurried, click End Turn when ready!" 
+              : "⭐ IT'S YOUR TURN! Roll the dice.";
+          }
         } else {
           document.getElementById('status-message').innerText = activePlayer.isBot
-            ? `🤖 ${activePlayer.name} is making its move...`
-            : `Waiting for ${activePlayer.name}${activePlayer.isAfk ? ' (Away / AFK)' : ''}...`;
+            ? `🤖 ${activePlayer.name} is studying the board...`
+            : `Waiting for ${activePlayer.name}...`;
         }
       }
 
-      document.getElementById('btn-roll').disabled = (!isMyTurn || state.hasRolledThisTurn || state.isPaused || isPawnWalking);
-      document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused || isPawnWalking);
-      document.getElementById('btn-bankrupt').disabled = (!isMyTurn || state.isPaused);
+      document.getElementById('btn-roll').disabled = (!isMyTurn || state.hasRolledThisTurn || state.isPaused || isPawnWalking || isInspectPaused || isModalOpen);
+      document.getElementById('btn-end-turn').disabled = (!isMyTurn || !state.hasRolledThisTurn || state.isPaused || isPawnWalking || isInspectPaused || isModalOpen);
 
-      // Bank Vault Status
+      // Banker Vault Status
       const props = state.properties || {};
       const soldDeedsCount = Object.keys(props).length;
       document.getElementById('bank-cash-val').innerText = `$${state.bankCash || 20580}`;
       document.getElementById('bank-deeds-val').innerText = `${28 - soldDeedsCount}`;
 
-      // Update Tile Owner Badges
+      // Update Bold Property Corner Ribbons & Active Rents
       TILES.forEach(tile => {
         const tileEl = document.getElementById(`tile-${tile.id}`);
         if (!tileEl) return;
         
-        let existingShield = tileEl.querySelector('.owner-shield-badge');
+        let existingRibbon = tileEl.querySelector('.owner-corner-ribbon');
+        const priceLabel = tileEl.querySelector('.tile-content span:last-child');
+
         if (props[tile.id]) {
           const owner = state.players[props[tile.id].ownerId];
           if (owner) {
-            if (!existingShield) {
-              existingShield = document.createElement('div');
-              existingShield.className = 'owner-shield-badge';
-              const bar = tileEl.querySelector('.tile-bar');
-              if (bar) bar.appendChild(existingShield);
+            if (!existingRibbon) {
+              existingRibbon = document.createElement('div');
+              existingRibbon.className = 'owner-corner-ribbon';
+              tileEl.appendChild(existingRibbon);
             }
-            existingShield.style.background = owner.color;
-            existingShield.innerText = owner.name.charAt(0).toUpperCase();
-            existingShield.title = `Owned by ${owner.name}`;
+            existingRibbon.style.background = owner.color;
+            existingRibbon.innerText = owner.name.substring(0, 3);
+            existingRibbon.title = `Owned by ${owner.name}`;
+
+            if (priceLabel && tile.rent) {
+              const currentHouses = props[tile.id].houses || 0;
+              const hasMonopoly = checkColorMonopoly(owner.id, tile.color);
+              let rentAmt = tile.rent[currentHouses];
+              if (currentHouses === 0 && hasMonopoly) rentAmt *= 2;
+              priceLabel.innerText = `Rent: $${rentAmt}`;
+              priceLabel.style.color = "#15803d";
+              priceLabel.style.fontWeight = "900";
+            }
           }
-        } else if (existingShield) {
-          existingShield.remove();
+        } else if (existingRibbon) {
+          existingRibbon.remove();
+          if (priceLabel && tile.price) {
+            priceLabel.innerText = `$${tile.price}`;
+            priceLabel.style.color = "#444";
+            priceLabel.style.fontWeight = "700";
+          }
         }
       });
 
-      // Ledger with AFK Vote Triggers
+      // Ledger with Itemized Transaction History Icon & Jail Badge
       const ledger = document.getElementById('players-ledger');
       ledger.innerHTML = '';
       state.playerOrder.forEach(pId => {
@@ -1949,13 +2201,8 @@
         const isLowCash = (!p.bankrupt && p.money < 150);
         const initialLetter = p.name ? p.name.charAt(0).toUpperCase() : '?';
         const card = document.createElement('div');
-        card.className = `player-card ${isCurrent ? 'active' : ''} ${isSelected ? 'selected-view' : ''} ${isLowCash ? 'low-cash-alert' : ''} ${p.isAfk ? 'player-afk' : ''}`;
+        card.className = `player-card ${isCurrent ? 'active' : ''} ${isSelected ? 'selected-view' : ''} ${isLowCash ? 'low-cash-alert' : ''}`;
         card.onclick = () => { viewingPlayerId = pId; renderPhysicalPortfolio(state); renderLiveGameState(state); };
-
-        let afkButton = '';
-        if (p.isAfk && pId !== localPlayerId && !p.bankrupt) {
-          afkButton = `<button style="background:#ad2d30; border:none; color:#fff; font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:800; cursor:pointer;" onclick="event.stopPropagation(); initiateLiquidationVote('${pId}')">Vote Kick</button>`;
-        }
 
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1963,16 +2210,14 @@
               <span class="player-avatar" style="background:${p.color};">${initialLetter}</span>
               <span>${p.name} ${pId === localPlayerId ? '(You)' : (p.isBot ? '🤖' : '')}</span>
             </div>
-            <div class="player-balance ${isLowCash ? 'balance-danger' : ''}">
-              ${isLowCash ? '⚠️ ' : ''}$${p.money}
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="player-balance ${isLowCash ? 'balance-danger' : ''}">${isLowCash ? '⚠️ ' : ''}$${p.money}</span>
+              <button style="background:transparent; border:none; font-size:0.85rem; cursor:pointer;" onclick="event.stopPropagation(); viewPlayerHistory('${pId}')" title="View Transaction Statement">📜</button>
             </div>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#8fa9a3;">
             <span>${TILES[p.position].name}</span>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <span>${p.inJail ? '🔒 In Jail' : (p.bankrupt ? '❌ Bankrupt' : (p.isAfk ? '⏸️ Away' : 'Active'))}</span>
-              ${afkButton}
-            </div>
+            <span>${p.inJail ? `🔒 In Jail (${p.jailTurns || 0}/3)` : (p.bankrupt ? '💀 Bankrupt' : 'Active')}</span>
           </div>
         `;
         ledger.appendChild(card);
@@ -1993,6 +2238,7 @@
               const wrapper = document.createElement('div');
               wrapper.className = 'board-token-wrapper';
               wrapper.id = `token-wrapper-${pId}`;
+              wrapper.onclick = () => triggerInteractivePawnThought(pId);
 
               const nametag = document.createElement('div');
               nametag.className = 'token-nametag';
@@ -2020,17 +2266,9 @@
         if (!housesEl || !tileEl) return;
         housesEl.innerHTML = '';
 
-        const oldStripe = tileEl.querySelector('.mortgage-stripe');
-        if (oldStripe) oldStripe.remove();
-
         if (state.properties && state.properties[tId]) {
           const prop = state.properties[tId];
-          if (prop.mortgaged) {
-            const stripe = document.createElement('div');
-            stripe.className = 'mortgage-stripe';
-            stripe.innerText = 'MORTGAGED';
-            tileEl.appendChild(stripe);
-          } else if (prop.houses === 5) {
+          if (prop.houses === 5) {
             housesEl.innerHTML = '<div class="hotel-dot"></div>';
           } else if (prop.houses > 0) {
             for (let i = 0; i < prop.houses; i++) {
@@ -2040,14 +2278,18 @@
         }
       });
 
-      // Logs
+      // Smart-Lock Game Feed Update
       const feed = document.getElementById('game-feed');
       if (state.logs) {
         feed.innerHTML = state.logs.map(l => `<div style="line-height:1.35; margin-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:2px;">• ${l}</div>`).join('');
-        feed.scrollTop = feed.scrollHeight;
+        if (isFeedAtBottom) {
+          feed.scrollTop = feed.scrollHeight;
+        } else {
+          document.getElementById('scroll-jump-pill').style.display = 'block';
+        }
       }
 
-      // Chat
+      // Live Chat Update
       const chatFeed = document.getElementById('chat-feed');
       if (state.messages) {
         chatFeed.innerHTML = state.messages.map(m => `
@@ -2056,10 +2298,52 @@
             <span>${m.text}</span>
           </div>
         `).join('');
-        chatFeed.scrollTop = chatFeed.scrollHeight;
+        if (isChatAtBottom) chatFeed.scrollTop = chatFeed.scrollHeight;
       }
 
       renderPhysicalPortfolio(state);
+    }
+
+    /* Homescapes Style Silent Comic Thought Balloon */
+    function showPawnThought(pId, text, durationMs = 4500) {
+      const wrapper = document.getElementById(`token-wrapper-${pId}`);
+      if (!wrapper) return;
+
+      const oldBalloon = wrapper.querySelector('.thought-balloon');
+      if (oldBalloon) oldBalloon.remove();
+
+      const balloon = document.createElement('div');
+      balloon.className = 'thought-balloon';
+      balloon.innerText = text;
+      wrapper.appendChild(balloon);
+
+      setTimeout(() => balloon.remove(), durationMs);
+    }
+
+    function triggerInteractivePawnThought(pId) {
+      const p = currentGameState.players[pId];
+      if (!p) return;
+
+      let thought = "";
+      if (p.inJail) thought = "💭 Doing time behind bars. Rolling for doubles to escape!";
+      else if (p.money < 150) thought = "💭 Cash is thin right now... hope I dodge opponents' hotels!";
+      else if (p.money > 2000) thought = "💭 Rolling in liquidity. Looking for deeds to build up!";
+      else thought = `💭 Hey! Eyes on the board, let's keep playing!`;
+
+      showPawnThought(pId, thought, 4500);
+    }
+
+    function startIdleTriviaEngine() {
+      clearInterval(idleTriviaInterval);
+      idleTriviaInterval = setInterval(() => {
+        if (!currentGameState || currentGameState.isPaused || isPawnWalking || isInspectPaused) return;
+        const players = currentGameState.playerOrder.filter(id => !currentGameState.players[id].bankrupt);
+        if (players.length === 0) return;
+
+        const randomPId = players[Math.floor(Math.random() * players.length)];
+        const trivia = MONOPOLY_TRIVIA[Math.floor(Math.random() * MONOPOLY_TRIVIA.length)];
+        showPawnThought(randomPId, `💭 Trivia: ${trivia}`, 6000);
+      }, 35000); // Relaxed, natural 35-second interval
     }
 
     /* Tactile Pawn Walking */
@@ -2072,7 +2356,7 @@
       const tokenEl = document.getElementById(`board-token-${pId}`);
 
       function nextStep() {
-        if (remainingSteps <= 0 || (currentGameState && currentGameState.isPaused)) {
+        if (remainingSteps <= 0 || (currentGameState && currentGameState.isPaused) || isInspectPaused) {
           isPawnWalking = false;
           if (onComplete) onComplete(currentTile);
           return;
@@ -2091,23 +2375,27 @@
           }, 120);
         }
 
-        setTimeout(nextStep, 250);
+        setTimeout(nextStep, 260);
       }
 
       nextStep();
     }
 
-    function stepAnimateMoveTo(pId, targetIndex) {
+    function stepAnimateMoveTo(pId, targetIndex, allowPassGo = false) {
       const player = currentGameState.players[pId];
       let steps = (targetIndex - player.position + 40) % 40;
       if (steps === 0) steps = 40;
 
       animatePawnStepWalk(pId, player.position, steps, (finalPos) => {
         let newMoney = player.money;
-        if (finalPos < player.position || targetIndex === 0) {
+
+        // Airtight Pass GO Whitelist
+        if (allowPassGo && (finalPos < player.position || targetIndex === 0)) {
           newMoney += 200;
           SFX.cashIn();
           triggerBankToPlayerCashAnimation(pId, 200);
+          triggerInWorldCashTag(0, "+$200", true);
+          recordLedgerEntry(pId, `+$200: Passed GO salary (Collected from Banker).`);
         }
 
         const up = {};
@@ -2117,7 +2405,7 @@
       });
     }
 
-    /* Contextual Building Helper in Portfolio */
+    /* Downward-Offset Stacking for Banknotes & Shingle Property Decks */
     function renderPhysicalPortfolio(state) {
       const targetPId = viewingPlayerId || localPlayerId;
       const targetPlayer = state.players ? state.players[targetPId] : null;
@@ -2127,31 +2415,49 @@
       document.getElementById('portfolio-title').innerText = isSelf ? "Your Portfolio" : `${targetPlayer.name}'s Portfolio`;
       document.getElementById('portfolio-owner-badge').innerText = isSelf ? "Viewing: You" : `Viewing: ${targetPlayer.name}`;
 
-      const billRack = document.getElementById('bill-rack-display');
-      billRack.innerHTML = '';
-      const denominations = [
-        { val: 500, label: "$500", class: "bill-500" },
-        { val: 100, label: "$100", class: "bill-100" },
-        { val: 50,  label: "$50",  class: "bill-50" },
-        { val: 20,  label: "$20",  class: "bill-20" },
-        { val: 10,  label: "$10",  class: "bill-10" },
-        { val: 5,   label: "$5",   class: "bill-5" },
-        { val: 1,   label: "$1",   class: "bill-1" }
-      ];
-
+      // 1. Permanent Bill Placards
+      const rack = document.getElementById('placards-rack-display');
+      rack.innerHTML = '';
       let remainingCash = targetPlayer.money;
-      denominations.forEach(d => {
+
+      DENOMINATIONS.forEach(d => {
         let count = Math.floor(remainingCash / d.val);
         if (remainingCash < 0) count = 0;
-        const b = document.createElement('div');
-        b.className = `bill-card ${d.class}`;
-        b.innerHTML = `<span>${d.label}</span><span style="font-size:0.55rem; font-weight:900;">×${count}</span>`;
-        b.title = "Click to break this bill at the Bank";
-        b.onclick = () => { if (isSelf && count > 0) breakBillAtBank(d.val); };
-        billRack.appendChild(b);
+
+        const slot = document.createElement('div');
+        slot.className = 'placard-slot';
+
+        const label = document.createElement('div');
+        label.className = 'placard-label';
+        label.innerText = d.label;
+        slot.appendChild(label);
+
+        if (count > 0) {
+          const stackContainer = document.createElement('div');
+          stackContainer.className = 'cascading-stack';
+          stackContainer.title = `${d.label} stack (${count} bills)`;
+
+          const visibleLayers = Math.min(count, 5);
+          for (let i = 0; i < visibleLayers; i++) {
+            const billEl = document.createElement('div');
+            billEl.className = `fanned-bill ${d.class}`;
+            billEl.style.top = `${i * 3}px`;
+            billEl.style.left = `${i * 2}px`;
+            billEl.innerText = (i === visibleLayers - 1) ? `×${count}` : d.label;
+            stackContainer.appendChild(billEl);
+          }
+
+          stackContainer.onclick = () => {
+            if (isSelf) breakBillAtBank(d.val);
+          };
+          slot.appendChild(stackContainer);
+        }
+
+        rack.appendChild(slot);
         remainingCash %= d.val;
       });
 
+      // 2. Special Jail Cards
       const specialTray = document.getElementById('special-cards-tray');
       specialTray.innerHTML = '';
       if (targetPlayer.jailCards > 0) {
@@ -2163,6 +2469,7 @@
         }
       }
 
+      // 3. Downward-Offset Shingle Stacking for Properties
       const deedsTray = document.getElementById('deeds-tray');
       deedsTray.innerHTML = '';
       const props = state.properties || {};
@@ -2174,85 +2481,233 @@
         return;
       }
 
+      // Group owned deeds by color / category
+      const groupedDeeds = {};
       owned.forEach(id => {
-        const tile = TILES[id];
-        const prop = props[id];
-        const deedCard = document.createElement('div');
-        deedCard.className = `deed-card ${prop.mortgaged ? 'mortgaged-deed' : ''}`;
+        const t = TILES[id];
+        const group = t.color || t.type;
+        if (!groupedDeeds[group]) groupedDeeds[group] = [];
+        groupedDeeds[group].push(id);
+      });
 
-        const hasFullColorSet = tile.color ? checkColorMonopoly(targetPId, tile.color) : false;
-        let setStatusBadge = '';
-        if (tile.color) {
-          const totalInGroup = COLOR_GROUPS[tile.color].length;
-          const currentlyOwned = COLOR_GROUPS[tile.color].filter(tId => props[tId] && props[tId].ownerId === targetPId).length;
-          setStatusBadge = hasFullColorSet 
-            ? `<div style="font-size:0.6rem; color:#10b981; font-weight:900;">👑 Monopoly Set Complete!</div>` 
-            : `<div style="font-size:0.58rem; color:#d97706; font-weight:800;">🔒 (${currentlyOwned}/${totalInGroup} Owned to Build)</div>`;
-        }
+      Object.keys(groupedDeeds).forEach(groupKey => {
+        const groupWrapper = document.createElement('div');
+        groupWrapper.className = 'shingle-group-stack';
 
-        let detailsHtml = '';
-        if (tile.type === 'street') {
-          detailsHtml = `
-            <div class="deed-row bold"><span>Rent</span><span>$${tile.rent[0]}</span></div>
-            <div class="deed-row"><span>With 1 House</span><span>$${tile.rent[1]}</span></div>
-            <div class="deed-row"><span>With 2 Houses</span><span>$${tile.rent[2]}</span></div>
-            <div class="deed-row"><span>With 3 Houses</span><span>$${tile.rent[3]}</span></div>
-            <div class="deed-row"><span>With 4 Houses</span><span>$${tile.rent[4]}</span></div>
-            <div class="deed-row bold"><span>With HOTEL</span><span>$${tile.rent[5]}</span></div>
-            <hr class="deed-divider"/>
-            <div class="deed-row"><span>House cost:</span><span>$${tile.houseCost}</span></div>
-            <div class="deed-row"><span>Mortgage:</span><span>$${tile.price / 2}</span></div>
-          `;
-        } else if (tile.type === 'railroad') {
-          detailsHtml = `
-            <div class="deed-row"><span>1 Railroad</span><span>$25</span></div>
-            <div class="deed-row"><span>2 Railroads</span><span>$50</span></div>
-            <div class="deed-row"><span>3 Railroads</span><span>$100</span></div>
-            <div class="deed-row"><span>4 Railroads</span><span>$200</span></div>
-            <hr class="deed-divider"/>
-            <div class="deed-row"><span>Mortgage:</span><span>$100</span></div>
-          `;
-        } else if (tile.type === 'utility') {
-          detailsHtml = `
-            <p style="font-size:0.6rem; color:#444;">1 Utility owned: 4× dice.<br>Both Utilities: 10× dice.</p>
-            <hr class="deed-divider"/>
-            <div class="deed-row"><span>Mortgage:</span><span>$75</span></div>
-          `;
-        }
+        const totalInGroup = COLOR_GROUPS[groupKey] ? COLOR_GROUPS[groupKey].length : groupedDeeds[groupKey].length;
+        const countOwned = groupedDeeds[groupKey].length;
+        const hasMonopoly = COLOR_GROUPS[groupKey] ? checkColorMonopoly(targetPId, groupKey) : false;
 
-        let actionButtons = '';
-        if (isSelf) {
-          actionButtons = `
-            <div class="deed-actions-row">
-              ${tile.type === 'street' && !prop.mortgaged && prop.houses < 5 && hasFullColorSet ? `<button class="deed-btn" onclick="buildHouseOnline(${id})">+House</button>` : ''}
-              ${!prop.mortgaged ? `<button class="deed-btn" onclick="toggleMortgageOnline(${id}, true)">Mortgage</button>` : `<button class="deed-btn" onclick="toggleMortgageOnline(${id}, false)">Unmortgage</button>`}
+        groupWrapper.innerHTML = `
+          <div class="shingle-group-title">
+            <span style="text-transform:uppercase;">${groupKey}</span>
+            <span>${hasMonopoly ? '👑 Monopoly (3/3)' : `(${countOwned}/${totalInGroup})`}</span>
+          </div>
+          <div class="shingle-deck-container" style="min-height: ${42 + (countOwned - 1) * 22}px;"></div>
+        `;
+
+        const deckContainer = groupWrapper.querySelector('.shingle-deck-container');
+
+        groupedDeeds[groupKey].forEach((tId, idx) => {
+          const t = TILES[tId];
+          const prop = props[tId];
+          const shingle = document.createElement('div');
+          shingle.className = 'shingle-card';
+          shingle.style.top = `${idx * 22}px`;
+          shingle.style.zIndex = idx + 1;
+
+          shingle.innerHTML = `
+            <div class="shingle-card-bar color-${t.color || 'railroad'}"></div>
+            <div class="shingle-card-body">
+              <span>${t.name}</span>
+              <span>${prop.mortgaged ? '🏚️ Mortgaged' : (prop.houses ? `🏠 ×${prop.houses}` : `$${t.price}`)}</span>
             </div>
           `;
-        }
 
-        deedCard.innerHTML = `
-          <div class="deed-header color-${tile.color || 'railroad'}">
-            <span class="deed-sub">TITLE DEED</span>
-            ${tile.name}
-          </div>
-          <div class="deed-body">
-            ${setStatusBadge}
-            ${detailsHtml}
-            ${prop.houses > 0 ? `<div style="font-weight:900; color:#1b7340; margin-top:2px;">Built: ${prop.houses === 5 ? '1 Hotel' : prop.houses + ' Houses'}</div>` : ''}
-            ${prop.mortgaged ? `<div style="font-weight:900; color:#b91c1c; margin-top:2px;">MORTGAGED</div>` : ''}
-            ${actionButtons}
-          </div>
-        `;
-        deedsTray.appendChild(deedCard);
+          shingle.onclick = () => openInspectDeedModal(tId, isSelf);
+          deckContainer.appendChild(shingle);
+        });
+
+        deedsTray.appendChild(groupWrapper);
       });
     }
 
+    function openInspectDeedModal(tileId, isSelf) {
+      const tile = TILES[tileId];
+      const prop = currentGameState.properties[tileId];
+      const hasFullColorSet = tile.color ? checkColorMonopoly(localPlayerId, tile.color) : false;
+
+      let detailsHtml = '';
+      if (tile.type === 'street') {
+        detailsHtml = `
+          <div style="font-size:0.85rem; line-height:1.6;">
+            <div>Rent: <strong>$${tile.rent[0]}</strong> (Doubled on Monopoly: <strong>$${tile.rent[0] * 2}</strong>)</div>
+            <div>With 1 House: $${tile.rent[1]}</div>
+            <div>With 2 Houses: $${tile.rent[2]}</div>
+            <div>With 3 Houses: $${tile.rent[3]}</div>
+            <div>With 4 Houses: $${tile.rent[4]}</div>
+            <div>With HOTEL: $${tile.rent[5]}</div>
+            <hr style="margin:8px 0; border:0; border-top:1px solid #ddd;">
+            <div>House Cost: $${tile.houseCost} each</div>
+            <div>Mortgage Value: $${tile.price / 2}</div>
+          </div>
+        `;
+      } else if (tile.type === 'railroad') {
+        detailsHtml = `<p>Rent: 1 RR=$25, 2 RR=$50, 3 RR=$100, 4 RR=$200.<br>Mortgage: $100.</p>`;
+      } else {
+        detailsHtml = `<p>1 Utility: 4× dice roll.<br>Both Utilities: 10× dice roll.<br>Mortgage: $75.</p>`;
+      }
+
+      const buttons = [];
+      if (isSelf) {
+        if (tile.type === 'street' && !prop.mortgaged && prop.houses < 5 && hasFullColorSet) {
+          buttons.push({ label: `+Build House ($${tile.houseCost})`, action: () => { buildHouseOnline(tileId); closeModal(); } });
+        }
+        if (!prop.mortgaged) {
+          buttons.push({ label: `Mortgage ($${tile.price / 2})`, action: () => { toggleMortgageOnline(tileId, true); closeModal(); } });
+        } else {
+          buttons.push({ label: `Unmortgage ($${Math.round((tile.price / 2) * 1.1)})`, action: () => { toggleMortgageOnline(tileId, false); closeModal(); } });
+        }
+      }
+      buttons.push({ label: "Close", class: "btn-secondary", action: closeModal });
+
+      openModal(`Title Deed: ${tile.name}`, detailsHtml, buttons);
+    }
+
+    /* Turn Handling with Official Jail Rulebook Integration */
     function rollDice() {
-      if (!currentGameState || currentGameState.isPaused || isPawnWalking || aiTurnInProgress) return;
+      if (!currentGameState || currentGameState.isPaused || isPawnWalking || aiTurnInProgress || isInspectPaused || isModalOpen) return;
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
       if (localPlayerId !== activeId || currentGameState.hasRolledThisTurn) return;
 
+      const player = currentGameState.players[activeId];
+
+      // Handle Incarceration Directives
+      if (player.inJail) {
+        handleHumanJailTurn(activeId);
+        return;
+      }
+
       executeTurnRoll(activeId, false);
+    }
+
+    function handleHumanJailTurn(activeId) {
+      const player = currentGameState.players[activeId];
+      const buttons = [];
+
+      // 1. Get out with card
+      if (player.jailCards > 0) {
+        buttons.push({
+          label: "⚖️ Use 'Get Out of Jail Free' Card",
+          action: () => {
+            closeModal();
+            const up = {};
+            up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = false;
+            up[`rooms/${currentRoomCode}/players/${activeId}/jailTurns`] = 0;
+            up[`rooms/${currentRoomCode}/players/${activeId}/jailCards`] = player.jailCards - 1;
+            let logs = currentGameState.logs || [];
+            logs.push(`⚖️ ${player.name} played a 'Get Out of Jail Free' Card and walked out of Jail!`);
+            up[`rooms/${currentRoomCode}/logs`] = logs;
+            db.ref().update(up).then(() => {
+              showDirectorsBanner('⚖️', 'Freed From Jail', 'You used your card and are now free to roll normally.');
+            });
+          }
+        });
+      }
+
+      // 2. Pay $50 Fine before rolling
+      if (player.money >= 50) {
+        buttons.push({
+          label: "💵 Pay $50 Fine to Leave",
+          action: () => {
+            closeModal();
+            const up = {};
+            up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = false;
+            up[`rooms/${currentRoomCode}/players/${activeId}/jailTurns`] = 0;
+            up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - 50;
+            up[`rooms/${currentRoomCode}/bankCash`] = (currentGameState.bankCash || 20580) + 50;
+            let logs = currentGameState.logs || [];
+            logs.push(`💵 ${player.name} paid $50 fine to the Banker and left Jail.`);
+            up[`rooms/${currentRoomCode}/logs`] = logs;
+            db.ref().update(up).then(() => {
+              triggerPlayerToBankCashAnimation(activeId, 50);
+              recordLedgerEntry(activeId, `-$50: Paid fine to leave Jail.`);
+              showDirectorsBanner('💵', 'Jail Fine Paid', 'You paid $50 to the Banker and are now free to roll normally.');
+            });
+          }
+        });
+      }
+
+      // 3. Roll for Doubles
+      buttons.push({
+        label: `🎲 Roll for Doubles (Attempt ${(player.jailTurns || 0) + 1}/3)`,
+        action: () => {
+          closeModal();
+          executeJailRollAttempt(activeId, false);
+        }
+      });
+
+      openModal("🔒 Official Jail Directives", `
+        <div style="text-align:center;">
+          <p>You are currently incarcerated in Jail.</p>
+          <p style="font-size:0.8rem; color:#666; margin-top:6px;">You can attempt to roll doubles for up to 3 turns. On your 3rd failed attempt, you MUST pay the $50 fine.</p>
+        </div>
+      `, buttons);
+    }
+
+    function executeJailRollAttempt(activeId, isBot = false) {
+      const d1 = Math.floor(Math.random() * 6) + 1;
+      const d2 = Math.floor(Math.random() * 6) + 1;
+      const total = d1 + d2;
+      const isDouble = (d1 === d2);
+      const player = currentGameState.players[activeId];
+      const currentTurnsInJail = (player.jailTurns || 0) + 1;
+
+      animateDiceRoll(d1, d2, () => {
+        if (isDouble) {
+          // Escaped Free! Move sum of dice, no extra roll
+          showDirectorsBanner('✨', 'DOUBLES ROLLED!', `${player.name} threw matching ${d1}s and broke out of Jail for free!`);
+          const up = {};
+          up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = false;
+          up[`rooms/${currentRoomCode}/players/${activeId}/jailTurns`] = 0;
+          up[`rooms/${currentRoomCode}/hasRolledThisTurn`] = true;
+          let logs = currentGameState.logs || [];
+          logs.push(`✨ ${player.name} rolled DOUBLES (${d1} + ${d2} = ${total}) and escaped Jail freely!`);
+          up[`rooms/${currentRoomCode}/logs`] = logs;
+          db.ref().update(up).then(() => {
+            stepAnimateMoveTo(activeId, (10 + total) % 40, false);
+          });
+        } else if (currentTurnsInJail >= 3) {
+          // Mandatory 3rd Turn Exit: Pay $50 and move rolled total
+          showDirectorsBanner('⚖️', '3rd Failed Jail Attempt', `${player.name} failed doubles 3 times. Required by rule to pay $50 fine and advance.`);
+          const up = {};
+          up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = false;
+          up[`rooms/${currentRoomCode}/players/${activeId}/jailTurns`] = 0;
+          up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - 50;
+          up[`rooms/${currentRoomCode}/bankCash`] = (currentGameState.bankCash || 20580) + 50;
+          up[`rooms/${currentRoomCode}/hasRolledThisTurn`] = true;
+          let logs = currentGameState.logs || [];
+          logs.push(`⚖️ ${player.name} served 3 turns in Jail, paid $50 fine, and advanced ${total} spaces.`);
+          up[`rooms/${currentRoomCode}/logs`] = logs;
+          db.ref().update(up).then(() => {
+            triggerPlayerToBankCashAnimation(activeId, 50);
+            recordLedgerEntry(activeId, `-$50: Required fine paid after 3 turns in Jail.`);
+            stepAnimateMoveTo(activeId, (10 + total) % 40, false);
+          });
+        } else {
+          // Failed roll: Remain behind bars
+          const up = {};
+          up[`rooms/${currentRoomCode}/players/${activeId}/jailTurns`] = currentTurnsInJail;
+          up[`rooms/${currentRoomCode}/hasRolledThisTurn`] = true;
+          let logs = currentGameState.logs || [];
+          logs.push(`🔒 ${player.name} rolled ${d1} + ${d2} = ${total} (No doubles). Remains in Jail.`);
+          up[`rooms/${currentRoomCode}/logs`] = logs;
+          db.ref().update(up).then(() => {
+            showDirectorsBanner('🔒', 'No Doubles Thrown', `You rolled ${d1} and ${d2}. You must remain in Jail until your next turn.`);
+            if (isBot) setTimeout(() => endTurn(), 2000);
+          });
+        }
+      });
     }
 
     function executeTurnRoll(activeId, isBot = false) {
@@ -2265,6 +2720,7 @@
       const player = currentGameState.players[activeId];
 
       animateDiceRoll(d1, d2, () => {
+        // Speeding Check (3 Doubles)
         if (currentDoublesCount >= 3) {
           const up = {};
           up[`rooms/${currentRoomCode}/dice`] = [d1, d2];
@@ -2272,50 +2728,93 @@
           up[`rooms/${currentRoomCode}/hasRolledThisTurn`] = true;
           up[`rooms/${currentRoomCode}/players/${activeId}/position`] = 10;
           up[`rooms/${currentRoomCode}/players/${activeId}/inJail`] = true;
+          up[`rooms/${currentRoomCode}/players/${activeId}/jailTurns`] = 0;
 
           let logs = currentGameState.logs || [];
-          logs.push(`🚨 ${player.name} rolled 3 DOUBLES IN A ROW! Caught speeding directly to Jail!`);
+          logs.push(`🚨 ${player.name} rolled 3 DOUBLES IN A ROW! Speeding directly to Jail!`);
           up[`rooms/${currentRoomCode}/logs`] = logs;
 
           db.ref().update(up).then(() => {
-            broadcastFx('dread', '🚨', 'SPEEDING! 3 DOUBLES VOIDED!', `${player.name} caught speeding directly to Jail!`);
-            if (isBot) setTimeout(() => { endTurn(); }, 1800);
+            showDirectorsBanner('🚨', 'SPEEDING PENALTY!', `${player.name} rolled 3 doubles in succession and was sent directly to Jail! Movement voided.`);
+            if (isBot) setTimeout(() => { endTurn(); }, 2500);
           });
           return;
         }
 
-        if (isBoxcars) broadcastFx('celebrate', '🎲', 'BOXCARS! HIGHEST ROLL (12)!', `${player.name} rolled the maximum (6+6=12)! Extra roll awarded!`);
-        else if (isDouble) broadcastFx('celebrate', '✨', 'DOUBLES ROLLED!', `${player.name} rolled matching ${d1}s! Extra turn awarded.`);
+        // Announce Roll & 2.5s Comprehension Buffer
+        const doubleText = isDouble ? " — DOUBLES! Roll again." : "";
+        showDirectorsBanner('🎲', `Rolled: ${d1} + ${d2} = ${total}`, `Pawn will advance ${total} spaces${doubleText}.`);
 
-        animatePawnStepWalk(activeId, player.position, total, (newPos) => {
-          let newMoney = player.money;
-          if (newPos < player.position) {
-            newMoney += 200;
-            SFX.cashIn();
-            triggerBankToPlayerCashAnimation(activeId, 200);
-            broadcastFx('celebrate', '💰', 'Passed GO!', `${player.name} collected $200 salary.`);
+        // Check Movement Mode
+        if (!isBot && movementMode === "manual") {
+          pendingManualDestination = (player.position + total) % 40;
+          showDirectorsBanner('✋', `Move ${total} Spaces Manually`, `Tap tile #${pendingManualDestination} (${TILES[pendingManualDestination].name}) to move your pawn!`);
+          enableManualTileSelection(activeId, player.position, total, pendingManualDestination, isDouble, currentDoublesCount, d1, d2);
+          return;
+        }
+
+        // Auto-Hop Execution after 2.5s Buffer
+        setTimeout(() => {
+          proceedWithMovement(activeId, player.position, total, (player.position + total) % 40, isDouble, currentDoublesCount, d1, d2, isBot);
+        }, 2500);
+      });
+    }
+
+    function enableManualTileSelection(activeId, oldPos, total, expectedPos, isDouble, currentDoublesCount, d1, d2) {
+      TILES.forEach((tile, idx) => {
+        const el = document.getElementById(`tile-${idx}`);
+        if (!el) return;
+        el.onclick = () => {
+          if (idx !== expectedPos) {
+            // Polite Referee Feedback
+            showDirectorsBanner('⚠️', 'Incorrect Destination Counted!', `You rolled a ${total}. From ${TILES[oldPos].name}, counting ${total} spaces brings you to ${TILES[expectedPos].name}. Try tapping that space!`);
+            SFX.lowCashAlarm();
+          } else {
+            // Correct Tile Tapped
+            TILES.forEach((_, t) => {
+              const resetEl = document.getElementById(`tile-${t}`);
+              if (resetEl) resetEl.onclick = null;
+            });
+            proceedWithMovement(activeId, oldPos, total, expectedPos, isDouble, currentDoublesCount, d1, d2, false);
           }
+        };
+      });
+    }
 
-          const updates = {};
-          updates[`rooms/${currentRoomCode}/dice`] = [d1, d2];
-          updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = currentDoublesCount;
-          updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = newPos;
-          updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
-          updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
-          updates[`rooms/${currentRoomCode}/turnStartTime`] = Date.now();
+    function proceedWithMovement(activeId, oldPos, total, newPos, isDouble, currentDoublesCount, d1, d2, isBot) {
+      const player = currentGameState.players[activeId];
 
-          let logs = currentGameState.logs || [];
-          logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[newPos].name}.`);
-          updates[`rooms/${currentRoomCode}/logs`] = logs;
+      animatePawnStepWalk(activeId, oldPos, total, (finalPos) => {
+        let newMoney = player.money;
 
-          db.ref().update(updates).then(() => {
-            handleLandingAction(newPos, total, isBot, isDouble);
-          });
+        // Regular Walking GO Salary Check
+        if (finalPos < oldPos) {
+          newMoney += 200;
+          SFX.cashIn();
+          triggerBankToPlayerCashAnimation(activeId, 200);
+          triggerInWorldCashTag(0, "+$200", true);
+          recordLedgerEntry(activeId, `+$200: Passed GO salary (Collected from Banker).`);
+        }
+
+        const updates = {};
+        updates[`rooms/${currentRoomCode}/dice`] = [d1, d2];
+        updates[`rooms/${currentRoomCode}/consecutiveDoubles`] = currentDoublesCount;
+        updates[`rooms/${currentRoomCode}/players/${activeId}/position`] = finalPos;
+        updates[`rooms/${currentRoomCode}/players/${activeId}/money`] = newMoney;
+        updates[`rooms/${currentRoomCode}/hasRolledThisTurn`] = !isDouble;
+        updates[`rooms/${currentRoomCode}/frozenSecondsRemaining`] = 60;
+
+        let logs = currentGameState.logs || [];
+        logs.push(`${player.name} rolled <strong>${d1} + ${d2} = ${total}</strong> ${isDouble ? '(DOUBLES!)' : ''} and moved to ${TILES[finalPos].name}.`);
+        updates[`rooms/${currentRoomCode}/logs`] = logs;
+
+        db.ref().update(updates).then(() => {
+          handleLandingAction(finalPos, total, isBot, isDouble);
         });
       });
     }
 
-    /* Landing Logic, Contextual Helpers & Auction Triggers */
+    /* Landing Action with Manual Card Reveal & Exact Accounting */
     function handleLandingAction(tileIndex, diceTotal, isBot = false, wasDouble = false) {
       const tile = TILES[tileIndex];
       const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
@@ -2328,7 +2827,7 @@
           if (!isBot) {
             if (player.money >= tile.price) {
               const isLow = (player.money - tile.price < 150);
-              const warningBanner = isLow ? `<div style="background:#fef3c7; border:1px solid #f59e0b; color:#92400e; padding:8px; border-radius:6px; margin-top:8px; font-size:0.78rem;">⚠️ <strong>Warning:</strong> Purchasing this will drop your cash reserves to $${player.money - tile.price} (below the $150 safety threshold).</div>` : '';
+              const warningBanner = isLow ? `<div style="background:#fef3c7; border:1px solid #f59e0b; color:#92400e; padding:8px; border-radius:6px; margin-top:8px; font-size:0.78rem;">⚠️ <strong>Warning:</strong> Purchasing this drops your cash reserves below $150 ($${player.money - tile.price} remaining).</div>` : '';
 
               openModal(
                 "Acquire Title Deed",
@@ -2342,69 +2841,59 @@
                     label: `Count Cash & Buy ($${tile.price})`,
                     action: () => {
                       closeModal();
-                      openTactileCashCheckout(activeId, null, tile.price, `Purchase of ${tile.name}`, () => {
-                        executePropertyBuy(activeId, tile);
+                      openTactileCashCheckout(activeId, null, tile.price, `Purchase of ${tile.name}`, (offered, change) => {
+                        executePropertyBuy(activeId, tile, offered, change);
                       });
                     }
                   },
-                  {
-                    label: "Pass (Start Auction)",
-                    class: "btn-secondary",
-                    action: () => {
-                      closeModal();
-                      startPublicAuction(tile.id);
-                    }
-                  }
+                  { label: "Pass (No Buy)", class: "btn-secondary", action: closeModal }
                 ]
               );
-            } else {
-              startPublicAuction(tile.id);
             }
           } else {
             setTimeout(() => {
               if (currentGameState && currentGameState.isPaused) return;
               if (player.money - tile.price >= 150) {
+                showPawnThought(activeId, `Buying ${tile.name} for $${tile.price}!`);
                 triggerPlayerToBankCashAnimation(activeId, tile.price);
-                executePropertyBuy(activeId, tile);
+                executePropertyBuy(activeId, tile, tile.price, 0);
               } else {
-                startPublicAuction(tile.id);
+                showPawnThought(activeId, `Passing on ${tile.name}.`);
               }
               finishBotTurnDecision(wasDouble);
-            }, 1400);
+            }, 2500);
             return;
           }
         } else if (prop.ownerId === activeId) {
-          // Landed on own property - Show building contextual helper if not a monopoly
           if (tile.type === "street") {
             const hasMonopoly = checkColorMonopoly(activeId, tile.color);
             if (!hasMonopoly) {
-              const missingProps = COLOR_GROUPS[tile.color]
-                .filter(id => id !== tile.id)
-                .map(id => TILES[id].name)
-                .join(" and ");
-              showEventToast('celebrate', '🏠', `You own ${tile.name}!`, `To build houses here, complete the set by acquiring ${missingProps}.`);
+              const missingProps = COLOR_GROUPS[tile.color].filter(id => id !== tile.id).map(id => TILES[id].name).join(" and ");
+              showDirectorsBanner('🏠', `You Own ${tile.name}!`, `To build houses on this street, complete the set by acquiring ${missingProps}.`);
             } else {
-              showEventToast('celebrate', '👑', `Welcome Home!`, `You hold the full ${tile.color.toUpperCase()} monopoly! Build houses anytime from your portfolio.`);
+              showDirectorsBanner('👑', 'Full Monopoly Territory!', `You hold all ${tile.color.toUpperCase()} properties! Rents are doubled. Build houses anytime from your portfolio.`);
             }
           }
-          if (isBot) setTimeout(() => finishBotTurnDecision(wasDouble), 1400);
+          if (isBot) setTimeout(() => finishBotTurnDecision(wasDouble), 2000);
         } else if (!prop.mortgaged) {
           let rent = tile.rent ? tile.rent[prop.houses || 0] : 25;
           const owner = currentGameState.players[prop.ownerId];
 
           if (!isBot) {
-            openTactileCashCheckout(activeId, owner.id, rent, `Rent on ${tile.name} to ${owner.name}`, () => {
+            openTactileCashCheckout(activeId, owner.id, rent, `Rent on ${tile.name} to ${owner.name}`, (offered, change) => {
               const up = {};
               up[`rooms/${currentRoomCode}/players/${activeId}/money`] = player.money - rent;
               up[`rooms/${currentRoomCode}/players/${owner.id}/money`] = owner.money + rent;
 
               let logs = currentGameState.logs || [];
-              logs.push(`${player.name} paid $${rent} rent to ${owner.name} for ${tile.name}.`);
+              logs.push(`💸 ${player.name} paid $${rent} rent on ${tile.name} to ${owner.name} (Tendered: $${offered}, Change: $${change}).`);
               up[`rooms/${currentRoomCode}/logs`] = logs;
 
               db.ref().update(up).then(() => {
+                recordLedgerEntry(activeId, `-$${rent}: Paid rent on ${tile.name} to ${owner.name}. Handed over $${offered}, received $${change} change.`);
+                recordLedgerEntry(owner.id, `+$${rent}: Received rent from ${player.name} on ${tile.name}.`);
                 triggerPlayerToPlayerCashAnimation(activeId, owner.id, rent);
-                if (rent >= 200) broadcastFx('dread', '💸', 'HEFTY RENT PAID!', `${player.name} paid $${rent} to ${owner.name}!`);
+                triggerInWorldCashTag(tile.id, `-$${rent}`, false);
               });
             });
           } else {
@@ -2414,96 +2903,152 @@
               up[`rooms/${currentRoomCode}/players/${owner.id}/money`] = owner.money + rent;
 
               let logs = currentGameState.logs || [];
-              logs.push(`${player.name} paid $${rent} rent to ${owner.name} for ${tile.name}.`);
+              logs.push(`💸 ${player.name} paid $${rent} rent on ${tile.name} to ${owner.name}.`);
               up[`rooms/${currentRoomCode}/logs`] = logs;
 
               db.ref().update(up).then(() => {
+                showPawnThought(activeId, `Ouch! Paid $${rent} rent to ${owner.name}.`);
+                recordLedgerEntry(activeId, `-$${rent}: Paid rent on ${tile.name} to ${owner.name}.`);
+                recordLedgerEntry(owner.id, `+$${rent}: Received rent from ${player.name} on ${tile.name}.`);
                 triggerPlayerToPlayerCashAnimation(activeId, owner.id, rent);
+                triggerInWorldCashTag(tile.id, `-$${rent}`, false);
                 finishBotTurnDecision(wasDouble);
               });
-            }, 1400);
+            }, 2500);
             return;
           }
         }
-      } else if (tile.type === "chance") {
-        drawPhysicalCard("chance", activeId, isBot, wasDouble);
-        return;
-      } else if (tile.type === "community") {
-        drawPhysicalCard("community", activeId, isBot, wasDouble);
+      } else if (tile.type === "chance" || tile.type === "community") {
+        if (!isBot) {
+          // Manual Deck Reveal: Prompt human to tap the center 3D stack
+          const deckName = (tile.type === "chance") ? "Chance" : "Community Chest";
+          showDirectorsBanner('🎴', `Landed on ${deckName}!`, `Click the 3D ${deckName} deck stack in the center of the board to reveal your card.`);
+          const stackEl = document.getElementById(tile.type === "chance" ? "deck-chance-interactive" : "deck-community-interactive");
+          if (stackEl) {
+            stackEl.style.boxShadow = "0 0 25px #ffd15c";
+            stackEl.onclick = () => {
+              stackEl.style.boxShadow = "";
+              drawPhysicalCard(tile.type, activeId, false, wasDouble);
+            };
+          }
+        } else {
+          // Simulated human delay for bot card draw
+          setTimeout(() => {
+            drawPhysicalCard(tile.type, activeId, true, wasDouble);
+          }, 2000);
+        }
         return;
       } else if (tile.type === "tax") {
         if (!isBot) {
-          openTactileCashCheckout(activeId, null, tile.amount, `Tax Assessment: ${tile.name}`, () => {
-            debitMoney(activeId, tile.amount, tile.name);
+          openTactileCashCheckout(activeId, null, tile.amount, `Tax Assessment: ${tile.name}`, (offered, change) => {
+            debitMoney(activeId, tile.amount, `${tile.name} (Tendered: $${offered}, Change: $${change})`);
           });
         } else {
           setTimeout(() => {
+            showPawnThought(activeId, `Paid $${tile.amount} tax.`);
             triggerPlayerToBankCashAnimation(activeId, tile.amount);
             debitMoney(activeId, tile.amount, tile.name);
             finishBotTurnDecision(wasDouble);
-          }, 1400);
+          }, 2500);
           return;
         }
       } else if (tile.type === "gotojail") {
         sendToJailOnline(activeId);
         if (isBot) {
-          setTimeout(() => finishBotTurnDecision(false), 1400);
+          setTimeout(() => finishBotTurnDecision(false), 2500);
           return;
         }
       }
 
-      if (isBot) setTimeout(() => finishBotTurnDecision(wasDouble), 1400);
+      if (isBot) setTimeout(() => finishBotTurnDecision(wasDouble), 2500);
     }
 
-    /* Tactile Cash Checkout */
+    /* Tactile Cash Checkout with Live Spectator Broadcast */
     function openTactileCashCheckout(payerId, payeeId, targetAmount, description, onComplete) {
-      let runningTotal = 0;
+      let offeredTotal = 0;
+      let billCounts = { 500: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 1: 0 };
+
+      // Broadcast opening of transaction to room
+      const payer = currentGameState.players[payerId];
+      db.ref(`rooms/${currentRoomCode}/liveSettlement`).set({
+        payerName: payer.name,
+        targetAmount,
+        description,
+        tendered: 0
+      });
 
       function renderCheckoutBody() {
-        const remaining = Math.max(0, targetAmount - runningTotal);
+        const changeDue = Math.max(0, offeredTotal - targetAmount);
+        const stillNeeded = Math.max(0, targetAmount - offeredTotal);
+
         return `
           <div style="text-align:center;">
             <p style="font-weight:700; color:#374151;">${description}</p>
-            <div style="font-size:2rem; font-weight:900; color:#1b7340; margin:8px 0;">$${targetAmount}</div>
-            <div style="font-size:0.8rem; color:#6b7280;">Paid So Far: <strong>$${runningTotal}</strong> | Needed: <strong style="color:#b91c1c;">$${remaining}</strong></div>
-            <div class="checkout-bill-slot">
-              <div class="checkout-bill-item bill-500" onclick="addCheckoutBill(500)">+$500</div>
-              <div class="checkout-bill-item bill-100" onclick="addCheckoutBill(100)">+$100</div>
-              <div class="checkout-bill-item bill-50" onclick="addCheckoutBill(50)">+$50</div>
-              <div class="checkout-bill-item bill-20" onclick="addCheckoutBill(20)">+$20</div>
-              <div class="checkout-bill-item bill-10" onclick="addCheckoutBill(10)">+$10</div>
-              <div class="checkout-bill-item bill-5" onclick="addCheckoutBill(5)">+$5</div>
-              <div class="checkout-bill-item bill-1" onclick="addCheckoutBill(1)">+$1</div>
+            <div style="font-size:2.2rem; font-weight:900; color:#1b7340; margin:6px 0;">$${targetAmount}</div>
+            
+            <div style="font-size:0.85rem; color:#4b5563; margin-bottom:10px;">
+              Offered: <strong>$${offeredTotal}</strong> | 
+              ${stillNeeded > 0 ? `<span style="color:#b91c1c;">Needed: $${stillNeeded}</span>` : `<span style="color:#10b981;">Change Returning: $${changeDue}</span>`}
             </div>
-            <p style="font-size:0.75rem; color:#888;">Tip: Overpaying automatically calculates and returns change from payee/bank.</p>
+
+            <div style="font-size:0.72rem; font-weight:800; color:#6b7280; text-transform:uppercase;">Click to Add or Return Bills to Wallet:</div>
+            <div class="checkout-bill-slot">
+              ${[500, 100, 50, 20, 10, 5, 1].map(v => `
+                <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                  <button class="checkout-bill-item bill-${v}" onclick="adjustCheckoutBill(${v}, 1)">+$${v}</button>
+                  <span style="font-size:0.7rem; font-weight:900; color:#111;">Offered: ${billCounts[v]}</span>
+                  ${billCounts[v] > 0 ? `<button style="background:#fee2e2; border:1px solid #ef4444; color:#991b1b; border-radius:4px; font-size:0.6rem; padding:2px 6px; cursor:pointer;" onclick="adjustCheckoutBill(${v}, -1)">- Remove</button>` : ''}
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:8px; margin-top:10px;">
+              <button class="btn-action btn-secondary" style="font-size:0.75rem; padding:6px 12px;" onclick="breakBillAtBankPrompt()">Ask Banker for Change</button>
+            </div>
           </div>
         `;
       }
 
-      window.addCheckoutBill = function(denomination) {
+      window.adjustCheckoutBill = function(denomination, delta) {
+        if (delta < 0 && billCounts[denomination] <= 0) return;
         SFX.billRustle();
-        runningTotal += denomination;
+        billCounts[denomination] += delta;
+        offeredTotal += (denomination * delta);
+
+        // Update room spectators live
+        db.ref(`rooms/${currentRoomCode}/liveSettlement/tendered`).set(offeredTotal);
+
         document.getElementById('modal-content').innerHTML = renderCheckoutBody();
-        if (runningTotal >= targetAmount) {
-          document.getElementById('btn-confirm-payment').disabled = false;
-        }
+        const confirmBtn = document.getElementById('btn-confirm-payment');
+        if (confirmBtn) confirmBtn.disabled = (offeredTotal < targetAmount);
       };
 
-      openModal("Cash Payment Tray", renderCheckoutBody(), [
+      window.breakBillAtBankPrompt = function() {
+        alert("The Banker swapped your largest banknote into smaller bills ($20s, $10s, and $1s) for making exact payment.");
+        recordLedgerEntry(payerId, `Banker Swap: Broke large bill into smaller denominations.`);
+        SFX.billRustle();
+      };
+
+      openModal("💵 Cash Payment Tray", renderCheckoutBody(), [
         {
           label: "Confirm Payment",
           id: "btn-confirm-payment",
           action: () => {
             closeModal();
-            if (onComplete) onComplete();
+            db.ref(`rooms/${currentRoomCode}/liveSettlement`).remove();
+            const change = Math.max(0, offeredTotal - targetAmount);
+            if (change > 0) {
+              showDirectorsBanner('💵', 'Change Returned from Transaction', `You tendered $${offeredTotal} for a $${targetAmount} payment. Exactly $${change} in change was returned to your wallet.`);
+            }
+            if (onComplete) onComplete(offeredTotal, change);
           }
         }
       ]);
+
       document.getElementById('modal-actions').querySelector('button').id = "btn-confirm-payment";
       document.getElementById('btn-confirm-payment').disabled = true;
     }
 
-    /* Cash & Deed Animations */
     function triggerBankToPlayerCashAnimation(pId, amount) {
       const bankEl = document.querySelector('.bank-vault-box');
       const tokenEl = document.getElementById(`board-token-${pId}`);
@@ -2530,7 +3075,7 @@
 
     function breakBillAtBank(val) {
       if (val <= 1) return;
-      alert(`The Bank has broken your $${val} note into smaller bills.`);
+      alert(`The Banker has broken your $${val} note into smaller bills.`);
       SFX.billRustle();
     }
 
@@ -2544,13 +3089,13 @@
         setTimeout(() => {
           const activeId = currentGameState.playerOrder[currentGameState.activePlayerIndex];
           executeTurnRoll(activeId, true);
-        }, 1400);
+        }, 2200);
       } else {
-        setTimeout(() => { endTurn(); }, 1200);
+        setTimeout(() => { endTurn(); }, 2200);
       }
     }
 
-    function executePropertyBuy(pId, tile) {
+    function executePropertyBuy(pId, tile, tenderedAmount = 0, changeAmount = 0) {
       const player = currentGameState.players[pId];
       const up = {};
       const newBalance = player.money - tile.price;
@@ -2561,11 +3106,15 @@
       up[`rooms/${currentRoomCode}/bankCash`] = bankCash;
       
       let logs = currentGameState.logs || [];
-      logs.push(`${player.name} bought Title Deed: ${tile.name} for $${tile.price}.`);
+      const tenderText = (tenderedAmount > 0) ? ` (Tendered: $${tenderedAmount}, Change: $${changeAmount})` : '';
+      logs.push(`🏛️ ${player.name} bought Title Deed: ${tile.name} for $${tile.price}${tenderText}.`);
       up[`rooms/${currentRoomCode}/logs`] = logs;
 
       db.ref().update(up).then(() => {
+        recordLedgerEntry(pId, `-$${tile.price}: Purchased Title Deed: ${tile.name}.${tenderText}`);
         triggerPlayerToBankCashAnimation(pId, tile.price);
+        triggerInWorldCashTag(tile.id, `-$${tile.price}`, false);
+
         const bankEl = document.querySelector('.bank-vault-box');
         const tokenEl = document.getElementById(`board-token-${pId}`);
         if (bankEl && tokenEl) {
@@ -2574,9 +3123,9 @@
 
         if (newBalance < 150) {
           SFX.lowCashAlarm();
-          showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s balance dropped to $${newBalance}!`);
+          showDirectorsBanner('⚠️', 'CRITICAL CASH RESERVES!', `${player.name}'s balance dropped to $${newBalance} (below $150). Consider mortgaging estates before paying rent.`);
         } else if (tile.color && checkColorMonopoly(pId, tile.color)) {
-          broadcastFx('celebrate', '👑', 'FULL COLOR MONOPOLY!', `${player.name} owns all ${tile.color.toUpperCase()} properties! Rents are now DOUBLED!`);
+          showDirectorsBanner('👑', 'FULL COLOR MONOPOLY ACHIEVED!', `${player.name} now holds every ${tile.color.toUpperCase()} street! Base site rent on this color group is now doubled.`);
         } else {
           SFX.cashIn();
         }
@@ -2584,414 +3133,92 @@
     }
 
     function evaluateAITurn(state) {
-      if (aiTurnInProgress || state.isPaused || isPawnWalking || state.activeAuction) return;
+      if (aiTurnInProgress || state.isPaused || isPawnWalking || isInspectPaused || isModalOpen) return;
 
       const activeId = state.playerOrder[state.activePlayerIndex];
-      const player = state.players[activeId];
+      if (activeId === localPlayerId) return;
 
+      const player = state.players[activeId];
       if (player && player.isBot && state.playerOrder[0] === localPlayerId) {
         aiTurnInProgress = true;
         setTimeout(() => {
-          if (!currentGameState || currentGameState.isPaused) {
+          if (!currentGameState || currentGameState.isPaused || isInspectPaused || isModalOpen) {
             aiTurnInProgress = false;
             return;
           }
-          executeTurnRoll(activeId, true);
-        }, 1600);
-      }
-    }
-
-    /* Live Public Auction Engine */
-    function startPublicAuction(tileId) {
-      const tile = TILES[tileId];
-      SFX.gavelBang();
-
-      const auctionData = {
-        tileId: tile.id,
-        currentBid: 10,
-        highBidderId: null,
-        highBidderName: "No Bids",
-        endsAt: Date.now() + 7000
-      };
-
-      let logs = currentGameState.logs || [];
-      logs.push(`🔨 GAVEL! ${tile.name} is now UP FOR PUBLIC AUCTION! Starting bid: $10.`);
-      
-      const up = {};
-      up[`rooms/${currentRoomCode}/activeAuction`] = auctionData;
-      up[`rooms/${currentRoomCode}/logs`] = logs;
-      db.ref().update(up);
-    }
-
-    function handleLiveAuctionModal(state) {
-      if (!state.activeAuction) {
-        if (auctionTimerInterval) clearInterval(auctionTimerInterval);
-        return;
-      }
-
-      const auction = state.activeAuction;
-      const tile = TILES[auction.tileId];
-      const remainingSec = Math.max(0, Math.ceil((auction.endsAt - Date.now()) / 1000));
-
-      const isHost = (state.playerOrder[0] === localPlayerId);
-
-      // Bot Bidding Logic in Auctions
-      if (isHost && remainingSec > 1) {
-        state.playerOrder.forEach(pId => {
-          const p = state.players[pId];
-          if (p.isBot && p.money >= auction.currentBid + 20 && Math.random() < 0.25) {
-            placeAuctionBid(pId, 10);
+          if (player.inJail) {
+            executeJailRollAttempt(activeId, true);
+          } else {
+            executeTurnRoll(activeId, true);
           }
-        });
+        }, 2200);
       }
+    }
 
-      if (remainingSec <= 0) {
-        if (isHost) finalizeAuction(auction);
-        return;
-      }
+    function recordLedgerEntry(pId, text) {
+      if (!currentRoomCode || !currentGameState) return;
+      const history = (currentGameState.ledgers && currentGameState.ledgers[pId]) ? currentGameState.ledgers[pId] : [];
+      history.push(`Turn: ${text}`);
+      db.ref(`rooms/${currentRoomCode}/ledgers/${pId}`).set(history);
+    }
+
+    function viewPlayerHistory(pId) {
+      const player = currentGameState.players[pId];
+      const history = (currentGameState.ledgers && currentGameState.ledgers[pId]) ? currentGameState.ledgers[pId] : ["No transactions recorded yet."];
 
       const bodyHtml = `
-        <div class="auction-stage-box">
-          <div class="auction-gavel-icon">🔨</div>
-          <h2 style="color:#92400e; margin:6px 0;">PUBLIC AUCTION: ${tile.name}</h2>
-          <div style="font-size:2rem; font-weight:900; color:#1b7340;">Current High Bid: $${auction.currentBid}</div>
-          <div style="font-size:0.9rem; color:#555;">High Bidder: <strong>${auction.highBidderName}</strong></div>
-          <div style="font-size:1.1rem; font-weight:900; color:#b91c1c; margin-top:8px;">⏳ Gavel Drops In: ${remainingSec}s</div>
-        </div>
-        <div style="display:flex; justify-content:center; gap:12px; margin-top:14px;">
-          <button class="btn-action" style="padding:10px 18px;" onclick="placeAuctionBid('${localPlayerId}', 10)">Raise +$10</button>
-          <button class="btn-action btn-header-gold" style="padding:10px 18px;" onclick="placeAuctionBid('${localPlayerId}', 50)">Raise +$50</button>
+        <div style="max-height:300px; overflow-y:auto; font-family:monospace; font-size:0.8rem; line-height:1.5;">
+          ${history.map(entry => `<div style="border-bottom:1px solid #eee; padding:6px 0;">• ${entry}</div>`).join('')}
         </div>
       `;
-
-      openModal("🔨 Official Auction Floor", bodyHtml, []);
+      openModal(`📜 Financial Statement: ${player.name}`, bodyHtml, [{ label: "Close", action: closeModal }]);
     }
 
-    function placeAuctionBid(pId, raiseAmt) {
-      if (!currentGameState || !currentGameState.activeAuction) return;
-      const player = currentGameState.players[pId];
-      const newBid = currentGameState.activeAuction.currentBid + raiseAmt;
-
-      if (player.money < newBid) return alert("You lack the funds for this bid!");
-
-      SFX.gavelBang();
-      db.ref(`rooms/${currentRoomCode}/activeAuction`).update({
-        currentBid: newBid,
-        highBidderId: pId,
-        highBidderName: player.name,
-        endsAt: Date.now() + 5000 // Each bid resets clock to 5 seconds
-      });
-    }
-
-    function finalizeAuction(auction) {
-      const tile = TILES[auction.tileId];
-      const updates = {};
-      updates[`rooms/${currentRoomCode}/activeAuction`] = null;
-
-      let logs = currentGameState.logs || [];
-
-      if (auction.highBidderId) {
-        const winner = currentGameState.players[auction.highBidderId];
-        updates[`rooms/${currentRoomCode}/players/${winner.id}/money`] = winner.money - auction.currentBid;
-        updates[`rooms/${currentRoomCode}/properties/${tile.id}`] = { ownerId: winner.id, houses: 0, mortgaged: false };
-        updates[`rooms/${currentRoomCode}/bankCash`] = (currentGameState.bankCash || 20580) + auction.currentBid;
-        logs.push(`🔨 SOLD! ${tile.name} awarded to ${winner.name} for $${auction.currentBid}!`);
-        broadcastFx('celebrate', '🔨', 'AUCTION CONCLUDED!', `${tile.name} was won by ${winner.name} for $${auction.currentBid}!`);
-      } else {
-        logs.push(`🔨 AUCTION PASSED: No bids placed for ${tile.name}; title deed retained by Bank.`);
-      }
-
-      updates[`rooms/${currentRoomCode}/logs`] = logs;
-      db.ref().update(updates).then(() => closeModal());
-    }
-
-    /* Player-to-Player Trade Table */
-    function openTradeTableModal() {
-      const activeOrder = currentGameState.playerOrder.filter(id => id !== localPlayerId && !currentGameState.players[id].bankrupt);
-      if (activeOrder.length === 0) return alert("No opponents available to trade with!");
-
-      let targetPlayerId = activeOrder[0];
-      const props = currentGameState.properties || {};
-
-      function renderTradeModalBody() {
-        const myPlayer = currentGameState.players[localPlayerId];
-        const targetPlayer = currentGameState.players[targetPlayerId];
-
-        const myOwned = Object.keys(props).filter(id => props[id].ownerId === localPlayerId);
-        const theirOwned = Object.keys(props).filter(id => props[id].ownerId === targetPlayerId);
-
-        let partnerOptions = activeOrder.map(id => `<option value="${id}" ${id === targetPlayerId ? 'selected' : ''}>${currentGameState.players[id].name}</option>`).join('');
-
-        return `
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <span style="font-weight:800; font-size:0.85rem;">Select Trading Partner:</span>
-              <select id="trade-partner-select" onchange="switchTradePartner(this.value)" style="padding:4px 8px; border-radius:6px; font-weight:700;">
-                ${partnerOptions}
-              </select>
-            </div>
-
-            <div class="trade-grid">
-              <!-- My Offer -->
-              <div class="trade-side-box">
-                <div class="trade-side-title">Your Offer (${myPlayer.name})</div>
-                <div style="font-size:0.75rem; color:#555;">Cash Offer:</div>
-                <input type="number" id="trade-my-cash" placeholder="$0" min="0" max="${myPlayer.money}" style="width:100%; padding:4px; font-size:0.85rem;">
-                <div style="font-size:0.75rem; color:#555; margin-top:4px;">Deeds to Offer:</div>
-                ${myOwned.map(id => `
-                  <label class="trade-item-row">
-                    <input type="checkbox" name="my-trade-props" value="${id}">
-                    <span>${TILES[id].name}</span>
-                  </label>
-                `).join('') || '<div style="font-size:0.7rem; color:#888;">No properties owned</div>'}
-              </div>
-
-              <!-- Their Assets -->
-              <div class="trade-side-box">
-                <div class="trade-side-title">Demanded from ${targetPlayer.name}</div>
-                <div style="font-size:0.75rem; color:#555;">Cash Requested:</div>
-                <input type="number" id="trade-their-cash" placeholder="$0" min="0" max="${targetPlayer.money}" style="width:100%; padding:4px; font-size:0.85rem;">
-                <div style="font-size:0.75rem; color:#555; margin-top:4px;">Deeds Requested:</div>
-                ${theirOwned.map(id => `
-                  <label class="trade-item-row">
-                    <input type="checkbox" name="their-trade-props" value="${id}">
-                    <span>${TILES[id].name}</span>
-                  </label>
-                `).join('') || '<div style="font-size:0.7rem; color:#888;">No properties owned</div>'}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      window.switchTradePartner = function(id) {
-        targetPlayerId = id;
-        document.getElementById('modal-content').innerHTML = renderTradeModalBody();
-      };
-
-      openModal("🤝 The Trade Table", renderTradeModalBody(), [
-        {
-          label: "Propose Trade",
-          action: () => {
-            const myCash = parseInt(document.getElementById('trade-my-cash').value) || 0;
-            const theirCash = parseInt(document.getElementById('trade-their-cash').value) || 0;
-
-            const myProps = Array.from(document.querySelectorAll('input[name="my-trade-props"]:checked')).map(el => parseInt(el.value));
-            const theirProps = Array.from(document.querySelectorAll('input[name="their-trade-props"]:checked')).map(el => parseInt(el.value));
-
-            proposeTradeDeal(localPlayerId, targetPlayerId, myCash, myProps, theirCash, theirProps);
-            closeModal();
-          }
-        },
-        { label: "Cancel", class: "btn-secondary", action: closeModal }
-      ]);
-    }
-
-    function proposeTradeDeal(senderId, recipientId, senderCash, senderProps, recipientCash, recipientProps) {
-      const tradeObj = {
-        senderId,
-        recipientId,
-        senderCash,
-        senderProps,
-        recipientCash,
-        recipientProps,
-        status: "pending",
-        ts: Date.now()
-      };
-
-      db.ref(`rooms/${currentRoomCode}/activeTrade`).set(tradeObj).then(() => {
-        showEventToast('celebrate', '🤝', 'Trade Proposed!', `Offer sent to ${currentGameState.players[recipientId].name}.`);
-      });
-    }
-
-    function handleLiveTradeModal(state) {
-      if (!state.activeTrade || state.activeTrade.status !== "pending") return;
-
-      const trade = state.activeTrade;
-      if (trade.recipientId === localPlayerId) {
-        const sender = state.players[trade.senderId];
-        const offerPropsNames = (trade.senderProps || []).map(id => TILES[id].name).join(", ") || "No properties";
-        const demandPropsNames = (trade.recipientProps || []).map(id => TILES[id].name).join(", ") || "No properties";
-
-        const bodyHtml = `
-          <div style="text-align:center;">
-            <p style="font-size:1.05rem;"><strong>${sender.name}</strong> has proposed a real estate trade deal!</p>
-            <div class="trade-grid" style="margin-top:12px;">
-              <div class="trade-side-box">
-                <div class="trade-side-title">They Give You</div>
-                <div style="font-weight:900; color:#10b981;">+$${trade.senderCash || 0} Cash</div>
-                <div style="font-size:0.8rem; margin-top:4px;">${offerPropsNames}</div>
-              </div>
-              <div class="trade-side-box">
-                <div class="trade-side-title">They Want From You</div>
-                <div style="font-weight:900; color:#b91c1c;">-$${trade.recipientCash || 0} Cash</div>
-                <div style="font-size:0.8rem; margin-top:4px;">${demandPropsNames}</div>
-              </div>
-            </div>
-          </div>
-        `;
-
-        openModal("🤝 Trade Offer Received", bodyHtml, [
-          { label: "Accept Deal", action: () => resolveTradeDeal(true) },
-          { label: "Decline Deal", class: "btn-danger", action: () => resolveTradeDeal(false) }
-        ]);
-      }
-    }
-
-    function resolveTradeDeal(accepted) {
-      const trade = currentGameState.activeTrade;
-      if (!trade) return;
-
-      if (!accepted) {
-        db.ref(`rooms/${currentRoomCode}/activeTrade`).remove().then(() => {
-          closeModal();
-          showEventToast('dread', '❌', 'Trade Declined', 'Deal rejected.');
-        });
-        return;
-      }
-
-      const updates = {};
-      const sender = currentGameState.players[trade.senderId];
-      const recipient = currentGameState.players[trade.recipientId];
-
-      updates[`rooms/${currentRoomCode}/players/${sender.id}/money`] = sender.money - trade.senderCash + trade.recipientCash;
-      updates[`rooms/${currentRoomCode}/players/${recipient.id}/money`] = recipient.money - trade.recipientCash + trade.senderCash;
-
-      (trade.senderProps || []).forEach(tId => {
-        updates[`rooms/${currentRoomCode}/properties/${tId}/ownerId`] = recipient.id;
-      });
-      (trade.recipientProps || []).forEach(tId => {
-        updates[`rooms/${currentRoomCode}/properties/${tId}/ownerId`] = sender.id;
-      });
-
-      updates[`rooms/${currentRoomCode}/activeTrade`] = null;
-
-      let logs = currentGameState.logs || [];
-      logs.push(`🤝 TRADE SEALED! ${sender.name} and ${recipient.name} successfully exchanged properties and cash.`);
-      updates[`rooms/${currentRoomCode}/logs`] = logs;
-
-      db.ref().update(updates).then(() => {
-        closeModal();
-        broadcastFx('celebrate', '🤝', 'TRADE FINALIZED!', `${sender.name} and ${recipient.name} concluded a trade!`);
-      });
-    }
-
-    /* Unanimous Consent Liquidation Voting */
-    function initiateLiquidationVote(targetPlayerId) {
-      const target = currentGameState.players[targetPlayerId];
-      const activeVoters = currentGameState.playerOrder.filter(id => id !== targetPlayerId && !currentGameState.players[id].bankrupt);
-
-      const voteData = {
-        targetPlayerId,
-        targetName: target.name,
-        initiatedBy: localPlayerId,
-        votes: {},
-        votersRequired: activeVoters.length,
-        ts: Date.now()
-      };
-
-      db.ref(`rooms/${currentRoomCode}/activeLiquidationVote`).set(voteData);
-    }
-
-    function handleLiveLiquidationVote(state) {
-      if (!state.activeLiquidationVote) return;
-      const vote = state.activeLiquidationVote;
-
-      if (vote.targetPlayerId === localPlayerId) return;
-
-      if (vote.votes && vote.votes[localPlayerId] !== undefined) return;
-
+    function showOpeningBankrollModal() {
       const bodyHtml = `
         <div style="text-align:center;">
-          <div style="font-size:2.2rem; margin-bottom:6px;">⚖️</div>
-          <p style="font-size:1.05rem; font-weight:800;">Vote to Evict & Liquidate <strong>${vote.targetName}</strong>?</p>
-          <p style="font-size:0.8rem; color:#666; margin-top:6px;">This player is away. Unanimous consent of all active players is required to return their assets to the Bank and continue.</p>
+          <div style="font-size:2.4rem; margin-bottom:6px;">🏦</div>
+          <h2 style="color:#1b7340; margin-bottom:6px;">Initial Capital Distribution: $1,500</h2>
+          <p style="font-size:0.85rem; color:#4b5563; margin-bottom:12px;">Every player begins with the official tournament distribution:</p>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:#f9fafb; border:1px solid #e5e7eb; padding:10px; border-radius:8px; font-weight:800; font-size:0.8rem;">
+            <div>$500 Bill × 2 ($1,000)</div>
+            <div>$100 Bill × 4 ($400)</div>
+            <div>$50 Bill × 1 ($50)</div>
+            <div>$20 Bill × 1 ($20)</div>
+            <div>$10 Bill × 2 ($20)</div>
+            <div>$5 Bill × 1 ($5)</div>
+            <div style="grid-column:1/-1;">$1 Bill × 5 ($5)</div>
+          </div>
+
+          <p style="font-size:0.75rem; color:#6b7280; margin-top:10px;">Official Rules: Even building is mandatory for houses. 3 doubles send you to jail. Free Parking gives no jackpot.</p>
         </div>
       `;
 
-      openModal("⚖️ Liquidation Ballot", bodyHtml, [
-        { label: "Yes, Liquidate", action: () => castLiquidationVote(true) },
-        { label: "Keep Waiting (Protect)", class: "btn-secondary", action: () => castLiquidationVote(false) }
+      openModal("Official Monopoly Rules & Bankroll", bodyHtml, [
+        { label: "I Agree to Rules & Begin", action: closeModal }
       ]);
-    }
-
-    function castLiquidationVote(decision) {
-      if (!currentGameState || !currentGameState.activeLiquidationVote) return;
-      const vote = currentGameState.activeLiquidationVote;
-
-      closeModal();
-      if (!decision) {
-        // A single "Wait" cancels the vote immediately (Unanimous Protection)
-        db.ref(`rooms/${currentRoomCode}/activeLiquidationVote`).remove().then(() => {
-          showEventToast('celebrate', '🛡️', 'Liquidation Rejected', 'A player voted to keep waiting.');
-        });
-        return;
-      }
-
-      const updates = {};
-      updates[`rooms/${currentRoomCode}/activeLiquidationVote/votes/${localPlayerId}`] = true;
-      db.ref().update(updates).then(() => {
-        checkLiquidationResolution();
-      });
-    }
-
-    function checkLiquidationResolution() {
-      db.ref(`rooms/${currentRoomCode}/activeLiquidationVote`).once('value', snap => {
-        if (!snap.exists()) return;
-        const vote = snap.val();
-        const yesCount = Object.keys(vote.votes || {}).length;
-
-        if (yesCount >= vote.votersRequired) {
-          // Unanimous Vote Achieved: Liquidate Target Assets Back to Bank
-          const targetId = vote.targetPlayerId;
-          const up = {};
-          up[`rooms/${currentRoomCode}/players/${targetId}/bankrupt`] = true;
-          up[`rooms/${currentRoomCode}/players/${targetId}/money`] = 0;
-          up[`rooms/${currentRoomCode}/activeLiquidationVote`] = null;
-
-          const props = currentGameState.properties || {};
-          Object.keys(props).forEach(tId => {
-            if (props[tId].ownerId === targetId) {
-              up[`rooms/${currentRoomCode}/properties/${tId}`] = null; // Back to unowned
-            }
-          });
-
-          let logs = currentGameState.logs || [];
-          logs.push(`⚖️ UNANIMOUS VOTE: ${vote.targetName} was evicted and all assets liquidated to Bank.`);
-          up[`rooms/${currentRoomCode}/logs`] = logs;
-
-          db.ref().update(up).then(() => {
-            broadcastFx('dread', '⚖️', 'EVICTION FINALIZED!', `${vote.targetName} was liquidated back to Bank.`);
-          });
-        }
-      });
     }
 
     function drawPhysicalCard(type, pId, isBot = false, wasDouble = false) {
       SFX.cardFlip();
-      const deckEl = document.getElementById(type === 'chance' ? 'deck-chance-interactive' : 'deck-community-interactive');
-      if (deckEl) deckEl.style.transform = 'translateY(-8px) scale(1.08)';
+      const deck = (type === "chance") ? CHANCE_CARDS : COMMUNITY_CARDS;
+      const card = deck[Math.floor(Math.random() * deck.length)];
 
-      setTimeout(() => {
-        if (deckEl) deckEl.style.transform = '';
-        const deck = (type === "chance") ? CHANCE_CARDS : COMMUNITY_CARDS;
-        const card = deck[Math.floor(Math.random() * deck.length)];
-
-        if (!isBot) {
-          openModal(
-            `${type === 'chance' ? '❓ CHANCE CARD' : '📦 COMMUNITY CHEST'}`,
-            `<div style="text-align:center; padding:16px;">
-               <div style="font-size:2.4rem; margin-bottom:8px;">${type === 'chance' ? '❓' : '📦'}</div>
-               <p style="font-size:1.1rem; font-weight:800; line-height:1.4;">"${card.text}"</p>
-             </div>`,
-            [{ label: "Slide Under Pile", action: () => { closeModal(); card.action(pId); } }]
-          );
-        } else {
-          showEventToast('celebrate', type === 'chance' ? '❓' : '📦', `${currentGameState.players[pId].name} Drew a Card`, card.text);
-          card.action(pId);
-          setTimeout(() => finishBotTurnDecision(wasDouble), 1400);
-        }
-      }, 350);
+      if (!isBot) {
+        openModal(
+          `${type === 'chance' ? '❓ CHANCE CARD' : '📦 COMMUNITY CHEST'}`,
+          `<div style="text-align:center; padding:16px;">
+             <div style="font-size:2.4rem; margin-bottom:8px;">${type === 'chance' ? '❓' : '📦'}</div>
+             <p style="font-size:1.1rem; font-weight:800; line-height:1.4;">"${card.text}"</p>
+           </div>`,
+          [{ label: "Slide Under Pile", action: () => { closeModal(); card.action(pId); } }]
+        );
+      } else {
+        showPawnThought(pId, `Drew: "${card.text}"`);
+        card.action(pId);
+        setTimeout(() => finishBotTurnDecision(wasDouble), 2500);
+      }
     }
 
     function inspectDeck(type) {
@@ -3011,6 +3238,7 @@
       up[`rooms/${currentRoomCode}/logs`] = logs;
 
       db.ref().update(up).then(() => {
+        recordLedgerEntry(pId, `Awarded Get Out of Jail Free Card.`);
         broadcastFx('celebrate', '⚖️', 'JAIL PASS ACQUIRED!', `${player.name} holds a Get Out of Jail Free card.`);
       });
     }
@@ -3024,8 +3252,10 @@
       logs.push(`${player.name} received $${amt} (${reason}).`);
       up[`rooms/${currentRoomCode}/logs`] = logs;
       db.ref().update(up).then(() => {
+        recordLedgerEntry(pId, `+$${amt}: ${reason}`);
         SFX.cashIn();
         triggerBankToPlayerCashAnimation(pId, amt);
+        triggerInWorldCashTag(player.position, `+$${amt}`, true);
       });
     }
 
@@ -3039,27 +3269,32 @@
       logs.push(`${player.name} paid $${amt} for ${reason}.`);
       up[`rooms/${currentRoomCode}/logs`] = logs;
       db.ref().update(up).then(() => {
+        recordLedgerEntry(pId, `-$${amt}: ${reason}`);
         triggerPlayerToBankCashAnimation(pId, amt);
+        triggerInWorldCashTag(player.position, `-$${amt}`, false);
         if (remainingFunds < 150) {
           SFX.lowCashAlarm();
-          showEventToast('dread', '⚠️', 'LOW CASH RESERVES!', `${player.name}'s balance dropped to $${remainingFunds}!`);
+          showDirectorsBanner('⚠️', 'CRITICAL CASH RESERVES!', `${player.name}'s balance dropped to $${remainingFunds}!`);
         } else {
           broadcastFx('dread', '💸', 'FEE CHARGED', `${player.name} paid $${amt} for ${reason}.`);
         }
       });
     }
 
+    /* Send To Jail: Disallows GO Salary */
     function sendToJailOnline(pId) {
       const player = currentGameState.players[pId];
       const up = {};
       up[`rooms/${currentRoomCode}/players/${pId}/position`] = 10;
       up[`rooms/${currentRoomCode}/players/${pId}/inJail`] = true;
+      up[`rooms/${currentRoomCode}/players/${pId}/jailTurns`] = 0;
       up[`rooms/${currentRoomCode}/consecutiveDoubles`] = 0;
       let logs = currentGameState.logs || [];
-      logs.push(`🚨 ${player.name} was sent directly to Jail!`);
+      logs.push(`🚨 ${player.name} was sent directly to Jail (Do not pass GO, do not collect $200).`);
       up[`rooms/${currentRoomCode}/logs`] = logs;
 
       db.ref().update(up).then(() => {
+        showPawnThought(pId, "Locked up in Jail!");
         broadcastFx('dread', '🔒', 'LOCKED UP IN JAIL!', `${player.name} was sent directly to the cell!`);
       });
     }
@@ -3081,7 +3316,9 @@
         up[`rooms/${currentRoomCode}/logs`] = logs;
 
         db.ref().update(up).then(() => {
+          recordLedgerEntry(localPlayerId, `-$${tile.houseCost}: Built ${isHotel ? 'Hotel' : 'House'} on ${tile.name}.`);
           triggerPlayerToBankCashAnimation(localPlayerId, tile.houseCost);
+          triggerInWorldCashTag(tileId, `-$${tile.houseCost}`, false);
           if (isHotel) broadcastFx('celebrate', '🏨', 'LUXURY HOTEL ERECTED!', `${player.name} built a Hotel on ${tile.name}!`);
           else SFX.cashIn();
         });
@@ -3110,6 +3347,7 @@
       up[`rooms/${currentRoomCode}/logs`] = logs;
 
       db.ref().update(up).then(() => {
+        recordLedgerEntry(localPlayerId, `${toMortgage ? '+$' + val : '-$' + Math.round(val * 1.1)}: ${toMortgage ? 'Mortgaged' : 'Unmortgaged'} ${tile.name}.`);
         if (toMortgage) {
           triggerBankToPlayerCashAnimation(localPlayerId, val);
           broadcastFx('dread', '🏚️', 'ESTATE MORTGAGED', `${player.name} mortgaged ${tile.name} for liquidity.`);
@@ -3121,7 +3359,7 @@
     }
 
     function endTurn() {
-      if (!currentGameState || currentGameState.isPaused || isPawnWalking) return;
+      if (!currentGameState || currentGameState.isPaused || isPawnWalking || isInspectPaused || isModalOpen) return;
       
       aiTurnInProgress = false;
       const nextIndex = (currentGameState.activePlayerIndex + 1) % currentGameState.playerOrder.length;
@@ -3129,26 +3367,9 @@
         [`rooms/${currentRoomCode}/activePlayerIndex`]: nextIndex,
         [`rooms/${currentRoomCode}/hasRolledThisTurn`]: false,
         [`rooms/${currentRoomCode}/consecutiveDoubles`]: 0,
-        [`rooms/${currentRoomCode}/turnStartTime`]: Date.now()
+        [`rooms/${currentRoomCode}/frozenSecondsRemaining`]: 60
       };
       db.ref().update(updates);
-    }
-
-    function declareBankruptcy() {
-      if (!confirm("Are you sure you want to declare bankruptcy?")) return;
-      const player = currentGameState.players[localPlayerId];
-      const up = {};
-      up[`rooms/${currentRoomCode}/players/${localPlayerId}/bankrupt`] = true;
-      up[`rooms/${currentRoomCode}/players/${localPlayerId}/money`] = 0;
-      
-      let logs = currentGameState.logs || [];
-      logs.push(`💀 ${player.name} has gone bankrupt and forfeited!`);
-      up[`rooms/${currentRoomCode}/logs`] = logs;
-
-      db.ref().update(up).then(() => {
-        broadcastFx('dread', '☠️', 'BANKRUPTCY DECLARED!', `${player.name} has run out of funds and is eliminated!`);
-        endTurn();
-      });
     }
 
     function promptEndAndTally() {
@@ -3226,23 +3447,30 @@
 
     function openRuleBookModal() {
       const rulesHtml = `
-        <div class="rule-section">
-          <div class="rule-title">🎯 Objective of the Game</div>
-          <div class="rule-text">The object of Monopoly is to become the wealthiest player through buying, renting, and trading real estate until opponents forfeit or the match is concluded by asset tally.</div>
+        <div class="rule-section" style="margin-bottom:12px;">
+          <div style="font-weight:900; color:#1f2937;">🎯 Objective of the Game</div>
+          <div style="font-size:0.82rem; color:#4b5563;">Become the wealthiest player through buying, renting, and trading real estate until opponents forfeit or the match is concluded by asset tally.</div>
         </div>
-        <div class="rule-section">
-          <div class="rule-title">🎲 Turn Sequence, Dice & Speeding</div>
-          <div class="rule-text">On your turn, roll both dice and move clockwise around the board. If you roll doubles, move, carry out the action, and roll again. Three consecutive doubles sends you directly to Jail!</div>
+        <div class="rule-section" style="margin-bottom:12px;">
+          <div style="font-weight:900; color:#1f2937;">🔒 Official Jail Rules</div>
+          <div style="font-size:0.82rem; color:#4b5563;">
+            • Just Visiting: Landing on Jail space naturally does not confine you.<br>
+            • Sent to Jail: 3 doubles, Go to Jail space, or card sends you inside.<br>
+            • Exiting: Use a card, pay $50 fine before rolling, or attempt doubles up to 3 turns.<br>
+            • 3rd Turn Rule: On your 3rd failed doubles roll, you MUST pay $50 and advance.<br>
+            • You collect full rent while in Jail.
+          </div>
         </div>
-        <div class="rule-section">
-          <div class="rule-title">🏠 Buying Properties & Monopolies</div>
-          <div class="rule-text">Landing on an unowned property gives you the right to purchase it at its listed price. Holding all properties of a single color group grants a Monopoly, doubling unimproved rent.</div>
+        <div class="rule-section" style="margin-bottom:12px;">
+          <div style="font-weight:900; color:#1f2937;">🏠 Building Evenly</div>
+          <div style="font-size:0.82rem; color:#4b5563;">You must own the complete color group before building. Houses must be erected evenly across the group.</div>
         </div>
       `;
       openModal("📖 Official Monopoly Rule Book", rulesHtml, [{ label: "Close Rules", action: closeModal }]);
     }
 
     function openModal(title, html, buttons = []) {
+      isModalOpen = true;
       document.getElementById('modal-title').innerText = title;
       document.getElementById('modal-content').innerHTML = html;
       const footer = document.getElementById('modal-actions');
@@ -3258,6 +3486,7 @@
     }
 
     function closeModal() {
+      isModalOpen = false;
       document.getElementById('app-modal').classList.remove('active');
     }
 
